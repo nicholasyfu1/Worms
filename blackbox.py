@@ -1,6 +1,8 @@
 """
 
-This is a program to run the behavior box
+
+
+It's Friday.
 
 Andrew Huynh '20
 Summer 2018
