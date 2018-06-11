@@ -91,6 +91,11 @@ class PageTwo(tk.Frame):
     """Allows run time selection"""
         
     runtime = 0 # initalize class runtime variable
+    
+    def cat():
+        update_idletasks()
+        controller.show_frame(PageThree)
+    cow = cat()
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -107,7 +112,7 @@ class PageTwo(tk.Frame):
         button1 = ttk.Button(self, text="Back to\nExperiment Selection", command=lambda: controller.show_frame(PageOne)) #create a button to return to experiment selection
         button1.grid(row=7, column= 0, rowspan=100, sticky="nsew")
         
-        button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frame(PageThree(PageTwo))) #create a button to exp selection
+        button2 = ttk.Button(self, text="Next", command=lambda: cow) #create a button to exp selection
         button2.grid(row=7, column= 6, columnspan=100, sticky="e")
         
         """Creates display for time inputed"""
@@ -148,14 +153,14 @@ class PageTwo(tk.Frame):
                 self.totaltime = currentnum + z
         self.totaltimetext.configure(text = "Run time:  %.5s" % self.totaltime)
         PageTwo.runtime = self.totaltime 
+        print(self.getruntime())
+    
+    def getruntime(self):
+        return PageTwo.runtime
 
 class PageThree(tk.Frame, PageTwo):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        PageTwo.__init__(self, runtime)
-        print("Made it")
-
-
         label = tk.Label(self, text="Select Experiment Type", font=LARGE_FONT) #create object
         label.grid(row=0, column=0, columnspan=100) #pack object into window
         
@@ -165,9 +170,11 @@ class PageThree(tk.Frame, PageTwo):
         button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frame(PageFour)) #create a button to exp selection
         button2.grid(row=7, column= 6, columnspan=100, sticky="e")
 
-        self.totaltimenumber = tk.Label(self, text = "", font=LARGE_FONT)
-        self.totaltimenumber.grid(row = 1, column = 0, sticky="w")
 
+        self.totaltimetext = tk.Label(self, text = "", font=LARGE_FONT) 
+        self.totaltimetext.grid(row = 1, column = 0, sticky="w")
+        self.totaltimetext.configure(text = "Yeet %s" % self.getruntime())
+   
 
 
 class PageTen(tk.Frame):
@@ -191,5 +198,4 @@ class PageTen(tk.Frame):
 app = BehaviorBox()
 app.geometry("1280x720")
 app.mainloop()
-
 
