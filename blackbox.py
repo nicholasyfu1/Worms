@@ -26,7 +26,7 @@ SMALL_FONT = ("Verdana", 8)
 
 
 
-class Experiment(self, expnumber):
+class Experiment():
 	
 	def __init__(self, expnumber):
 		self.expnumber = expnumber
@@ -40,6 +40,7 @@ class Experiment(self, expnumber):
 	def set_exptime(self, totaltime):
 		self.exptime = int(totaltime)
 	
+Appa = Experiment(str(40))
 
 class BehaviorBox(tk.Tk, Experiment):
 
@@ -75,9 +76,9 @@ class BehaviorBox(tk.Tk, Experiment):
         frame.tkraise() #raise to front
    
    #Save experiment number -> experiment type
-    def show_frameKappa(self, cont, userchoice):
+    def show_frameAlpha(self, cont, usernumchoice):
         frame = self.frames[cont]
-        Appa = Experiment(userchoice) #create experiment object
+        Appa = Experiment(usernumchoice) #create experiment object
         frame.tkraise() #raise to front
     
     #Save experiment type -> experiment time
@@ -86,20 +87,14 @@ class BehaviorBox(tk.Tk, Experiment):
         Appa.set_type(userexpchoice) #set experiment object's type to user's choice
         frame.tkraise() #raise to front
     
-    #Save time choice -> instruct user to insert worm
+    #Save time choice -> confirmation
     def show_frameCharlie(self, cont, usertimechoice):
         frame = self.frames[cont]
         Appa.set_exptime(usertimechoice) #set experiment object's time to user's choice
         frame.tkraise() #raise to front
-
-    #instruct user to insert stimuli
-    def show_frame2to3(self, cont, number):
-        frame = self.frames[cont]
-        #camera.start_preview(fullscreen=false, window(0,0,500,500))
-        frame.tkraise() #raise to front
-    
-    #Begin imaging
-    def show_frame3to4(self, cont, expnumber, runtime):
+  
+    #stim prep -> start imaging
+    def show_frameDelta(self, cont, expnumber, runtime):
         frame = self.frames[cont]
         savetofile = "/home/pi/Desktop/Exp" + str(expnumber)
 	ticker = 0
@@ -137,7 +132,7 @@ class StartPage(tk.Frame):
         button2 = ttk.Button(self, text="Data Retrieval", command=lambda: controller.show_frame(PageTen)) #create a button to start a new experiment 
         button2.pack()
 
-class ExpNum(tk.Frame, Experiment):
+class ExpNumPg(tk.Frame, Experiment):
 
     """Gets user input for experiment number for name file todo: check to see if expnum taken"""
         
@@ -152,10 +147,10 @@ class ExpNum(tk.Frame, Experiment):
         self.grid_rowconfigure(4, minsize=20) 
 
 
-        button1 = ttk.Button(self, text="Back to\nMain Menu", command=lambda: controller.show_frame(StartPage)) #create a button to return to experiment selection
+        button1 = ttk.Button(self, text="Back to\nMain Menu", command=lambda: controller.show_frame(StartPage)) #create a button to return to main menu
         button1.grid(row=7, column= 0, rowspan=100, sticky="nsew")
         
-        button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frameKappa(ExpSelPg, self.usernumchoice)) #create a button to InsertPg
+        button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frameAlpha(ExpSelPg, self.usernumchoice)) #create a button to experiment type
         button2.grid(row=7, column= 6, columnspan=100, sticky="e")
         
         """Creates display for number inputed"""
@@ -214,16 +209,16 @@ class ExpSelPg(tk.Frame, Experiment):
         button2.grid(row=7, column= 10, sticky="e")
 
         
-        button3 = ttk.Button(self, text="Thermotaxis", command=lambda: exptype("t")) #create a button to thermotaxis
+        button3 = ttk.Button(self, text="Thermotaxis", command=lambda b = "t": exptype(b)) #create a button to thermotaxis
         button3.grid(row=2, column= 3, sticky="nsew")
         
-        button4 = ttk.Button(self, text="Phototaxis", command=lambda: exptype("p")) #create a button to phototaxis
+        button4 = ttk.Button(self, text="Phototaxis", command=lambda b = "p": exptype(b)) #create a button to phototaxis
         button4.grid(row=3, column= 3, sticky="nsew")
         
-        button5 = ttk.Button(self, text="Chemotaxis", command=lambda: exptype("c")) #create a button to chemotaxis
+        button5 = ttk.Button(self, text="Chemotaxis", command=lambda b = "c": exptype(b)) #create a button to chemotaxis
         button5.grid(row=4, column= 3, sticky="nsew")
         
-        button6 = ttk.Button(self, text="None", command=lambda: exptype("n")) #create a button to control
+        button6 = ttk.Button(self, text="None", command=lambda b = "n": exptype(b)) #create a button to control
         button6.grid(row=5, column= 3, sticky="nsew")
         
         self.totaltimetext = tk.Label(self, text = "", font=LARGE_FONT) 
@@ -313,7 +308,7 @@ class ConfirmPg(tk.Frame, Experiment):
 	
 	""" Displays chosen parameters for user to confirm"""
 	def __init__(self, parent, controller):
-		tk.Frame.__init__(self, parent)
+		tk.Frame.__init__(self, parent) 
         	label1 = tk.Label(self, text="Chosen Parameters", font=LARGE_FONT) #create object
         	label1.grid(row=0, column=5, columnspan=100) #grid object into window
         
@@ -327,7 +322,7 @@ class ConfirmPg(tk.Frame, Experiment):
         	button1 = ttk.Button(self, text="Back to\nRun time", command=lambda: controller.show_frame(TimeSelPg)) #create a button to return to run time
         	button1.grid(row=7, column= 0, sticky="w")
         
-        	button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frame3to4(StimPrepPg)) #prepstimuli
+        	button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frame(StimPrepPg)) #prepstimuli
         	button2.grid(row=7, column= 10, sticky="e")
 
         def label2confirm(self, number):
@@ -355,19 +350,15 @@ class InsertPg(tk.Frame):
         button1 = ttk.Button(self, text="Back to\nConfirmation Page", command=lambda: controller.show_frame(ConfirmPg)) #create a button to return to run time
         button1.grid(row=7, column= 0, sticky="w")
         
-        button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frame3to4(StimPrepPg)) #prepstimuli
+        button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frame(StimPrepPg)) #prepstimuli
         button2.grid(row=7, column= 10, sticky="e")
         
         self.totaltimetext = tk.Label(self, text = "", font=LARGE_FONT) 
         self.totaltimetext.grid(row = 1, column = 0, sticky="w")
     
-    #todo impliment preview window
-    
-    def hiding(self, number):
-        if number != 0:
-            self.totaltimetext.configure(text = "Exp time: " + str(number))
+
         
-class StimPrepPg(tk.Frame, ExpSelPg):
+class StimPrepPg(tk.Frame):
     """
     Prepare stimuli
     expchoice from ExpSelPg
@@ -381,14 +372,15 @@ class StimPrepPg(tk.Frame, ExpSelPg):
     """
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        
-        label = tk.Label(self, text="", font=LARGE_FONT) #create object
-        label.grid(row=0, column=5, columnspan=100) #grid object into window
-        if expchoice == 0 or 3:
+        label1 = tk.Label(self, text="", font=LARGE_FONT) #create object
+        label1.grid(row=0, column=5, columnspan=100) #grid object into window
+        if Appa.exptype == 0 or 3:
         	words = "Ready"
-        elif expchoice == 1 or 2:
+        elif Appa.exptype == 1 or 2:
         	words = "Prepare/Insert Stimuli"
-        self.label.configure(text = words)
+        else:
+        	words = "guciiiiiii"
+        label1.configure(text = words)
         
         label2 = tk.Label(self, text="Press 'Start' to begin experiment", font=LARGE_FONT) #create object
         label2.grid(row=3, column=5, columnspan=100) #grid object into window
@@ -397,16 +389,19 @@ class StimPrepPg(tk.Frame, ExpSelPg):
         button1 = ttk.Button(self, text="Back to\nInsert Worms", command=lambda: controller.show_frame(InsertPg)) #create a button to return to InsertPg
         button1.grid(row=7, column= 0, sticky="w")
         
-        button2 = ttk.Button(self, text="Start", command=lambda: controller.show_frame4to5(StimPrepPg)) #prepstimuli
+        button2 = ttk.Button(self, text="Start", command=lambda: controller.show_frameDelta(StimPrepPg)) #Start Experiment
         button2.grid(row=7, column= 10, sticky="e")
 
-class ExpRunPg(tk.Frame, ExpSelPg, TimeSelPg """, ExpNamePg"""):
+class ExpRunPg(tk.Frame, ExpSelPg, TimeSelPg, ExpNumPg):
     """
     Experiment capture
     
-    totaltime from TimeSelPg
     
-    expchoice from ExpSelPg
+    usernumchoice from ExpNumPg
+    totaltime from TimeSelPg
+    userexpchoice from ExpSelPg
+    
+    
     check expchoice to see if need to turn on light
     
     none = 0
