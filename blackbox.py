@@ -16,9 +16,8 @@ from time import *
 
 
 LARGE_FONT = ("Verdana", 12)
-
-
-
+def printer(parm):
+    print(parm) #create a button to exp selection
 
 class BehaviorBox(tk.Tk):
 
@@ -51,6 +50,11 @@ class BehaviorBox(tk.Tk):
     def show_frame(self, cont):
 
         frame = self.frames[cont]
+        frame.tkraise() #raise to front
+        
+    def show_frame2(self, cont, number):
+        frame = self.frames[cont]
+        frame.hiding(number)
         frame.tkraise() #raise to front
 
 
@@ -92,10 +96,7 @@ class PageTwo(tk.Frame):
         
     runtime = 0 # initalize class runtime variable
     
-    def cat():
-        update_idletasks()
-        controller.show_frame(PageThree)
-    cow = cat()
+   
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -112,7 +113,7 @@ class PageTwo(tk.Frame):
         button1 = ttk.Button(self, text="Back to\nExperiment Selection", command=lambda: controller.show_frame(PageOne)) #create a button to return to experiment selection
         button1.grid(row=7, column= 0, rowspan=100, sticky="nsew")
         
-        button2 = ttk.Button(self, text="Next", command=lambda: cow) #create a button to exp selection
+        button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frame2(PageThree, self.totaltime)) #create a button to exp selection
         button2.grid(row=7, column= 6, columnspan=100, sticky="e")
         
         """Creates display for time inputed"""
@@ -153,7 +154,6 @@ class PageTwo(tk.Frame):
                 self.totaltime = currentnum + z
         self.totaltimetext.configure(text = "Run time:  %.5s" % self.totaltime)
         PageTwo.runtime = self.totaltime 
-        print(self.getruntime())
     
     def getruntime(self):
         return PageTwo.runtime
@@ -169,12 +169,18 @@ class PageThree(tk.Frame, PageTwo):
         
         button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frame(PageFour)) #create a button to exp selection
         button2.grid(row=7, column= 6, columnspan=100, sticky="e")
-
-
+        
+        button3 = ttk.Button(self, text="Next", command=lambda: printer(self.runtime))
+        button3.grid(row=10, column= 6, columnspan=100, sticky="e")
+        
         self.totaltimetext = tk.Label(self, text = "", font=LARGE_FONT) 
         self.totaltimetext.grid(row = 1, column = 0, sticky="w")
-        self.totaltimetext.configure(text = "Yeet %s" % self.getruntime())
-   
+    
+    def hiding(self, number):
+        if number != 0:
+            self.totaltimetext.configure(text = "Yeet" + str(number))
+        
+        
 
 
 class PageTen(tk.Frame):
