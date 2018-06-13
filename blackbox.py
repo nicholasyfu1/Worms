@@ -11,7 +11,7 @@ except ImportError:
     import tkinter as tk
 
 
-import ttk
+import ttk as ttk
 import tkMessageBox
 import os
 from time import *
@@ -204,26 +204,37 @@ class ExpSelPg(tk.Frame, Experiment):
         label = tk.Label(self, text="Select Experiment Type", font=LARGE_FONT) #create object
         label.grid(row=0, column=0, columnspan=100) #pack object into window
         
+        self.userexpchoice = str()
         
-        button1 = ttk.Button(self, text="Back to\nMain Menu", command=lambda: controller.show_frame(StartPage)) #create a button to return to run time
+	button1 = ttk.Button(self, text="Back to\nMain Menu", command=lambda: controller.show_frame(StartPage)) #create a button to return to run time
         button1.grid(row=7, column= 0, sticky="w")
         
         button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frameBravo(TimeSelPg, self.userexpchoice)) #create a button to time entry
         button2.grid(row=7, column= 10, sticky="e")
 
+        nonebutton = ttk.Radiobutton(parent, text="None", variable = self.userexpchoice, value = 0)
+        thermobutton = ttk.Radiobutton(parent, text="Thermotaxis", variable = self.userexpchoice, value = 1)
+        chemobutton = ttk.Radiobutton(parent, text="Chemotaxis", variable = self.userexpchoice, value = 2)
+        photobutton = ttk.Radiobutton(parent, text="Photootaxis", variable = self.userexpchoice, value = 3)
+	
+	nonebutton.grid(row=2, column= 3, sticky="nsew")
+        thermobutton.grid(row=3, column= 3, sticky="nsew")
+        chemobutton.grid(row=4, column= 3, sticky="nsew")
+        photobutton.grid(row=5, column= 3, sticky="nsew")
         
-        button3 = ttk.Button(self, text="Thermotaxis", command=lambda b = "t": self.exptype(b)) #create a button to thermotaxis
-        button3.grid(row=2, column= 3, sticky="nsew")
+        """
+        self.button3 = ttk.Button(self, text="Thermotaxis", command=lambda b = "t": self.exptype(b)) #create a button to thermotaxis
+        self.button3.grid(row=2, column= 3, sticky="nsew")
         
-        button4 = ttk.Button(self, text="Phototaxis", command=lambda b = "p": self.exptype(b)) #create a button to phototaxis
-        button4.grid(row=3, column= 3, sticky="nsew")
+        self.button4 = ttk.Button(self, text="Phototaxis", command=lambda b = "p": self.exptype(b)) #create a button to phototaxis
+        self.button4.grid(row=3, column= 3, sticky="nsew")
         
-        button5 = ttk.Button(self, text="Chemotaxis", command=lambda b = "c": self.exptype(b)) #create a button to chemotaxis
-        button5.grid(row=4, column= 3, sticky="nsew")
+        self.button5 = ttk.Button(self, text="Chemotaxis", command=lambda b = "c": self.exptype(b)) #create a button to chemotaxis
+        self.button5.grid(row=4, column= 3, sticky="nsew")
         
-        button6 = ttk.Button(self, text="None", command=lambda b = "n": self.exptype(b)) #create a button to control
-        button6.grid(row=5, column= 3, sticky="nsew")
-        
+        self.button6 = ttk.Button(self, text="None", command=lambda b = "n": self.exptype(b)) #create a button to control
+        self.button6.grid(row=5, column= 3, sticky="nsew")
+        """
         self.totaltimetext = tk.Label(self, text = "", font=LARGE_FONT) 
         self.totaltimetext.grid(row = 1, column = 0, sticky="w")
    

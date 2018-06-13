@@ -8,31 +8,89 @@ Behavior Box project
 This code is for if the user selects themotaxis or chemotaxis
 
 """
+# The code for changing pages was derived from: http://stackoverflow.com/questions/7546050/switch-between-two-frames-in-tkinter
+# License: http://creativecommons.org/licenses/by-sa/3.0/	
 
-from time import *
-from picamera import PiCamera
-import os
-
-
-capturerate = 5
-runtime = 15
-expnumber = 59
-camera = PiCamera()
-savetofile = "/home/pi/Desktop/Exp" + str(expnumber)
-while True:
-    if not os.path.exists(savetofile):
-        os.makedirs(savetofile)
-        break
-    else: #duplicated file
-        savetofile = savetofile + "(1)"
-camera.start_preview(fullscreen=False, window=(0,0,1000,1000))
-sleep(2)
-#frame.tkraise() #raise to front
-for i in range(int(runtime/capturerate+1)):
-    camera.capture("/home/pi/Desktop/Exp" + str(expnumber) + "/image" + str(i) + ".jpg")
-    print("hit %i" % i)
-    if i != int(runtime/capturerate):
-       	sleep(capturerate)
+import Tkinter as tk
+import ttk
 
 
-camera.stop_preview()
+LARGE_FONT= ("Verdana", 12)
+
+
+class SeaofBTCapp(tk.Tk):
+
+    def __init__(self, *args, **kwargs):
+        
+        tk.Tk.__init__(self, *args, **kwargs)
+
+    
+        tk.Tk.wm_title(self, "Sea of BTC Client")
+
+        container = tk.Frame(self)
+        container.pack(side="top", fill="both", expand = True)
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
+
+        self.frames = {}
+
+        for F in (StartPage, PageOne, PageTwo):
+
+            frame = F(container, self)
+            self.frames[F] = frame
+            frame.grid(row=0, column=0, sticky="nsew")
+
+        self.show_frame(StartPage)
+
+    def show_frame(self, cont):
+
+        frame = self.frames[cont]
+        frame.tkraise()
+
+        
+class StartPage(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self,parent)
+        
+ 
+	phone = str()
+	home = ttk.Radiobutton(parent, text='Home', variable=phone, value='home')
+	office = ttk.Radiobutton(parent, text='Office', variable=phone, value='office')
+	home.grid(row=10)
+	office.grid(row=1)
+class PageOne(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = ttk.Label(self, text="Page One!!!", font=LARGE_FONT)
+        label.pack(pady=10,padx=10)
+
+        button1 = ttk.Button(self, text="Back to Home",
+                            command=lambda: controller.show_frame(StartPage))
+        button1.pack()
+
+        button2 = ttk.Button(self, text="Page Two",
+                            command=lambda: controller.show_frame(PageTwo))
+        button2.pack()
+
+
+class PageTwo(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = ttk.Label(self, text="Page Two!!!", font=LARGE_FONT)
+        label.pack(pady=10,padx=10)
+
+        button1 = ttk.Button(self, text="Back to Home",
+                            command=lambda: controller.show_frame(StartPage))
+        button1.pack()
+
+        button2 = ttk.Button(self, text="Page One",
+                            command=lambda: controller.show_frame(PageOne))
+        button2.pack()
+        
+
+
+app = SeaofBTCapp()
+app.mainloop()
