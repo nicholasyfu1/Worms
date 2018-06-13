@@ -66,7 +66,7 @@ class BehaviorBox(tk.Tk, Experiment):
 
         self.frames = {}
         
-        for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpRunPg, PageTen):
+        for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTen):
 
             frame = F(container, self)
 
@@ -102,8 +102,14 @@ class BehaviorBox(tk.Tk, Experiment):
 	frame.label4confirm(Appa.exptime)
         frame.tkraise() #raise to front
   
+  #conformation -> stim prep
+    def show_frameDelta(self, cont):
+        frame = self.frames[cont]
+        frame.gettext()
+        frame.tkraise() #raise to front
+        
     #stim prep -> start imaging
-    def show_frameDelta(self, cont,):
+    def show_frameEcho(self, cont,):
         frame = self.frames[cont]
         savetofile = "/home/pi/Desktop/Exp" + str(Appa.expnumber)
 	ticker = 0
@@ -117,7 +123,7 @@ class BehaviorBox(tk.Tk, Experiment):
 	camera.start_preview(fullscreen=False, window=(0,0,1000,1000))
 	sleep(2)
 	
-	#frame.tkraise() #raise to front
+	frame.tkraise() #raise to front
 	
 	#Image capturing
 	for i in range(int(Appa.exptime/Appa.capturerate+1)):
@@ -229,41 +235,8 @@ class ExpSelPg(tk.Frame, Experiment):
         chemobutton.grid(row=4, column= 3, sticky="nsew")
         photobutton.grid(row=5, column= 3, sticky="nsew")
         
-    def qfb(self, ExpOptionChosen):
+    def qfb(self, ExpOptionChosen): #stores the selection
         self.userexpchoice = str(ExpOptionChosen)
-        
-        """
-        self.button3 = ttk.Button(self, text="Thermotaxis", command=lambda b = "t": self.exptype(b)) #create a button to thermotaxis
-        self.button3.grid(row=2, column= 3, sticky="nsew")
-        
-        self.button4 = ttk.Button(self, text="Phototaxis", command=lambda b = "p": self.exptype(b)) #create a button to phototaxis
-        self.button4.grid(row=3, column= 3, sticky="nsew")
-        
-        self.button5 = ttk.Button(self, text="Chemotaxis", command=lambda b = "c": self.exptype(b)) #create a button to chemotaxis
-        self.button5.grid(row=4, column= 3, sticky="nsew")
-        
-        self.button6 = ttk.Button(self, text="None", command=lambda b = "n": self.exptype(b)) #create a button to control
-        self.button6.grid(row=5, column= 3, sticky="nsew")
-        """
-        self.totaltimetext = tk.Label(self, text = "", font=LARGE_FONT) 
-        self.totaltimetext.grid(row = 1, column = 0, sticky="w")
-
-    # function to store exp type
-    def exptype(self, expchoice):
-    	if expchoice == "n":
-    		self.userexpchoice = 0
-    		self.button6.config(relief=SUNKEN)
-    	elif expchoice == "t":
-    		self.userexpchoice = 1
-    		self.button3.config(relief=SUNKEN)
-    	elif expchoice == "c":
-    		self.userexpchoice = 2
-    		self.button5.config(relief=SUNKEN)
-    	elif expchoice == "p":
-    		self.userexpchoice = 3
-    		self.button4.config(relief=SUNKEN)
-
-    
 
 
 
@@ -395,7 +368,7 @@ class InsertPg(tk.Frame):
         button1 = ttk.Button(self, text="Back to\nConfirmation Page", command=lambda: controller.show_frame(ConfirmPg)) #create a button to return to run time
         button1.grid(row=7, column= 0, sticky="w")
         
-        button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frame(StimPrepPg)) #prepstimuli
+        button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frameDelta(StimPrepPg)) #prepstimuli
         button2.grid(row=7, column= 10, sticky="e")
         
         self.totaltimetext = tk.Label(self, text = "", font=LARGE_FONT) 
@@ -405,27 +378,18 @@ class InsertPg(tk.Frame):
         
 class StimPrepPg(tk.Frame):
     """
-    Prepare stimuli
-    expchoice from ExpSelPg
+    Instruct students to prepare stimuli
     
     check expchoice to see if need to insert stimuli
+    Key: 0 = none; 1 = thermo; 2 = chemo; 3 = photo     
     
-    none = 0
-    ther = 1
-    chem = 2
-    photo = 3
     """
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label1 = tk.Label(self, text="", font=LARGE_FONT) #create object
-        label1.grid(row=0, column=5, columnspan=100) #grid object into window
-        if Appa.exptype == 0 or 3:
-        	words = "Ready"
-        elif Appa.exptype == 1 or 2:
-        	words = "Prepare/Insert Stimuli"
-        else:
-        	words = "guciiiiiii"
-        label1.configure(text = words)
+        self.label1 = tk.Label(self, text="", font=LARGE_FONT) #create object
+        self.label1.grid(row=0, column=5, columnspan=100) #grid object into window
+    
+
         
         label2 = tk.Label(self, text="Press 'Start' to begin experiment", font=LARGE_FONT) #create object
         label2.grid(row=3, column=5, columnspan=100) #grid object into window
@@ -434,17 +398,26 @@ class StimPrepPg(tk.Frame):
         button1 = ttk.Button(self, text="Back to\nInsert Worms", command=lambda: controller.show_frame(InsertPg)) #create a button to return to InsertPg
         button1.grid(row=7, column= 0, sticky="w")
         
-        button2 = ttk.Button(self, text="Start", command=lambda: controller.show_frameDelta(ExpRunPg)) #Start Experiment
+        button2 = ttk.Button(self, text="Start", command=lambda: controller.show_frameEcho(ExpFinishPg)) #Start Experiment and raise experiment finished page
         button2.grid(row=7, column= 10, sticky="e")
+    #Key: 0 = none; 1 = thermo; 2 = chemo; 3 = photo       
+    def gettext(self):
+        if Appa.exptype == "0" or Appa.exptype == "3":
+        	words = "Ready"
+        elif Appa.exptype == "1" or Appa.exptype == "2":
+        	words = "Prepare/Insert Stimuli"
+        else:
+        	words = "guciiiiiii"
+        self.label1.configure(text = words)
 
-class ExpRunPg(tk.Frame, ExpSelPg, TimeSelPg, ExpNumPg):
+class ExpFinishPg(tk.Frame):
     """
     Experiment capture
+    Allow user to go directly into data analysis or return to main menu
     
-    
-    usernumchoice from ExpNumPg
-    totaltime from TimeSelPg
-    userexpchoice from ExpSelPg
+    Appa.expnumber
+    Appa.exptype
+    Appa.exptime
     
     
     check expchoice to see if need to turn on light
@@ -456,8 +429,15 @@ class ExpRunPg(tk.Frame, ExpSelPg, TimeSelPg, ExpNumPg):
     """
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Experiment running", font=LARGE_FONT) #create object
-        label.grid(row=0, column=5, columnspan=100) #grid object into window
+        label = tk.Label(self, text="Experiment Finished", font=LARGE_FONT) #create object
+        label.pack()
+        #label.grid(row=0, column=5, columnspan=100) #grid object into window
+        
+    	button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frame(ExpNumPg)) #create a button to start a new experiment       
+    	button1.pack()
+
+        button2 = ttk.Button(self, text="Data Retrieval", command=lambda: controller.show_frame(PageTen)) #create a button to start a new experiment 
+        button2.pack()
     
 
 class PageTen(tk.Frame):
