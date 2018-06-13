@@ -55,14 +55,22 @@ class StartPage(tk.Frame):
         tk.Frame.__init__(self,parent)
         
  	
-	phone = str()
-	self.home = ttk.Radiobutton(parent, text='Home', variable=phone, value='1', command = lambda: self.qf(phone))
-	self.office = ttk.Radiobutton(parent, text='Office', variable=phone, value='office')
-	self.home.grid(row=10)
-	self.office.grid(row=1)
+	self.phone = int(3)
+	home = ttk.Radiobutton(parent, text='Home', variable=self.phone, value= 1, command = lambda: self.selected(home.value))
+	office = ttk.Radiobutton(parent, text='Office', variable=self.phone, value= 2, command = lambda: self.selected(office.value))
+	home.grid(row=10)
+	office.grid(row=1)
 	
-    def qf(self, text):
-        print(self.home.text)
+    def selected(self, value):
+        self.phone.set(value)
+        if self.phone == 3:
+        	print ("It initalized")
+	elif self.phone == "":
+		print("Still empty")
+	elif self.phone == 1:
+		print("You made it")
+	elif self.phone == 2:
+		print("Heyyy it worked")
 class PageOne(tk.Frame):
 
     def __init__(self, parent, controller):

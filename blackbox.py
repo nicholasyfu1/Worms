@@ -219,15 +219,18 @@ class ExpSelPg(tk.Frame, Experiment):
         button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frameBravo(TimeSelPg, self.userexpchoice)) #create a button to time entry
         button2.grid(row=7, column= 10, sticky="e")
 
-        nonebutton = ttk.Radiobutton(self, text="None", variable = self.userexpchoice, value = 0) #indicatoron = 0)
-        thermobutton = ttk.Radiobutton(self, text="Thermotaxis", variable = self.userexpchoice, value = 1) #indicatoron = 0)
-        chemobutton = ttk.Radiobutton(self, text="Chemotaxis", variable = self.userexpchoice, value = 2) #indicatoron = 0)
-        photobutton = ttk.Radiobutton(self, text="Photootaxis", variable = self.userexpchoice, value = 3) #indicatoron = 0)
+        nonebutton = ttk.Radiobutton(self, text="None", variable = "ExpOption", value = 0, command = lambda: self.qfb(0)) #indicatoron = 0)
+        thermobutton = ttk.Radiobutton(self, text="Thermotaxis", variable = "ExpOption", value = 1, command = lambda: self.qfb(1)) #indicatoron = 0)
+        chemobutton = ttk.Radiobutton(self, text="Chemotaxis", variable = "ExpOption", value = 2, command = lambda: self.qfb(2)) #indicatoron = 0)
+        photobutton = ttk.Radiobutton(self, text="Phototaxis", variable = "ExpOption", value = 3, command = lambda: self.qfb(3)) #indicatoron = 0)
 	
 	nonebutton.grid(row=2, column= 3, sticky="nsew")
         thermobutton.grid(row=3, column= 3, sticky="nsew")
         chemobutton.grid(row=4, column= 3, sticky="nsew")
         photobutton.grid(row=5, column= 3, sticky="nsew")
+        
+    def qfb(self, ExpOptionChosen):
+        self.userexpchoice = str(ExpOptionChosen)
         
         """
         self.button3 = ttk.Button(self, text="Thermotaxis", command=lambda b = "t": self.exptype(b)) #create a button to thermotaxis
@@ -359,13 +362,13 @@ class ConfirmPg(tk.Frame, Experiment):
 
         def label3confirm(self, exptype):
 	    	words = str()
-	    	if exptype == 0:
+	    	if exptype == "0":
     			words = "None"
-    		elif exptype == 1:
+    		elif exptype == "1":
     			words = "Thermotaxis"
-		elif exptype == 2:
+		elif exptype == "2":
     			words = "Chemotaxis"
-		elif exptype == 3:
+		elif exptype == "3":
 			words = "Phototaxis"
 		else:
 			print(exptype)
