@@ -47,18 +47,22 @@ class SeaofBTCapp(tk.Tk):
         frame = self.frames[cont]
         frame.tkraise()
 
+
         
 class StartPage(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
         
- 
+ 	
 	phone = str()
-	home = ttk.Radiobutton(parent, text='Home', variable=phone, value='home')
-	office = ttk.Radiobutton(parent, text='Office', variable=phone, value='office')
-	home.grid(row=10)
-	office.grid(row=1)
+	self.home = ttk.Radiobutton(parent, text='Home', variable=phone, value='1', command = lambda: self.qf(phone))
+	self.office = ttk.Radiobutton(parent, text='Office', variable=phone, value='office')
+	self.home.grid(row=10)
+	self.office.grid(row=1)
+	
+    def qf(self, text):
+        print(self.home.text)
 class PageOne(tk.Frame):
 
     def __init__(self, parent, controller):

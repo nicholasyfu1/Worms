@@ -10,8 +10,14 @@ try:
 except ImportError:
     import tkinter as tk
 
-
-import ttk as ttk
+try:
+	from Tkinter import *
+	import ttk
+except:
+	from tkinter import ttk
+	from tkinter import *
+	from tkinter.ttk import *
+#import ttk as ttk
 import tkMessageBox
 import os
 from time import *
@@ -204,7 +210,8 @@ class ExpSelPg(tk.Frame, Experiment):
         label = tk.Label(self, text="Select Experiment Type", font=LARGE_FONT) #create object
         label.grid(row=0, column=0, columnspan=100) #pack object into window
         
-        self.userexpchoice = str()
+        self.userexpchoice = int()
+        
         
 	button1 = ttk.Button(self, text="Back to\nMain Menu", command=lambda: controller.show_frame(StartPage)) #create a button to return to run time
         button1.grid(row=7, column= 0, sticky="w")
@@ -212,10 +219,10 @@ class ExpSelPg(tk.Frame, Experiment):
         button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frameBravo(TimeSelPg, self.userexpchoice)) #create a button to time entry
         button2.grid(row=7, column= 10, sticky="e")
 
-        nonebutton = ttk.Radiobutton(parent, text="None", variable = self.userexpchoice, value = 0)
-        thermobutton = ttk.Radiobutton(parent, text="Thermotaxis", variable = self.userexpchoice, value = 1)
-        chemobutton = ttk.Radiobutton(parent, text="Chemotaxis", variable = self.userexpchoice, value = 2)
-        photobutton = ttk.Radiobutton(parent, text="Photootaxis", variable = self.userexpchoice, value = 3)
+        nonebutton = ttk.Radiobutton(self, text="None", variable = self.userexpchoice, value = 0) #indicatoron = 0)
+        thermobutton = ttk.Radiobutton(self, text="Thermotaxis", variable = self.userexpchoice, value = 1) #indicatoron = 0)
+        chemobutton = ttk.Radiobutton(self, text="Chemotaxis", variable = self.userexpchoice, value = 2) #indicatoron = 0)
+        photobutton = ttk.Radiobutton(self, text="Photootaxis", variable = self.userexpchoice, value = 3) #indicatoron = 0)
 	
 	nonebutton.grid(row=2, column= 3, sticky="nsew")
         thermobutton.grid(row=3, column= 3, sticky="nsew")
@@ -237,7 +244,7 @@ class ExpSelPg(tk.Frame, Experiment):
         """
         self.totaltimetext = tk.Label(self, text = "", font=LARGE_FONT) 
         self.totaltimetext.grid(row = 1, column = 0, sticky="w")
-   
+
     # function to store exp type
     def exptype(self, expchoice):
     	if expchoice == "n":
@@ -329,8 +336,9 @@ class ConfirmPg(tk.Frame, Experiment):
 		tk.Frame.__init__(self, parent) 
         	self.label1 = tk.Label(self, text="Chosen Parameters", font=LARGE_FONT) #create object
         	self.label1.grid(row=0, column=5, columnspan=100) #grid object into window
-        
-        	self.label2 = tk.Label(self, text="awaw", font=SMALL_FONT) #create object
+        	
+        	
+        	self.label2 = tk.Label(self, text="", font=SMALL_FONT) #create object
         	self.label2.grid(row=2, column=5) #grid object into window
         
 		self.label3 = tk.Label(self, text="", font=SMALL_FONT) #create object
@@ -350,15 +358,18 @@ class ConfirmPg(tk.Frame, Experiment):
             self.label2.configure(text = "Experiment number:" + str(expnumber))
 
         def label3confirm(self, exptype):
-	    	
-	    	if exptype == "0":
+	    	words = str()
+	    	if exptype == 0:
     			words = "None"
-    		elif exptype == "1":
+    		elif exptype == 1:
     			words = "Thermotaxis"
-		elif exptype == "2":
+		elif exptype == 2:
     			words = "Chemotaxis"
-		elif exptype == "3":
+		elif exptype == 3:
 			words = "Phototaxis"
+		else:
+			print(exptype)
+			print(type(exptype))
             
 		self.label3.configure(text = "Experiment type: " + words)
             	
