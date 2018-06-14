@@ -22,11 +22,14 @@ import tkMessageBox
 import os
 from time import *
 from picamera import PiCamera
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
+
 import matplotlib
 matplotlib.use("TkAgg")
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 import numpy as np
 
@@ -88,6 +91,11 @@ class BehaviorBox(tk.Tk, Experiment):
 
         frame = self.frames[cont]
         frame.tkraise() #raise to front
+    def show_frameFish(self, cont):
+
+        frame = self.frames[cont]
+        #camera.start_preview(fullscreen=False, window=(250,0,1000,1000)) #this line starts the preview. TODO: insert coordinates and resize preview
+        frame.tkraise() #raise to front
    
    #Save experiment number -> experiment type
     def show_frameAlpha(self, cont, usernumchoice):
@@ -128,8 +136,8 @@ class BehaviorBox(tk.Tk, Experiment):
     		else: #duplicated file
 			ticker += 1
         		savetofile = savetofile + "(" + str(ticker) + ")"
-	camera.start_preview(fullscreen=False, window=(0,0,1000,1000))
-	sleep(2)
+	camera.start_preview(fullscreen=False, window=(250,0,1000,1000))
+	#sleep(.8)
 	
 	frame.tkraise() #raise to front
 	
@@ -335,7 +343,7 @@ class ConfirmPg(tk.Frame, Experiment):
         	button1 = ttk.Button(self, text="Back to\nRun time", command=lambda: controller.show_frame(TimeSelPg)) #create a button to return to run time
         	button1.grid(row=7, column= 0, sticky="w")
         
-        	button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frame(InsertPg)) #Insert worms
+        	button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frameFish(InsertPg)) #Insert worms
         	button2.grid(row=7, column= 10, sticky="e")
 
         def label2confirm(self, expnumber):
@@ -381,6 +389,9 @@ class InsertPg(tk.Frame):
         
         self.totaltimetext = tk.Label(self, text = "", font=LARGE_FONT) 
         self.totaltimetext.grid(row = 1, column = 0, sticky="w")
+        
+        #Live preview of worms being inserted
+	
     
 
         
@@ -467,10 +478,10 @@ class PageTest(tk.Frame):
 		a.imshow(img) #Renders image
 		
 		canvas = FigureCanvasTkAgg(f, self) #add canvas which is what we intend to render graph to and fill it with figure
-		canvas.show() #raise canvas
+		canvas.draw() #raise canvas
 		canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 		
-		toolbar = NavigationToolbar2TkAgg(canvas, self) #add traditionalmatplotlib toolbar
+		toolbar = NavigationToolbar2Tk(canvas, self) #add traditionalmatplotlib toolbar
 		toolbar.update()
 		canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 		
