@@ -22,6 +22,14 @@ import tkMessageBox
 import os
 from time import *
 from picamera import PiCamera
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.figure import Figure
+import numpy as np
+
 
 camera = PiCamera()
 
@@ -66,7 +74,7 @@ class BehaviorBox(tk.Tk, Experiment):
 
         self.frames = {}
         
-        for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTen):
+        for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTest, PageTen):
 
             frame = F(container, self)
 
@@ -436,9 +444,38 @@ class ExpFinishPg(tk.Frame):
     	button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frame(ExpNumPg)) #create a button to start a new experiment       
     	button1.pack()
 
-        button2 = ttk.Button(self, text="Data Retrieval", command=lambda: controller.show_frame(PageTen)) #create a button to start a new experiment 
+        button2 = ttk.Button(self, text="Review This\nExperiment's Data", command=lambda: controller.show_frame(PageTest)) #create a button to start a new experiment 
         button2.pack()
     
+class PageTest(tk.Frame):
+	
+	"""Data review page. Let's user choose whether or not to keep data"""
+	
+	def __init__(self, parent, controller):
+		tk.Frame.__init__(self, parent)
+		label = tk.Label(self, text = "Graph Page!", font=LARGE_FONT)
+		label.pack(pady=10, padx=10)
+		
+		button1 = ttk.Button(self,text="Back", command=lambda: controller.show_frame(ExpFinishPg))
+		button1.pack()
+		
+		
+		f = Figure(figsize = (5,5), dpi=100) #define figure
+		a = f.add_subplot(111) #add subplot RCP. Pth pos on grid with R rows and C columns
+		
+		img = mpimg.imread('/home/pi/Desktop/Exp10/image0.jpg') #read in image
+		a.imshow(img) #Renders image
+		
+		canvas = FigureCanvasTkAgg(f, self) #add canvas which is what we intend to render graph to and fill it with figure
+		canvas.show() #raise canvas
+		canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+		
+		toolbar = NavigationToolbar2TkAgg(canvas, self) #add traditionalmatplotlib toolbar
+		toolbar.update()
+		canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+		
+
+
 
 class PageTen(tk.Frame):
 
@@ -446,7 +483,7 @@ class PageTen(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Data Retrieval", font=LARGE_FONT) #create object
+        label = tk.Label(self, text="Data Review", font=LARGE_FONT) #create object
         label.pack(pady=10, padx=10) #pack object into window
         
         button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
