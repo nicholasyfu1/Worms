@@ -73,7 +73,7 @@ class StartPage(tk.Frame):
 
 		#add subplot with all images in folder 'PictureFolder'
 		#f = Figure(figsize = (20,8))#define figure
-		f = plt.figure(figsize = (20,8))#define figure
+		f = plt.figure(figsize = (20,40))#define figure
 		i=1
 		for picture in  os.listdir("/home/pi/Desktop/PictureFolder/"):
 			a = f.add_subplot(6,1,i) #add subplot RCP. Pth pos on grid with R rows and C columns
@@ -92,7 +92,7 @@ class StartPage(tk.Frame):
 		
 		#add canvas which is what we intend to render graph to and fill it with figure
 		canvas = FigureCanvasTkAgg(f, self) 
-		canvas.get_tk_widget().config(width=630, height=480)
+		canvas.get_tk_widget().config(width=630, height=960)
 		#canvas.get_tk_widget().grid_rowconfigure(1, minsize=200) 
 		#canvas.get_tk_widget().grid_columnconfigure(1, minsize=200) 
 		#frame2 = tk.Frame(canvas)
@@ -104,7 +104,7 @@ class StartPage(tk.Frame):
 		scrollbar = tk.Scrollbar(self)
 		scrollbar.config(command=canvas.get_tk_widget().yview)
 #		canvas.get_tk_widget().config(scrollregion=(canvas.get_tk_widget().bbox("all")))
-		canvas.get_tk_widget().config(scrollregion=(0,0,630,960))
+		canvas.get_tk_widget().config(scrollregion=(0,0,630,960*3))
 		scrollbar.grid(row=0, column=1, sticky="NS")
 		canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
 		

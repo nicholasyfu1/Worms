@@ -122,7 +122,8 @@ class BehaviorBox(tk.Tk, Experiment):
     #stim prep -> start imaging
     def show_frameEcho(self, cont,):
         frame = self.frames[cont]
-        savetofile = "/home/pi/Desktop/Exp" + str(Appa.expnumber)
+        savetofile = "/home/pi/Desktop/ExperimentFolder/Exp" + str(Appa.expnumber)
+
 	ticker = 0
 	while True:
     		if not os.path.exists(savetofile):
@@ -138,7 +139,7 @@ class BehaviorBox(tk.Tk, Experiment):
 	
 	#Image capturing
 	for i in range(int(Appa.exptime/Appa.capturerate+1)):
-    		camera.capture("/home/pi/Desktop/Exp" + str(Appa.expnumber) + "/image" + str(i) + ".jpg")
+    		camera.capture("/home/pi/Desktop/ExperimentFolder/Exp" + str(Appa.expnumber) + "/image" + str(i) + ".jpg")
 
 		if i != int(Appa.exptime/Appa.capturerate):
 			sleep(Appa.capturerate)
@@ -463,29 +464,37 @@ class PageTest(tk.Frame):
 		label.grid(row = 0, column=1, columnspan = 2, sticky="NSEW")
 		
 		button1 = ttk.Button(self,text="Back", command=lambda: controller.show_frame(ExpFinishPg))
-		button1.grid(row=1, column = 0)
+		button1.grid(row=1, column = 0, sticky="NS")
 		
+		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frame(StartPage)) #WAMBA
+		button2.grid(row=1, column = 4, sticky= "NS")
 
-		f = Figure(figsize = (8,8), dpi=100)#define figure		
+		button3 = ttk.Button(self,text="Keep", command=lambda: tkMessageBox.showwarning("Confirm Delete", "Are you sure you want \nto discard these data?")) #WAMBA
+		button3.grid(row=2, column = 4, sticky="NS")
+
+		f = Figure(figsize = (1,1))#define figure		
 		i=1
-		for picture in  os.listdir("/home/pi/Desktop/PictureFolder/"):
+		for picture in  os.listdir("/home/pi/Desktop/ExperimentFolder/PictureFolder"):
 			a = f.add_subplot(6,1,i) #add subplot RCP. Pth pos on grid with R rows and C columns
-			img = mpimg.imread("/home/pi/Desktop/PictureFolder/" + picture) #read in image
+			img = mpimg.imread("/home/pi/Desktop/ExperimentFolder/PictureFolder/" + picture) #read in image
+			a.xaxis.set_visible(False)
+			a.yaxis.set_visible(False)
 			a.imshow(img) #Renders image
 			i+=1
 			
 		#add canvas which is what we intend to render graph to and fill it with figure
 		canvas = FigureCanvasTkAgg(f, self) 
 		canvas.draw() #raise canvas
-		canvas.get_tk_widget().grid(row=1, column=1, sticky="NS") #Fill options: BOTH, X, Y Expand options:  
+		canvas.get_tk_widget().grid(row=1, column=1, rowspan = 3, sticky="NS") #Fill options: BOTH, X, Y Expand options:  
 
 
 		#Add scrollbar
 		scrollbar = tk.Scrollbar(self)
 		scrollbar.config(command=canvas.get_tk_widget().yview)
 #		canvas.get_tk_widget().config(scrollregion=(canvas.get_tk_widget().bbox("all")))
-		canvas.get_tk_widget().config(scrollregion=(0,0,100,400))
-		scrollbar.grid(row=0, column=3, sticky="NS", rowspan = 2)
+		canvas.get_tk_widget().config(width=630, height=400)
+		canvas.get_tk_widget().config(scrollregion=(0,0,630,720*3))
+		scrollbar.grid(row=1, column=3, sticky="NS", rowspan = 3)
 		canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
 
 class PageTen(tk.Frame):
@@ -499,20 +508,22 @@ class PageTen(tk.Frame):
         
         button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
         button1.pack()
-	
+	i=0
 	self.yeehaw = []
-	List1=Listbox(self)
-	for item in ["zero","one", "two" ]:
-		List1.insert(END, item)
+	List1=tk.Listbox(self)
+	for item in os.listdir("/home/pi/Desktop/ExperimentFolder/"):
+		List1.insert(i, item)
 		self.yeehaw.append(item)
+		i+=1
 	List1.pack()
 	b = ttk.Button(self, text="Selectionnn", command = lambda List1=List1: self.asdf(List1))
 	b.pack()
 
-    def asdf(self, List1):
+    #def asdf(self, List1):
 	#items = map(int, List1.curselection())
 	#print(self.yeehaw[int(items)])
 	#print(type(List1.curselection()[0]))
+	
 
 
 app = BehaviorBox()
