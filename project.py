@@ -15,13 +15,10 @@ try:
 except ImportError:
     import tkinter as tk
 
-try:
-	from Tkinter import *
-	import ttk
-except:
-	from tkinter import ttk
-	from tkinter import *
-	from tkinter.ttk import *
+
+import ttk
+
+
 
 import tkMessageBox
 import os
@@ -37,6 +34,8 @@ from matplotlib.figure import Figure
 import numpy as np
 
 LARGE_FONT = ("Verdana", 12)
+
+
 
 class Project(tk.Tk):
 
@@ -69,8 +68,8 @@ class StartPage(tk.Frame):
         
 	def __init__(self, parent, controller):
 		tk.Frame.__init__(self, parent)
-		label = tk.Label(self, text = "Figure Page!", font=LARGE_FONT)
-		label.pack(pady=10, padx=10)
+		#label = tk.Label(self, text = "Figure Page!", font=LARGE_FONT)
+		#label.pack(pady=10, padx=10)
 
 		#add subplot with all images in folder 'PictureFolder'
 		f = Figure(figsize = (8,8), dpi=100)#define figure		
@@ -85,22 +84,17 @@ class StartPage(tk.Frame):
 		canvas = FigureCanvasTkAgg(f, self) 
 		#frame2 = tk.Frame(canvas)
 		canvas.draw() #raise canvas
-		canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.X, expand=True) #Fill options: BOTH, X, Y Expand options:  
-		
-		#Add figure toolbar
-		toolbar = NavigationToolbar2Tk(canvas, self) #add traditionalmatplotlib toolbar
-		toolbar.update()
-		canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-		
+		canvas.get_tk_widget().grid(row=0, column=0, sticky="NS") #Fill options: BOTH, X, Y Expand options:  
+
 
 		#Add scrollbar
-		scrollbar = Scrollbar(canvas)
-		scrollbar.config(command=canvas.yview)
+		scrollbar = tk.Scrollbar(self)
+		scrollbar.config(command=canvas.get_tk_widget().yview)
+#		canvas.get_tk_widget().config(scrollregion=(canvas.get_tk_widget().bbox("all")))
+		canvas.get_tk_widget().config(scrollregion=(0,50,500,50))
+		scrollbar.grid(row=0, column=1, sticky="NS")
+		canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
 		
-		scrollbar.pack(side=RIGHT, fill = Y)
-		canvas.pack(side=LEFT, expand = YES, fill=BOTH)
-		
-		canvas.config(yscrollcommand=scrollbar.set)
 
 
 
@@ -110,4 +104,4 @@ app = Project()
 app.geometry("640x480")
 app.mainloop()
 
-mainloop()
+

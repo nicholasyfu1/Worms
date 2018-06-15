@@ -465,28 +465,33 @@ class PageTest(tk.Frame):
 	def __init__(self, parent, controller):
 		tk.Frame.__init__(self, parent)
 		label = tk.Label(self, text = "Graph Page!", font=LARGE_FONT)
-		label.pack(pady=10, padx=10)
+		label.grid(row = 0, column=1, columnspan = 2, sticky="NSEW")
 		
 		button1 = ttk.Button(self,text="Back", command=lambda: controller.show_frame(ExpFinishPg))
-		button1.pack()
+		button1.grid(row=1, column = 0)
 		
-		
-		f = Figure(figsize = (5,5), dpi=100) #define figure
-		a = f.add_subplot(111) #add subplot RCP. Pth pos on grid with R rows and C columns
-		
-		img = mpimg.imread('/home/pi/Desktop/Exp10/image0.jpg') #read in image
-		a.imshow(img) #Renders image
-		
-		canvas = FigureCanvasTkAgg(f, self) #add canvas which is what we intend to render graph to and fill it with figure
+
+		f = Figure(figsize = (8,8), dpi=100)#define figure		
+		i=1
+		for picture in  os.listdir("/home/pi/Desktop/PictureFolder/"):
+			a = f.add_subplot(6,1,i) #add subplot RCP. Pth pos on grid with R rows and C columns
+			img = mpimg.imread("/home/pi/Desktop/PictureFolder/" + picture) #read in image
+			a.imshow(img) #Renders image
+			i+=1
+			
+		#add canvas which is what we intend to render graph to and fill it with figure
+		canvas = FigureCanvasTkAgg(f, self) 
 		canvas.draw() #raise canvas
-		canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
-		
-		toolbar = NavigationToolbar2Tk(canvas, self) #add traditionalmatplotlib toolbar
-		toolbar.update()
-		canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-		
+		canvas.get_tk_widget().grid(row=1, column=1, sticky="NS") #Fill options: BOTH, X, Y Expand options:  
 
 
+		#Add scrollbar
+		scrollbar = tk.Scrollbar(self)
+		scrollbar.config(command=canvas.get_tk_widget().yview)
+#		canvas.get_tk_widget().config(scrollregion=(canvas.get_tk_widget().bbox("all")))
+		canvas.get_tk_widget().config(scrollregion=(0,0,100,400))
+		scrollbar.grid(row=0, column=3, sticky="NS", rowspan = 2)
+		canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
 
 class PageTen(tk.Frame):
 
@@ -499,14 +504,28 @@ class PageTen(tk.Frame):
         
         button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
         button1.pack()
+	
+	self.yeehaw = []
+	List1=Listbox(self)
+	for item in ["zero","one", "two" ]:
+		List1.insert(END, item)
+		self.yeehaw.append(item)
+	List1.pack()
+	b = ttk.Button(self, text="Selectionnn", command = lambda List1=List1: self.asdf(List1))
+	b.pack()
 
-
-
-
-
+    def asdf(self, List1):
+	#items = map(int, List1.curselection())
+	#print(self.yeehaw[int(items)])
+	#print(type(List1.curselection()[0]))
 
 
 app = BehaviorBox()
 app.geometry("1280x720")
 app.mainloop()
+
+
+
+
+
 
