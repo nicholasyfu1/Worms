@@ -9,15 +9,10 @@ try:
     import Tkinter as tk
 except ImportError:
     import tkinter as tk
+    
+import ttk
 
-try:
-	from Tkinter import *
-	import ttk
-except:
-	from tkinter import ttk
-	from tkinter import *
-	from tkinter.ttk import *
-#import ttk as ttk
+
 import tkMessageBox
 import os
 from time import *
@@ -29,7 +24,7 @@ matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import numpy as np
 

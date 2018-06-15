@@ -29,7 +29,7 @@ matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import numpy as np
 
@@ -72,16 +72,29 @@ class StartPage(tk.Frame):
 		#label.pack(pady=10, padx=10)
 
 		#add subplot with all images in folder 'PictureFolder'
-		f = Figure(figsize = (8,8), dpi=100)#define figure		
+		#f = Figure(figsize = (20,8))#define figure
+		f = plt.figure(figsize = (20,8))#define figure
 		i=1
 		for picture in  os.listdir("/home/pi/Desktop/PictureFolder/"):
 			a = f.add_subplot(6,1,i) #add subplot RCP. Pth pos on grid with R rows and C columns
 			img = mpimg.imread("/home/pi/Desktop/PictureFolder/" + picture) #read in image
+			a.xaxis.set_visible(False)
+			a.yaxis.set_visible(False)
+			"""
+			#a.axis("Off")
+			x0,x1=a.get_xlim()
+			y0,y1=a.get_ylim()
+			#a.set_aspect(abs(x1-x0)/abs(y1-y0))
+			a.set_aspect(2)
+			"""
 			a.imshow(img) #Renders image
 			i+=1
-			
+		
 		#add canvas which is what we intend to render graph to and fill it with figure
 		canvas = FigureCanvasTkAgg(f, self) 
+		canvas.get_tk_widget().config(width=630, height=480)
+		#canvas.get_tk_widget().grid_rowconfigure(1, minsize=200) 
+		#canvas.get_tk_widget().grid_columnconfigure(1, minsize=200) 
 		#frame2 = tk.Frame(canvas)
 		canvas.draw() #raise canvas
 		canvas.get_tk_widget().grid(row=0, column=0, sticky="NS") #Fill options: BOTH, X, Y Expand options:  
@@ -91,7 +104,7 @@ class StartPage(tk.Frame):
 		scrollbar = tk.Scrollbar(self)
 		scrollbar.config(command=canvas.get_tk_widget().yview)
 #		canvas.get_tk_widget().config(scrollregion=(canvas.get_tk_widget().bbox("all")))
-		canvas.get_tk_widget().config(scrollregion=(0,50,500,50))
+		canvas.get_tk_widget().config(scrollregion=(0,0,630,960))
 		scrollbar.grid(row=0, column=1, sticky="NS")
 		canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
 		
