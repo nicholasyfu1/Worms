@@ -44,8 +44,8 @@ class Experiment():
 		self.expnumber = expnumber
 		self.exptype = str()
 		self.exptime = int()
-		self.capturerate=5
 		self.savefile = str()
+		self.capturerate=5
 	def set_number(self, number):
 		self.expnumber = str(number)
 	def set_type(self, exptype):
@@ -56,7 +56,7 @@ class Experiment():
 		self.savefile = str(savetofile)
 	
 	
-Appa = Experiment(str(40))
+Appa = Experiment(str())
 
 class BehaviorBox(tk.Tk, Experiment):
 
@@ -87,34 +87,37 @@ class BehaviorBox(tk.Tk, Experiment):
         self.show_frame(StartPage)
 
     def show_frame(self, cont):
-
         frame = self.frames[cont]
-        frame.tkraise() #raise to front
-    def show_frameFish(self, cont):
-
-        frame = self.frames[cont]
-        #camera.start_preview(fullscreen=False, window=(250,0,1000,1000)) #this line starts the preview. TODO: insert coordinates and resize preview
-        frame.tkraise() #raise to front
-   
-   #Save experiment number -> experiment type. Also checks if expnumber is valid
-    def show_frameAlpha(self, cont, usernumchoice):
-        frame = self.frames[cont]
-        #Appa.set_number(usernumchoice) #create experiment object
         frame.tkraise() #raise to front
     
-    #Save experiment type -> experiment time
-    def show_frameBravo(self, cont, userexpchoice):
+    #Main menu -> new experiment. Resets all of Appa's values
+    def show_frameAlpha(self, cont):
+	Appa.expnumber = str()
+        Appa.exptype = str()
+	Appa.exptime = int()
+	Appa.savefile = str()
+	ExpNumPg.usernumchoice = str()
+	ExpNumPg.usernumtext.configure(text = "Experiment Number: %.5s" % ExpNumPg.usernumchoice)
+	print(ExpNumPg.usernumchoice)
+	ExpSelPg.userexpchoice = int()
+	TimeSelPg.totaltime = str()
         frame = self.frames[cont]
-        Appa.set_type(userexpchoice) #set experiment object's type to user's choice
+        frame.tkraise() #raise to front
+        print("HIHIHI")
+    
+    def show_frameFish(self, cont):
+        frame = self.frames[cont]
+        os.makedirs(Appa.savefile)
+        #camera.start_preview(fullscreen=False, window=(250,0,1000,1000)) #this line starts the preview. TODO: insert coordinates and resize preview
         frame.tkraise() #raise to front
     
     #Save time choice -> confirmation
-    def show_frameCharlie(self, cont, usertimechoice):
+    def show_frameCharlie(self, cont):
         frame = self.frames[cont]
-        Appa.set_exptime(usertimechoice) #set experiment object's time to user's choice
         frame.label2confirm(Appa.expnumber)
         frame.label3confirm(Appa.exptype)
 	frame.label4confirm(Appa.exptime)
+
         frame.tkraise() #raise to front
   
   #conformation -> stim prep
@@ -128,16 +131,6 @@ class BehaviorBox(tk.Tk, Experiment):
         frame = self.frames[cont]
         savetofile = "/home/pi/Desktop/ExperimentFolder/Exp" + str(Appa.expnumber)
 
-	"""
-	ticker = 0
-	while True:
-    		if not os.path.exists(savetofile):
-        		os.makedirs(savetofile)
-        		break
-    		else: #duplicated file
-			ticker += 1
-        		savetofile = savetofile + "(" + str(ticker) + ")"
-        """
 	camera.start_preview(fullscreen=False, window=(250,0,1000,1000))
 	#sleep(.8)
 	
@@ -159,7 +152,7 @@ class StartPage(tk.Frame):
         label = tk.Label(self, text="Start Page", font=LARGE_FONT) #create object
         label.pack(pady=10, padx=10) #pack object into window
 
-        button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frame(ExpNumPg)) #create a button to start a new experiment       
+        button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frameAlpha(ExpNumPg)) #create a button to start a new experiment       
         button1.pack()
 
         button2 = ttk.Button(self, text="Data Retrieval", command=lambda: controller.show_frame(PageTen)) #create a button to start a new experiment 
@@ -167,7 +160,7 @@ class StartPage(tk.Frame):
 
 class ExpNumPg(tk.Frame, Experiment):
 
-    """Gets user input for experiment number for name file todo: check to see if expnum taken"""
+    """Gets user input for experiment number for name file"""
         
 
     def __init__(self, parent, controller):
@@ -191,6 +184,7 @@ class ExpNumPg(tk.Frame, Experiment):
         self.usernumtext = tk.Label(self, text = "", font=LARGE_FONT) 
         self.usernumtext.grid(row = 1, column = 0, sticky="w")
         self.usernumtext.configure(text = "Experiment Number: %.5s" % self.usernumchoice)
+        print("yawww")
 
         """ Number Pad """
         btn_numbers = [ '7', '8', '9', '4', '5', '6', '1', '2', '3', ' ', '0', 'x'] #create list of numbers to be displayed
@@ -248,10 +242,10 @@ class ExpSelPg(tk.Frame, Experiment):
         self.userexpchoice = int()
         
         
-	button1 = ttk.Button(self, text="Back to\nMain Menu", command=lambda: controller.show_frame(StartPage)) #create a button to return to run time
+	button1 = ttk.Button(self, text="Back to\nExperiment Number", command=lambda: controller.show_frame(ExpNumPg)) #create a button to return to run time
         button1.grid(row=7, column= 0, sticky="w")
         
-        button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frameBravo(TimeSelPg, self.userexpchoice)) #create a button to time entry
+        button2 = ttk.Button(self, text="Next", command=lambda: self.checkchosenexp(parent, controller)) #create a button to time entry
         button2.grid(row=7, column= 10, sticky="e")
 
         nonebutton = ttk.Radiobutton(self, text="None", variable = "ExpOption", value = 0, command = lambda: self.qfb(0)) #indicatoron = 0)
@@ -266,7 +260,14 @@ class ExpSelPg(tk.Frame, Experiment):
         
     def qfb(self, ExpOptionChosen): #stores the selection
         self.userexpchoice = str(ExpOptionChosen)
-
+    def checkchosenexp(self, parent, controller):
+    	if self.userexpchoice == int():
+    		tkMessageBox.showwarning("Error", "Must select an experiment type")
+    	else:
+    		Appa.set_type(self.userexpchoice) #set experiment object's type to user's choice
+    		controller.show_frame(TimeSelPg)
+    		
+    	
 
 
 class TimeSelPg(tk.Frame):
@@ -292,7 +293,7 @@ class TimeSelPg(tk.Frame):
         button1 = ttk.Button(self, text="Back to\nExperiment Selection", command=lambda: controller.show_frame(ExpSelPg)) #create a button to return to experiment selection
         button1.grid(row=7, column= 0, rowspan=100, sticky="nsew")
         
-        button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frameCharlie(ConfirmPg, self.totaltime)) #create a button to InsertPg
+        button2 = ttk.Button(self, text="Next", command=lambda: self.checkvalidexptime(parent, controller)) #create a button to InsertPg
         button2.grid(row=7, column= 6, columnspan=100, sticky="e")
         
         """Creates display for time inputed"""
@@ -332,7 +333,12 @@ class TimeSelPg(tk.Frame):
             else:
                 self.totaltime = currentnum + z
         self.totaltimetext.configure(text = "Run time:  %.5s" % self.totaltime)
-
+    def checkvalidexptime(self, parent, controller):
+   	if len(self.totaltime) == 0: #user did not enter a number
+    		tkMessageBox.showwarning("Error", "Must enter an experiment duration")
+    	else:
+		Appa.set_exptime(self.totaltime) #create experiment object
+		controller.show_frameCharlie(ConfirmPg)
     
 class ConfirmPg(tk.Frame, Experiment):
 	
