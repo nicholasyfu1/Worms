@@ -45,12 +45,16 @@ class Experiment():
 		self.exptype = str()
 		self.exptime = int()
 		self.capturerate=5
+		self.savefile = str()
 	def set_number(self, number):
 		self.expnumber = str(number)
 	def set_type(self, exptype):
 		self.exptype = str(exptype)
 	def set_exptime(self, totaltime):
 		self.exptime = int(totaltime)
+	def set_savefile(self, savetofile):
+		self.savefile = str(savetofile)
+	
 	
 Appa = Experiment(str(40))
 
@@ -92,10 +96,10 @@ class BehaviorBox(tk.Tk, Experiment):
         #camera.start_preview(fullscreen=False, window=(250,0,1000,1000)) #this line starts the preview. TODO: insert coordinates and resize preview
         frame.tkraise() #raise to front
    
-   #Save experiment number -> experiment type
+   #Save experiment number -> experiment type. Also checks if expnumber is valid
     def show_frameAlpha(self, cont, usernumchoice):
         frame = self.frames[cont]
-        Appa.set_number(usernumchoice) #create experiment object
+        #Appa.set_number(usernumchoice) #create experiment object
         frame.tkraise() #raise to front
     
     #Save experiment type -> experiment time
@@ -124,6 +128,7 @@ class BehaviorBox(tk.Tk, Experiment):
         frame = self.frames[cont]
         savetofile = "/home/pi/Desktop/ExperimentFolder/Exp" + str(Appa.expnumber)
 
+	"""
 	ticker = 0
 	while True:
     		if not os.path.exists(savetofile):
@@ -132,6 +137,7 @@ class BehaviorBox(tk.Tk, Experiment):
     		else: #duplicated file
 			ticker += 1
         		savetofile = savetofile + "(" + str(ticker) + ")"
+        """
 	camera.start_preview(fullscreen=False, window=(250,0,1000,1000))
 	#sleep(.8)
 	
@@ -139,7 +145,7 @@ class BehaviorBox(tk.Tk, Experiment):
 	
 	#Image capturing
 	for i in range(int(Appa.exptime/Appa.capturerate+1)):
-    		camera.capture("/home/pi/Desktop/ExperimentFolder/Exp" + str(Appa.expnumber) + "/image" + str(i) + ".jpg")
+    		camera.capture(Appa.savefile + "/image" + str(i) + ".jpg")
 
 		if i != int(Appa.exptime/Appa.capturerate):
 			sleep(Appa.capturerate)
@@ -178,7 +184,7 @@ class ExpNumPg(tk.Frame, Experiment):
         button1 = ttk.Button(self, text="Back to\nMain Menu", command=lambda: controller.show_frame(StartPage)) #create a button to return to main menu
         button1.grid(row=7, column= 0, rowspan=100, sticky="nsew")
         
-        button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frameAlpha(ExpSelPg, self.usernumchoice)) #create a button to experiment type
+        button2 = ttk.Button(self, text="Next", command=lambda: self.checkvalidexpnum(parent, controller)) #create a button to experiment type
         button2.grid(row=7, column= 6, columnspan=100, sticky="e")
         
         """Creates display for number inputed"""
@@ -218,6 +224,17 @@ class ExpNumPg(tk.Frame, Experiment):
             else:
                 self.usernumchoice = currentnum + z
         self.usernumtext.configure(text = "Experiment Number:  %.5s" % self.usernumchoice)
+    def checkvalidexpnum(self, parent, controller):
+    	if len(self.usernumchoice) == 0: #user did not enter a number
+    		tkMessageBox.showwarning("Error", "Must enter an experiment number")
+    	else:
+    		savetofile = "/home/pi/Desktop/ExperimentFolder/Exp" + str(self.usernumchoice) + "/"
+    		if os.path.exists(savetofile): #file already exists
+        		tkMessageBox.showwarning("Error", "Experiment number already used")
+    		else: 
+			Appa.set_savefile(savetofile)
+			Appa.set_number(self.usernumchoice) #create experiment object
+			controller.show_frame(ExpSelPg)
 
 
 class ExpSelPg(tk.Frame, Experiment):
@@ -460,7 +477,7 @@ class PageTest(tk.Frame):
 	
 	def __init__(self, parent, controller):
 		tk.Frame.__init__(self, parent)
-		label = tk.Label(self, text = "Graph Page!", font=LARGE_FONT)
+		label = tk.Label(self, text = "Keep This Experiment's Data?", font=LARGE_FONT)
 		label.grid(row = 0, column=1, columnspan = 2, sticky="NSEW")
 		
 		button1 = ttk.Button(self,text="Back", command=lambda: controller.show_frame(ExpFinishPg))
@@ -469,16 +486,18 @@ class PageTest(tk.Frame):
 		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frame(StartPage)) #WAMBA
 		button2.grid(row=1, column = 4, sticky= "NS")
 
-		button3 = ttk.Button(self,text="Keep", command=lambda: tkMessageBox.showwarning("Confirm Delete", "Are you sure you want \nto discard these data?")) #WAMBA
+		button3 = ttk.Button(self,text="Discard", command=lambda: tkMessageBox.showwarning("Confirm Delete", "Are you sure you want \nto discard these data?")) #WAMBA
 		button3.grid(row=2, column = 4, sticky="NS")
 
 		f = Figure(figsize = (1,1))#define figure		
 		i=1
+		wubdub = .2
 		for picture in  os.listdir("/home/pi/Desktop/ExperimentFolder/PictureFolder"):
-			a = f.add_subplot(6,1,i) #add subplot RCP. Pth pos on grid with R rows and C columns
+			a = f.add_subplot(5,1,i) #add subplot RCP. Pth pos on grid with R rows and C columns
 			img = mpimg.imread("/home/pi/Desktop/ExperimentFolder/PictureFolder/" + picture) #read in image
 			a.xaxis.set_visible(False)
 			a.yaxis.set_visible(False)
+			a.set_position([0,0+wubdub*(i-1),.5,wubdub])
 			a.imshow(img) #Renders image
 			i+=1
 			
@@ -492,8 +511,8 @@ class PageTest(tk.Frame):
 		scrollbar = tk.Scrollbar(self)
 		scrollbar.config(command=canvas.get_tk_widget().yview)
 #		canvas.get_tk_widget().config(scrollregion=(canvas.get_tk_widget().bbox("all")))
-		canvas.get_tk_widget().config(width=630, height=400)
-		canvas.get_tk_widget().config(scrollregion=(0,0,630,720*3))
+		canvas.get_tk_widget().config(width=630, height=720)
+		canvas.get_tk_widget().config(scrollregion=(0,0,1260,720*3))
 		scrollbar.grid(row=1, column=3, sticky="NS", rowspan = 3)
 		canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
 
@@ -503,7 +522,7 @@ class PageTen(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Data Review", font=LARGE_FONT) #create object
+        label = tk.Label(self, text="Data Review \n Please choose experiment to analyze", font=LARGE_FONT) #create object
         label.pack(pady=10, padx=10) #pack object into window
         
         button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
@@ -516,7 +535,7 @@ class PageTen(tk.Frame):
 		self.yeehaw.append(item)
 		i+=1
 	List1.pack()
-	b = ttk.Button(self, text="Selectionnn", command = lambda List1=List1: self.asdf(List1))
+	b = ttk.Button(self, text="Continue", command = lambda List1=List1: self.asdf(List1))
 	b.pack()
 
     #def asdf(self, List1):
