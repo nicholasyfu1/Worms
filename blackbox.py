@@ -80,7 +80,7 @@ class BehaviorBox(tk.Tk, Experiment):
     
     #Initalize all pages
     def startfresh(self):
-        for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTest, PageTen):
+        for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTest, DataDelPg, PageTen):
             frame = F(self.container, self)
             self.frames[F] = frame 
             frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
@@ -139,7 +139,7 @@ class BehaviorBox(tk.Tk, Experiment):
 	camera.stop_preview()
     def show_frameFoxtrot(self, cont,):
    	frame = self.frames[cont]
-	frame.listboxconfirm()
+	frame.update_idletasks()
 	frame.tkraise() #raise to front
 	
 
@@ -148,14 +148,18 @@ class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
         label = tk.Label(self, text="Start Page", font=LARGE_FONT) #Create label object
-        label.pack(pady=10, padx=10) #pack label into window
+        label.grid(row=0, column=1, sticky="nsew") #pack label into window
 
         button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frameAlpha(ExpNumPg)) #Create a button to start a new experiment       
-        button1.pack()
+        button1.grid(row=1, column=1, sticky="nsew")
 
         button2 = ttk.Button(self, text="Data Retrieval", command=lambda: controller.show_frameFoxtrot(PageTen)) #Create a button to go to 'data retrieval' page
-        button2.pack()
+        button2.grid(row=2, column=1, sticky="nsew")
+        
+        button3 = ttk.Button(self, text="Delete Data", command=lambda: controller.show_frameFoxtrot(DataDelPg)) #Create a button to go to 'data retrieval' page
+        button3.grid(row=3, column=1, sticky="nsew")
 
+	self.grid_columnconfigure(0, minsize=100)
 class ExpNumPg(tk.Frame, Experiment):
 
     """Gets user input for experiment number for name file"""
@@ -164,7 +168,8 @@ class ExpNumPg(tk.Frame, Experiment):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Enter Experiment Number", font=LARGE_FONT) #create object
-        label.grid(row=0, column=0, columnspan=100) #pack object into window
+        label.grid(row=0, column=0, columnspan=100, sticky="ew") #pack object into window
+        self.grid_columnconfigure(0, minsize=20)
         self.grid_columnconfigure(1, minsize=20)
         self.grid_rowconfigure(2, minsize=20) 
         self.grid_rowconfigure(3, minsize=20) 
@@ -173,15 +178,15 @@ class ExpNumPg(tk.Frame, Experiment):
 	self.usernumchoice = str()
 	
         button1 = ttk.Button(self, text="Back to\nMain Menu", command=lambda: controller.show_frame(StartPage)) #create a button to return to main menu
-        button1.grid(row=7, column= 0, rowspan=100, sticky="nsew")
+        button1.grid(row=8, column= 0, sticky="nsew")
         
         button2 = ttk.Button(self, text="Next", command=lambda: self.checkvalidexpnum(parent, controller)) #create a button to experiment type
-        button2.grid(row=7, column= 6, columnspan=100, sticky="e")
+        button2.grid(row=8, column= 6, sticky="nsew")
         
         """Creates display for number inputed"""
         self.usernumtext = tk.Label(self, text = "", font=LARGE_FONT) 
-        self.usernumtext.grid(row = 1, column = 0, sticky="w")
-        self.usernumtext.configure(text = "Experiment Number: %.5s" % self.usernumchoice)
+        self.usernumtext.grid(row = 1, column = 0, columnspan = 100, sticky="w")
+        self.usernumtext.configure(text = "Experiment Number: %3s" % self.usernumchoice)
 
 
         """ Number Pad """
@@ -215,7 +220,7 @@ class ExpNumPg(tk.Frame, Experiment):
                 tkMessageBox.showwarning("Error", "Number too long")
             else:
                 self.usernumchoice = currentnum + z
-        self.usernumtext.configure(text = "Experiment Number:  %.5s" % self.usernumchoice)
+        self.usernumtext.configure(text = "Experiment Number:  %3s" % self.usernumchoice)
     def checkvalidexpnum(self, parent, controller):
     	if len(self.usernumchoice) == 0: #user did not enter a number
     		tkMessageBox.showwarning("Error", "Must enter an experiment number")
@@ -297,7 +302,7 @@ class TimeSelPg(tk.Frame):
         
         """Creates display for time inputed"""
         self.totaltimetext = tk.Label(self, text = "", font=LARGE_FONT) 
-        self.totaltimetext.grid(row = 1, column = 0, sticky="w")
+        self.totaltimetext.grid(row = 1, column = 0, columnspan = 100, sticky="w")
         self.totaltimetext.configure(text = "Run time: %.5s" % self.totaltime)
 
         """ Number Pad """
@@ -348,6 +353,7 @@ class ConfirmPg(tk.Frame, Experiment):
         	self.label1 = tk.Label(self, text="Chosen Parameters", font=LARGE_FONT) #create object
         	self.label1.grid(row=0, column=5, columnspan=100) #grid object into window
         	
+
         	
         	self.label2 = tk.Label(self, text="", font=SMALL_FONT) #create object
         	self.label2.grid(row=2, column=5) #grid object into window
@@ -364,6 +370,9 @@ class ConfirmPg(tk.Frame, Experiment):
         
         	button2 = ttk.Button(self, text="Next", command=lambda: controller.show_frameFish(InsertPg)) #Insert worms
         	button2.grid(row=7, column= 10, sticky="e")
+ 
+
+        	
 
         def label2confirm(self, expnumber):
             self.label2.configure(text = "Experiment number:" + str(expnumber))
@@ -551,13 +560,6 @@ class PageTen(tk.Frame):
 	
 	b = ttk.Button(self, text="Continue", command = lambda List1=self.List1: self.asdf(List1))
 	b.grid(row=1, column = 3, sticky="NS")
-
-    def asdf(self, List1):
-	items = map(int, List1.curselection())
-	itemindex = List1.curselection()[0]
-	print(self.explist[itemindex])
-    
-    def listboxconfirm(self):
 	i=0
 	for item in os.listdir("/home/pi/Desktop/ExperimentFolder/"):
 		self.explist.append(item)
@@ -565,6 +567,67 @@ class PageTen(tk.Frame):
 	for experiment in self.explist:
 		self.List1.insert(i, experiment)
 		i+=1
+
+    def asdf(self, List1):
+	items = map(int, List1.curselection())
+	itemindex = List1.curselection()[0]
+	print(self.explist[itemindex])
+
+
+class DataDelPg(tk.Frame):
+
+    """Allows data retrieval"""
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text="Data Review \n Please choose experiment to delete", font=LARGE_FONT) #create object
+        label.grid(row = 0, column=1, columnspan = 2, sticky="NSEW")
+        
+        button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
+        button1.grid(row=1, column = 0, sticky="NS")
+
+	self.explist = []
+	
+	
+	
+	scrollbar = AutoScrollbar(self)
+	scrollbar.grid(row=1, column=2, sticky="NSW", rowspan = 3)
+	
+	canvas = tk.Canvas(yscrollcommand=scrollbar.set)
+	canvas.grid(row=1, column=1, rowspan = 3, sticky="NS") 
+	
+	self.check1=tk.Checkbutton(self, yscrollcommand = scrollbar.set)
+	self.check1.grid(row=1, column=1, rowspan = 2, sticky="NSE")
+	self.check1.config(scrollregion=self.List1.bbox("active"))
+	scrollbar.config(command=self.List1.yview)
+	
+	b = ttk.Button(self, text="Continue", command = lambda List1=self.List1: self.asdf(List1))
+	b.grid(row=1, column = 3, sticky="NS")
+	i=0
+	for item in os.listdir("/home/pi/Desktop/ExperimentFolder/"):
+		self.explist.append(item)
+	self.explist.sort()
+	for experiment in self.explist:
+		self.check1.insert(i, experiment)
+		i+=1
+
+    def asdf(self, List1):
+	items = map(int, List1.curselection())
+	itemindex = List1.curselection()[0]
+	print(self.explist[itemindex])
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class AutoScrollbar(tk.Scrollbar):
     # a scrollbar that hides itself if it's not needed.  only
@@ -584,6 +647,7 @@ class AutoScrollbar(tk.Scrollbar):
 app = BehaviorBox()
 app.geometry("1280x720")
 app.mainloop()
+
 
 
 
