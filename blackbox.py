@@ -40,8 +40,8 @@ SMALL_FONT = ("Verdana", 8)
 
 class Experiment():
 	
-	def __init__(self, expnumber):
-		self.expnumber = expnumber
+	def __init__(self):
+		self.expnumber = str()
 		self.exptype = str()
 		self.exptime = int()
 		self.savefile = str()
@@ -56,7 +56,7 @@ class Experiment():
 		self.savefile = str(savetofile)
 	
 	
-Appa = Experiment(str())
+Appa = Experiment()
 
 class BehaviorBox(tk.Tk, Experiment):
 
@@ -67,43 +67,42 @@ class BehaviorBox(tk.Tk, Experiment):
         
         tk.Tk.__init__(self, *args, **kwargs)
         
-        tk.Tk.wm_title(self, "Behavior Box")
+        tk.Tk.wm_title(self, "Behavior Box") #Set window title
         
-        container = tk.Frame(self) #Define frame/edge of window
-        container.pack(side="top", fill="both", expand=True) #fill will fill space you have allotted pack. Expand will take up all white space.
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1) #0 sets minimum size weight sets priority
+        self.container = tk.Frame(self) #Define frame/edge of window
+        self.container.pack(side="top", fill="both", expand=True) #Fill will fill space you have allotted pack. Expand will take up all white space.
+        self.container.grid_rowconfigure(0, weight=1) #Configure rows/grids. 0 sets minimum size weight sets priority
+        self.container.grid_columnconfigure(0, weight=1) 
 
         self.frames = {}
-        
+    	self.startfresh() #Calls command to initalize all pages
+    	self.show_frame(StartPage)
+    
+    #Initalize all pages
+    def startfresh(self):
         for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTest, PageTen):
-
-            frame = F(container, self)
-
+            frame = F(self.container, self)
             self.frames[F] = frame 
-
             frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
-
-        self.show_frame(StartPage)
-
+        
+    #Function to raise frame to the front
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise() #raise to front
     
     #Main menu -> new experiment. Resets all of Appa's values
     def show_frameAlpha(self, cont):
+	#Reset all of experiment-class variables
 	Appa.expnumber = str()
         Appa.exptype = str()
 	Appa.exptime = int()
 	Appa.savefile = str()
-	ExpNumPg.usernumchoice = str()
-	ExpNumPg.usernumtext.configure(text = "Experiment Number: %.5s" % ExpNumPg.usernumchoice)
-	print(ExpNumPg.usernumchoice)
-	ExpSelPg.userexpchoice = int()
-	TimeSelPg.totaltime = str()
+	
+	app.startfresh() #Reinitalize all pages to starting state
+	
         frame = self.frames[cont]
         frame.tkraise() #raise to front
-        print("HIHIHI")
+
     
     def show_frameFish(self, cont):
         frame = self.frames[cont]
@@ -111,7 +110,7 @@ class BehaviorBox(tk.Tk, Experiment):
         #camera.start_preview(fullscreen=False, window=(250,0,1000,1000)) #this line starts the preview. TODO: insert coordinates and resize preview
         frame.tkraise() #raise to front
     
-    #Save time choice -> confirmation
+    #Save time choice -> confirmation and updates label values in confirmation based on previous user input
     def show_frameCharlie(self, cont):
         frame = self.frames[cont]
         frame.label2confirm(Appa.expnumber)
@@ -120,42 +119,41 @@ class BehaviorBox(tk.Tk, Experiment):
 
         frame.tkraise() #raise to front
   
-  #conformation -> stim prep
+  #conformation -> stim prep and displays either "Ready" or "Insert stimuli" based on experiment type
     def show_frameDelta(self, cont):
         frame = self.frames[cont]
-        frame.gettext()
+        frame.gettext() #Displays either "Ready" or "Insert stimuli" based on experiment type
         frame.tkraise() #raise to front
         
     #stim prep -> start imaging
     def show_frameEcho(self, cont,):
         frame = self.frames[cont]
-        savetofile = "/home/pi/Desktop/ExperimentFolder/Exp" + str(Appa.expnumber)
-
-	camera.start_preview(fullscreen=False, window=(250,0,1000,1000))
-	#sleep(.8)
-	
 	frame.tkraise() #raise to front
 	
+	camera.start_preview(fullscreen=False, window=(250,0,1000,1000))
 	#Image capturing
 	for i in range(int(Appa.exptime/Appa.capturerate+1)):
     		camera.capture(Appa.savefile + "/image" + str(i) + ".jpg")
-
 		if i != int(Appa.exptime/Appa.capturerate):
 			sleep(Appa.capturerate)
 	camera.stop_preview()
-
+    def show_frameFoxtrot(self, cont,):
+   	frame = self.frames[cont]
+	frame.listboxconfirm()
+	frame.tkraise() #raise to front
+	
 
 class StartPage(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
-        label = tk.Label(self, text="Start Page", font=LARGE_FONT) #create object
-        label.pack(pady=10, padx=10) #pack object into window
+        label = tk.Label(self, text="Start Page", font=LARGE_FONT) #Create label object
+        label.pack(pady=10, padx=10) #pack label into window
 
-        button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frameAlpha(ExpNumPg)) #create a button to start a new experiment       
+        button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frameAlpha(ExpNumPg)) #Create a button to start a new experiment       
         button1.pack()
 
-        button2 = ttk.Button(self, text="Data Retrieval", command=lambda: controller.show_frame(PageTen)) #create a button to start a new experiment 
+        button2 = ttk.Button(self, text="Data Retrieval", command=lambda: controller.show_frameFoxtrot(PageTen)) #Create a button to go to 'data retrieval' page
         button2.pack()
 
 class ExpNumPg(tk.Frame, Experiment):
@@ -184,7 +182,7 @@ class ExpNumPg(tk.Frame, Experiment):
         self.usernumtext = tk.Label(self, text = "", font=LARGE_FONT) 
         self.usernumtext.grid(row = 1, column = 0, sticky="w")
         self.usernumtext.configure(text = "Experiment Number: %.5s" % self.usernumchoice)
-        print("yawww")
+
 
         """ Number Pad """
         btn_numbers = [ '7', '8', '9', '4', '5', '6', '1', '2', '3', ' ', '0', 'x'] #create list of numbers to be displayed
@@ -227,7 +225,7 @@ class ExpNumPg(tk.Frame, Experiment):
         		tkMessageBox.showwarning("Error", "Experiment number already used")
     		else: 
 			Appa.set_savefile(savetofile)
-			Appa.set_number(self.usernumchoice) #create experiment object
+			Appa.set_number(self.usernumchoice) #Configure experiment object's expnumber
 			controller.show_frame(ExpSelPg)
 
 
@@ -252,6 +250,9 @@ class ExpSelPg(tk.Frame, Experiment):
         thermobutton = ttk.Radiobutton(self, text="Thermotaxis", variable = "ExpOption", value = 1, command = lambda: self.qfb(1)) #indicatoron = 0)
         chemobutton = ttk.Radiobutton(self, text="Chemotaxis", variable = "ExpOption", value = 2, command = lambda: self.qfb(2)) #indicatoron = 0)
         photobutton = ttk.Radiobutton(self, text="Phototaxis", variable = "ExpOption", value = 3, command = lambda: self.qfb(3)) #indicatoron = 0)
+	for button in [nonebutton, thermobutton, chemobutton, photobutton]:
+		button.state(["!focus",'!selected'])
+
 	
 	nonebutton.grid(row=2, column= 3, sticky="nsew")
         thermobutton.grid(row=3, column= 3, sticky="nsew")
@@ -275,8 +276,6 @@ class TimeSelPg(tk.Frame):
     """Allows run time selection"""
         
     runtime = 0 # initialize class runtime variable
-    
-   
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -343,6 +342,7 @@ class TimeSelPg(tk.Frame):
 class ConfirmPg(tk.Frame, Experiment):
 	
 	""" Displays chosen parameters for user to confirm"""
+	
 	def __init__(self, parent, controller):
 		tk.Frame.__init__(self, parent) 
         	self.label1 = tk.Label(self, text="Chosen Parameters", font=LARGE_FONT) #create object
@@ -445,7 +445,7 @@ class StimPrepPg(tk.Frame):
         elif Appa.exptype == "1" or Appa.exptype == "2":
         	words = "Prepare/Insert Stimuli"
         else:
-        	words = "guciiiiiii"
+        	words = "Error"
         self.label1.configure(text = words)
 
 class ExpFinishPg(tk.Frame):
@@ -471,7 +471,7 @@ class ExpFinishPg(tk.Frame):
         label.pack()
         #label.grid(row=0, column=5, columnspan=100) #grid object into window
         
-    	button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frame(ExpNumPg)) #create a button to start a new experiment       
+    	button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frameAlpha(ExpNumPg)) #create a button to start a new experiment       
     	button1.pack()
 
         button2 = ttk.Button(self, text="Review This\nExperiment's Data", command=lambda: controller.show_frame(PageTest)) #create a button to start a new experiment 
@@ -494,6 +494,9 @@ class PageTest(tk.Frame):
 
 		button3 = ttk.Button(self,text="Discard", command=lambda: tkMessageBox.showwarning("Confirm Delete", "Are you sure you want \nto discard these data?")) #WAMBA
 		button3.grid(row=2, column = 4, sticky="NS")
+"""
+
+#This code is to load the figure but ignore for now to load faster
 
 		f = Figure(figsize = (1,1))#define figure		
 		i=1
@@ -521,7 +524,7 @@ class PageTest(tk.Frame):
 		canvas.get_tk_widget().config(scrollregion=(0,0,1260,720*3))
 		scrollbar.grid(row=1, column=3, sticky="NS", rowspan = 3)
 		canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
-
+"""
 class PageTen(tk.Frame):
 
     """Allows data retrieval"""
@@ -529,27 +532,54 @@ class PageTen(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Data Review \n Please choose experiment to analyze", font=LARGE_FONT) #create object
-        label.pack(pady=10, padx=10) #pack object into window
+        label.grid(row = 0, column=1, columnspan = 2, sticky="NSEW")
         
         button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
-        button1.pack()
-	i=0
-	self.yeehaw = []
-	List1=tk.Listbox(self)
-	for item in os.listdir("/home/pi/Desktop/ExperimentFolder/"):
-		List1.insert(i, item)
-		self.yeehaw.append(item)
-		i+=1
-	List1.pack()
-	b = ttk.Button(self, text="Continue", command = lambda List1=List1: self.asdf(List1))
-	b.pack()
+        button1.grid(row=1, column = 0, sticky="NS")
 
-    #def asdf(self, List1):
-	#items = map(int, List1.curselection())
-	#print(self.yeehaw[int(items)])
-	#print(type(List1.curselection()[0]))
+	self.explist = []
 	
 
+	
+	scrollbar = AutoScrollbar(self)
+	scrollbar.grid(row=1, column=2, sticky="NSW", rowspan = 3)
+	
+	self.List1=tk.Listbox(self, yscrollcommand = scrollbar.set)
+	self.List1.grid(row=1, column=1, rowspan = 2, sticky="NSE")
+	self.List1.config(scrollregion=self.List1.bbox("active"))
+	scrollbar.config(command=self.List1.yview)
+	
+	b = ttk.Button(self, text="Continue", command = lambda List1=self.List1: self.asdf(List1))
+	b.grid(row=1, column = 3, sticky="NS")
+
+    def asdf(self, List1):
+	items = map(int, List1.curselection())
+	itemindex = List1.curselection()[0]
+	print(self.explist[itemindex])
+    
+    def listboxconfirm(self):
+	i=0
+	for item in os.listdir("/home/pi/Desktop/ExperimentFolder/"):
+		self.explist.append(item)
+	self.explist.sort()
+	for experiment in self.explist:
+		self.List1.insert(i, experiment)
+		i+=1
+
+class AutoScrollbar(tk.Scrollbar):
+    # a scrollbar that hides itself if it's not needed.  only
+    # works if you use the grid geometry manager.
+    def set(self, lo, hi):
+        if float(lo) <= 0.0 and float(hi) >= 1.0:
+            # grid_remove is currently missing from Tkinter!
+            self.tk.call("grid", "remove", self)
+        else:
+            self.grid()
+        tk.Scrollbar.set(self, lo, hi)
+    def pack(self, **kw):
+        raise TclError, "cannot use pack with this widget"
+    def place(self, **kw):
+        raise TclError, "cannot use place with this widget"
 
 app = BehaviorBox()
 app.geometry("1280x720")
