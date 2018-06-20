@@ -586,36 +586,44 @@ class DataDelPg(tk.Frame):
         button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
         button1.grid(row=1, column = 0, sticky="NS")
 
+  	button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
+        button1.grid(row=1, column = 0, sticky="NS")
+	
+	def testbutton(self):
+		
+	
 	self.explist = []
 	
 	
-	
+        	
 	scrollbar = AutoScrollbar(self)
-	scrollbar.grid(row=1, column=2, sticky="NSW", rowspan = 3)
+	scrollbar.grid(row=1, column=2, sticky="NSW", rowspan=2)
+
+	self.checkbox_text = tk.Text(self, height=10, width=10, yscrollcommand=scrollbar.set)
 	
-	canvas = tk.Canvas(yscrollcommand=scrollbar.set)
-	canvas.grid(row=1, column=1, rowspan = 3, sticky="NS") 
+	#self.check1=tk.Checkbutton(canvas, yscrollcommand = scrollbar.set)
+	self.checkbox_text.grid(row=1, column=1, rowspan = 1, sticky="NSEW")
+	scrollbar.config(command=self.checkbox_text.yview)
 	
-	self.check1=tk.Checkbutton(self, yscrollcommand = scrollbar.set)
-	self.check1.grid(row=1, column=1, rowspan = 2, sticky="NSE")
-	self.check1.config(scrollregion=self.List1.bbox("active"))
-	scrollbar.config(command=self.List1.yview)
 	
-	b = ttk.Button(self, text="Continue", command = lambda List1=self.List1: self.asdf(List1))
+	
+	b = ttk.Button(self, text="Continue") #command = lambda: print("none"))
 	b.grid(row=1, column = 3, sticky="NS")
 	i=0
 	for item in os.listdir("/home/pi/Desktop/ExperimentFolder/"):
 		self.explist.append(item)
 	self.explist.sort()
 	for experiment in self.explist:
-		self.check1.insert(i, experiment)
+		cb = tk.Checkbutton(self.checkbox_text, text=experiment, variable=self.explist[i])
+		self.checkbox_text.window_create(tk.END, window=cb)
+		self.checkbox_text.insert(tk.END, "\n")
 		i+=1
 
     def asdf(self, List1):
 	items = map(int, List1.curselection())
 	itemindex = List1.curselection()[0]
 	print(self.explist[itemindex])
-
+        
 
 
 
