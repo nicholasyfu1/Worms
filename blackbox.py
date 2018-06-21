@@ -11,10 +11,12 @@ except ImportError:
     import tkinter as tk
     
 import ttk
-
-
 import tkMessageBox
+
 import os
+import shutil
+
+
 from time import *
 from picamera import PiCamera
 
@@ -75,12 +77,16 @@ class BehaviorBox(tk.Tk, Experiment):
         self.container.grid_columnconfigure(0, weight=1) 
 
         self.frames = {}
-    	self.startfresh() #Calls command to initalize all pages
+	for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTest, DataDelPg, PageTen):
+            frame = F(self.container, self)
+            self.frames[F] = frame 
+            frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
+#    	self.startfresh() #Calls command to initalize all pages
     	self.show_frame(StartPage)
     
     #Initalize all pages
     def startfresh(self):
-        for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTest, DataDelPg, PageTen):
+        for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, DataDelPg):
             frame = F(self.container, self)
             self.frames[F] = frame 
             frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
@@ -106,7 +112,6 @@ class BehaviorBox(tk.Tk, Experiment):
     
     def show_frameFish(self, cont):
         frame = self.frames[cont]
-        os.makedirs(Appa.savefile)
         #camera.start_preview(fullscreen=False, window=(250,0,1000,1000)) #this line starts the preview. TODO: insert coordinates and resize preview
         frame.tkraise() #raise to front
     
@@ -128,6 +133,7 @@ class BehaviorBox(tk.Tk, Experiment):
     #stim prep -> start imaging
     def show_frameEcho(self, cont,):
         frame = self.frames[cont]
+	os.makedirs(Appa.savefile)
 	frame.tkraise() #raise to front
 	
 	camera.start_preview(fullscreen=False, window=(250,0,1000,1000))
@@ -141,7 +147,11 @@ class BehaviorBox(tk.Tk, Experiment):
    	frame = self.frames[cont]
 	frame.update_idletasks()
 	frame.tkraise() #raise to front
-	
+    
+    def show_frameRhino(self, cont,):
+   	frame = self.frames[cont]
+	confirmdiscard()
+	frame.tkraise() #raise to front
 
 class StartPage(tk.Frame):
 
@@ -498,14 +508,14 @@ class PageTest(tk.Frame):
 		button1 = ttk.Button(self,text="Back", command=lambda: controller.show_frame(ExpFinishPg))
 		button1.grid(row=1, column = 0, sticky="NS")
 		
-		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frame(StartPage)) #WAMBA
+		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frame(StartPage)) 
 		button2.grid(row=1, column = 4, sticky= "NS")
 
-		button3 = ttk.Button(self,text="Discard", command=lambda: tkMessageBox.showwarning("Confirm Delete", "Are you sure you want \nto discard these data?")) #WAMBA
+		button3 = ttk.Button(self,text="Discard", command=lambda: controller.show_frameRhino(StartPage)) 
 		button3.grid(row=2, column = 4, sticky="NS")
-"""
 
-#This code is to load the figure but ignore for now to load faster
+
+		#This code is to load the figure but ignore for now to load faster
 
 		f = Figure(figsize = (1,1))#define figure		
 		i=1
@@ -533,7 +543,14 @@ class PageTest(tk.Frame):
 		canvas.get_tk_widget().config(scrollregion=(0,0,1260,720*3))
 		scrollbar.grid(row=1, column=3, sticky="NS", rowspan = 3)
 		canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
-"""
+		
+def confirmdiscard():
+	result = tkMessageBox.askquestion("Discard", "Are you sure you want \nto discard these data?")
+	if result == "yes":
+		shutil.rmtree(Appa.savefile)
+
+
+			
 class PageTen(tk.Frame):
 
     """Allows data retrieval"""
@@ -590,7 +607,7 @@ class DataDelPg(tk.Frame):
         button1.grid(row=1, column = 0, sticky="NS")
 	
 	def testbutton(self):
-		
+            print("Hi")	
 	
 	self.explist = []
 	
