@@ -15,7 +15,7 @@ import tkMessageBox
 
 import os
 import shutil
-
+import pickle
 
 from time import *
 from picamera import PiCamera
@@ -30,6 +30,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import numpy as np
 
+from pictureanalysis import *
 
 camera = PiCamera()
 
@@ -48,6 +49,9 @@ class Experiment():
 		self.exptime = int()
 		self.savefile = str()
 		self.capturerate=5
+		self.x = range(4)
+		self.controly =  [5,2,5,1,4]
+		self.expy = [6,3,7,3,5]
 	def set_number(self, number):
 		self.expnumber = str(number)
 	def set_type(self, exptype):
@@ -77,7 +81,7 @@ class BehaviorBox(tk.Tk, Experiment):
         self.container.grid_columnconfigure(0, weight=1) 
 
         self.frames = {}
-	for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTest, DataDelPg, PageTen):
+	for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTest, DataDelPg, DataAnalysisImagePg, PageTen):
             frame = F(self.container, self)
             self.frames[F] = frame 
             frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
@@ -131,15 +135,16 @@ class BehaviorBox(tk.Tk, Experiment):
         frame.tkraise() #raise to front
         
     #stim prep -> start imaging
-    def show_frameEcho(self, cont,):
+    def show_frameEcho(self, cont):
         frame = self.frames[cont]
-	os.makedirs(Appa.savefile)
+	os.makedirs(Appa.savefile) #Create general folder for experiment 
+	os.makedirs(Appa.savefile + "/ExpDataPictures") #Create folder for images from exp
 	frame.tkraise() #raise to front
 	
 	camera.start_preview(fullscreen=False, window=(250,0,1000,1000))
 	#Image capturing
 	for i in range(int(Appa.exptime/Appa.capturerate+1)):
-    		camera.capture(Appa.savefile + "/image" + str(i) + ".jpg")
+    		camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(i) + ".jpg")
 		if i != int(Appa.exptime/Appa.capturerate):
 			sleep(Appa.capturerate)
 	camera.stop_preview()
@@ -148,11 +153,30 @@ class BehaviorBox(tk.Tk, Experiment):
 	frame.update_idletasks()
 	frame.tkraise() #raise to front
     
-    def show_frameRhino(self, cont,):
+    def show_frameRhino(self, cont):
    	frame = self.frames[cont]
 	confirmdiscard()
 	frame.tkraise() #raise to front
+	
+    #after keep data -> store appa object and reset appa	
+    def show_frameStingray(self, cont):
+	saveobject(Appa)
+    	frame = self.frames[cont]
+        frame.tkraise() #raise to front
+        
 
+    #from: numberpad/"choose exp to analyze" to image
+    def show_frameTango(self, cont):
+	frame = self.frames[cont]
+    	if next image exists (check using length of Momo.expY to get image directory): #Case of not final image
+    		configure text of DataAnalysisNumPg to show "Next Image"
+       else: #case final image
+           configure text of DataAnalysisNumPg to show "Generate Graph"
+       configure image
+       frame.update_idletasks()
+       frame.tkraise()
+
+		
 class StartPage(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -487,14 +511,13 @@ class ExpFinishPg(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Experiment Finished", font=LARGE_FONT) #create object
-        label.pack()
-        #label.grid(row=0, column=5, columnspan=100) #grid object into window
+        label.grid(row=0, column=0, columnspan=100) #grid object into window
         
     	button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frameAlpha(ExpNumPg)) #create a button to start a new experiment       
-    	button1.pack()
+        button1.grid(row=1, column=0, columnspan=100) #grid object into window
 
         button2 = ttk.Button(self, text="Review This\nExperiment's Data", command=lambda: controller.show_frame(PageTest)) #create a button to start a new experiment 
-        button2.pack()
+        button2.grid(row=2, column=0, columnspan=100) #grid object into window
     
 class PageTest(tk.Frame):
 	
@@ -508,6 +531,7 @@ class PageTest(tk.Frame):
 		button1 = ttk.Button(self,text="Back", command=lambda: controller.show_frame(ExpFinishPg))
 		button1.grid(row=1, column = 0, sticky="NS")
 		
+#		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frameStingray(StartPage)) 
 		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frame(StartPage)) 
 		button2.grid(row=1, column = 4, sticky= "NS")
 
@@ -563,10 +587,8 @@ class PageTen(tk.Frame):
         button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
         button1.grid(row=1, column = 0, sticky="NS")
 
-	self.explist = []
 	
-
-	
+		
 	scrollbar = AutoScrollbar(self)
 	scrollbar.grid(row=1, column=2, sticky="NSW", rowspan = 3)
 	
@@ -574,10 +596,13 @@ class PageTen(tk.Frame):
 	self.List1.grid(row=1, column=1, rowspan = 2, sticky="NSE")
 	self.List1.config(scrollregion=self.List1.bbox("active"))
 	scrollbar.config(command=self.List1.yview)
-	
-	b = ttk.Button(self, text="Continue", command = lambda List1=self.List1: self.asdf(List1))
-	b.grid(row=1, column = 3, sticky="NS")
+
+	button2 = ttk.Button(self, text="Continue", command = lambda List1=self.List1: self.asdf(List1))
+	button2.grid(row=1, column = 3, sticky="NS")
+
+	self.explist = []
 	i=0
+
 	for item in os.listdir("/home/pi/Desktop/ExperimentFolder/"):
 		self.explist.append(item)
 	self.explist.sort()
@@ -589,7 +614,44 @@ class PageTen(tk.Frame):
 	items = map(int, List1.curselection())
 	itemindex = List1.curselection()[0]
 	print(self.explist[itemindex])
+	
+	
+class DataAnalysisImagePg(tk.Frame):
 
+	#WIll pull up images and super impose circles
+	
+	def __init__(self, parent, controller):
+		tk.Frame.__init__(self, parent)
+			
+		f = Figure(figsize = (1,1))#define figure		
+		a = f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
+		a.xaxis.set_visible(False)
+		a.yaxis.set_visible(False)
+		a.set_position([0,0,.5,.5])
+
+		img = mpimg.imread("/home/pi/Desktop/ExperimentFolder/PictureFolder/image0.jpg") #read in image
+		a.imshow(img) #Renders image
+
+			
+		#add canvas which is what we intend to render graph to and fill it with figure
+		canvas = FigureCanvasTkAgg(f, self) 
+		canvas.draw() #raise canvas
+		canvas.get_tk_widget().grid(row=1, column=1, rowspan = 3, sticky="NS") #Fill options: BOTH, X, Y Expand options:  
+
+
+		#Add scrollbar
+		scrollbar = tk.Scrollbar(self)
+		scrollbar.config(command=canvas.get_tk_widget().yview)
+#		canvas.get_tk_widget().config(scrollregion=(canvas.get_tk_widget().bbox("all")))
+		canvas.get_tk_widget().config(width=630, height=720)
+		canvas.get_tk_widget().config(scrollregion=(0,0,1260,720*3))
+		scrollbar.grid(row=1, column=3, sticky="NS", rowspan = 3)
+		canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
+			
+class DataAnalysisNumPg(tk.Frame):
+	
+	#numberpad to enter number of worms
+	
 
 class DataDelPg(tk.Frame):
 
@@ -670,7 +732,7 @@ class AutoScrollbar(tk.Scrollbar):
         raise TclError, "cannot use place with this widget"
 
 app = BehaviorBox()
-app.geometry("1280x720")
+app.geometry("800x480")
 app.mainloop()
 
 
