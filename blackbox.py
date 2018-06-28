@@ -148,7 +148,7 @@ class BehaviorBox(tk.Tk, Experiment):
 		if i != int(Appa.exptime/Appa.capturerate):
 			sleep(Appa.capturerate)
 	camera.stop_preview()
-    def show_frameFoxtrot(self, cont,):
+    def show_frameFoxtrot(self, cont):
    	frame = self.frames[cont]
 	frame.update_idletasks()
 	frame.tkraise() #raise to front
@@ -164,7 +164,7 @@ class BehaviorBox(tk.Tk, Experiment):
     	frame = self.frames[cont]
         frame.tkraise() #raise to front
         
-
+    """
     #from: numberpad/"choose exp to analyze" to image
     def show_frameTango(self, cont):
 	frame = self.frames[cont]
@@ -175,7 +175,7 @@ class BehaviorBox(tk.Tk, Experiment):
        configure image
        frame.update_idletasks()
        frame.tkraise()
-
+    """
 		
 class StartPage(tk.Frame):
 
@@ -597,7 +597,8 @@ class PageTen(tk.Frame):
 	self.List1.config(scrollregion=self.List1.bbox("active"))
 	scrollbar.config(command=self.List1.yview)
 
-	button2 = ttk.Button(self, text="Continue", command = lambda List1=self.List1: self.asdf(List1))
+#	button2 = ttk.Button(self, text="Continue", command = lambda List1=self.List1: self.asdf(List1))
+	button2 = ttk.Button(self, text="Continue", command = lambda: controller.show_frame(DataAnalysisImagePg))
 	button2.grid(row=1, column = 3, sticky="NS")
 
 	self.explist = []
@@ -618,41 +619,100 @@ class PageTen(tk.Frame):
 	
 class DataAnalysisImagePg(tk.Frame):
 
-	#WIll pull up images and super impose circles
-	
-	def __init__(self, parent, controller):
-		tk.Frame.__init__(self, parent)
+    #WIll pull up images and super impose circles
+    
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+
+        #button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
+        #button1.grid(row=14, column=3, sticky="NS", columnspan=2)
+        #button2 = ttk.Button(self, text="Next\nPicture", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
+        button2 = ttk.Button(self, text="Next\nPicture", command=lambda: self.qf2()) #create a button to return to home screen
+        button2.grid(row=10, column=6, sticky="NESW", rowspan=4, columnspan=3)
+        #button3 = ttk.Button(self, text="Previous\nPicture", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
+        button3 = ttk.Button(self, text="Previous\nPicture", command=lambda: self.qf1(parent)) #create a button to return to home screen
+        button3.grid(row=10, column=3, sticky="NESW", rowspan=4, columnspan=3)
+        
+        self.totaltime = ""
+        """Creates display for time inputed"""
+        self.totaltimetext = tk.Label(self, text = "", font=LARGE_FONT) 
+        self.totaltimetext.grid(row=2, column=3, rowspan=2, columnspan=7, sticky="EW")
+        self.totaltimetext.configure(text = "Number of worms:\n%.5s" % self.totaltime)
+        
+        
+        self.grid_columnconfigure(2, minsize=20) #spacer
+	for column in range(3,9):
+	        self.grid_columnconfigure(column, minsize=30) 
+        
+        
+        
+        
+        self.f = Figure(figsize = (1,1))#define figure		
+        self.a = self.f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
+        self.a.xaxis.set_visible(False)
+        self.a.yaxis.set_visible(False)
+        self.a.set_position([0,0,1,1])
+	self.a.set_aspect(1)
+        img = mpimg.imread("/home/pi/Desktop/ExperimentFolder/PictureFolder/image0.jpg") #read in image
+        self.a.imshow(img) #Renders image
+
+                
+        #add canvas which is what we intend to render graph to and fill it with figure
+        self.canvas = FigureCanvasTkAgg(self.f, self) 
+        self.canvas.draw() #canvas raise
+        self.canvas.get_tk_widget().grid(row=0, column=0, rowspan = 15) #Fill options: BOTH, X, Y Expand options:  
+        self.canvas.get_tk_widget().config(width=580, height=480)
+
 			
-		f = Figure(figsize = (1,1))#define figure		
-		a = f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
-		a.xaxis.set_visible(False)
-		a.yaxis.set_visible(False)
-		a.set_position([0,0,.5,.5])
+        """ Number Pad """
+        btn_numbers = [ '7', '8', '9', '4', '5', '6', '1', '2', '3', ' ', '0', 'x'] #create list of numbers to be displayed
+        r = 5 
+        c = 3
+  
 
-		img = mpimg.imread("/home/pi/Desktop/ExperimentFolder/PictureFolder/image0.jpg") #read in image
-		a.imshow(img) #Renders image
+        for num in btn_numbers:
+            if num == ' ':
+                self.num = ttk.Button(self, text=num, width=5)
+                self.num.grid(row=r, column=c, sticky= "nsew", columnspan=2)
+                c += 2
 
-			
-		#add canvas which is what we intend to render graph to and fill it with figure
-		canvas = FigureCanvasTkAgg(f, self) 
-		canvas.draw() #raise canvas
-		canvas.get_tk_widget().grid(row=1, column=1, rowspan = 3, sticky="NS") #Fill options: BOTH, X, Y Expand options:  
-
-
-		#Add scrollbar
-		scrollbar = tk.Scrollbar(self)
-		scrollbar.config(command=canvas.get_tk_widget().yview)
-#		canvas.get_tk_widget().config(scrollregion=(canvas.get_tk_widget().bbox("all")))
-		canvas.get_tk_widget().config(width=630, height=720)
-		canvas.get_tk_widget().config(scrollregion=(0,0,1260,720*3))
-		scrollbar.grid(row=1, column=3, sticky="NS", rowspan = 3)
-		canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
-			
-class DataAnalysisNumPg(tk.Frame):
-	
-	#numberpad to enter number of worms
-	
-
+            else: 
+                self.num = ttk.Button(self, text=num, width=5, command=lambda b = num: self.click(b))
+                self.num.grid(row=r, column=c, sticky= "nsew", columnspan=2)
+                c += 2
+            if c > 7:
+                c = 3
+                r += 1
+    """method to save user inputs and display them"""
+    def click(self, z):
+        currentnum = self.totaltime
+        if currentnum == '0':
+            self.totaltime = z
+        if z == 'x':
+            self.totaltime = currentnum[:-1]
+        else:
+            if len(self.totaltime) > 2:
+                tkMessageBox.showwarning("Error", "There's no way that there are that many worms")
+            else:
+                self.totaltime = currentnum + z
+        self.totaltimetext.configure(text = "Number of worms:\n%.5s" % self.totaltime)
+    def checkvalidexptime(self, parent, controller):
+   	if len(self.totaltime) == 0: #user did not enter a number
+    		tkMessageBox.showwarning("Error", "Must enter an experiment duration")
+    	else:
+		Appa.set_exptime(self.totaltime) #create experiment object
+		controller.show_frameCharlie(ConfirmPg)
+    def qf1(self, parent):
+    	start_time = time()
+    	img = mpimg.imread("/home/pi/Desktop/ExperimentFolder/PictureFolder/image3.jpg") #read in image
+        self.a.imshow(img) #Renders image
+        self.canvas.draw()
+        #self.canvas.get_tk_widget().update_idletasks() #canvas raise
+        print(time() - start_time)
+    def qf2(self):
+    	img = mpimg.imread("/home/pi/Desktop/ExperimentFolder/PictureFolder/image2.jpg") #read in image
+        self.a.imshow(img) #Renders image
+        self.canvas.get_tk_widget().update_idletasks()
 class DataDelPg(tk.Frame):
 
     """Allows data retrieval"""

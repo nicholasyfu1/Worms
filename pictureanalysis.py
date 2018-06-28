@@ -18,7 +18,7 @@ def getobject(expname):
 	with open(filepath, "rb") as input:
 		variablename = pickle.load(input)
 	return  variablename
-	
+"""	
 #function to 
 def 
 	#Pull up image
@@ -35,7 +35,7 @@ def
 			a.set_position([0,0+wubdub*(i-1),.5,wubdub])
 			a.imshow(img) #Renders image
 			i+=1	
-	
+"""	
 	
 	
 	
