@@ -637,13 +637,15 @@ class DataAnalysisImagePg(tk.Frame):
         #button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
         #button1.grid(row=14, column=3, sticky="NS", columnspan=2)
 
-        button2 = ttk.Button(self, text="Next\nPicture", command=lambda: self.ChangePic(1)) #create a button to return to home screen
-        button2.grid(row=10, column=6, sticky="NESW", rowspan=4, columnspan=3)
+        button1 = ttk.Button(self, text="Next\nPicture", command=lambda: self.ChangePic(1)) #create a button to return to home screen
+        button1.grid(row=10, column=6, sticky="NESW", rowspan=4, columnspan=3)
 
-        button3 = ttk.Button(self, text="Previous\nPicture", command=lambda: self.ChangePic(-1)) #create a button to return to home screen
-        button3.grid(row=10, column=3, sticky="NESW", rowspan=4, columnspan=3)
+        self.button2 = ttk.Button(self, text="Previous\nPicture", command=lambda: self.ChangePic(-1)) #create a button to return to home screen
+        self.button2.grid(row=10, column=3, sticky="NESW", rowspan=4, columnspan=3)
         
-
+	self.button3 = ttk.Button(self, text="Generate\nGraph", command=lambda: self.qfa()) #create a button to return to home screen
+	self.button3.grid(row=10, column=6, sticky="NESW", rowspan=4, columnspan=3)
+	
         """Creates display for worms counted"""
         self.wormscounted = ""
         self.wormscountedtext = tk.Label(self, text = "", font=LARGE_FONT) 
@@ -706,36 +708,29 @@ class DataAnalysisImagePg(tk.Frame):
                 tkMessageBox.showwarning("Error", "There's no way that there are that many worms")
             else:
                 self.wormscounted = currentnum + z
-        self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % self.wormscounted)
+        Momo.expy[self.currentimagenum]=int(self.wormscounted)#store number of counted worms
+        self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % str(Momo.expy[self.currentimagenum]))
 
     
     
     def ChangePic(self, direction):
-    	#Store the number of counted worms 
-    	if self.currentimagenum != -1:
-    		Momo.expy[self.currentimagenum]=self.wormscounted
+	
     	#Go to next screen
-    	if self.currentimagenum < len(Momo.expy)-1:
+    	if self.currentimagenum <= len(Momo.expy)-1:
+		self.button3.lower()
+		self.button2.lift()
 		self.currentimagenum = self.currentimagenum + direction
-		print(self.currentimagenum)
+		self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % str(Momo.expy[self.currentimagenum]))
+		self.wormscounted = Momo.expy[self.currentimagenum]
 		self.f.clf()
 		self.placesubplot()
 		img = mpimg.imread(Momo.savefile + "/ExpDataPictures/image" + str(self.currentimagenum) + ".jpg") #read in image
 		self.a.imshow(img) #Renders image
 		self.canvas.draw()
-    	if self.currentimagenum = len(Momo.expy)-1:
-    		tkMessageBox.showwarning("Error", "Last Image")
+    	if self.currentimagenum == len(Momo.expy)-1:
+        	self.button3.lift()
+        	self.button2.lower()
 	self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, len(Momo.expy)))    
-    """
-    def PreviousPic(self):
-    	self.currentimagenum -= 1
-    	self.f.clf()
-    	self.placesubplot()
-    	img = mpimg.imread(Momo.savefile + "/ExpDataPictures/image" + str(self.currentimagenum) + ".jpg") #read in image
-        self.a.imshow(img) #Renders image
-        self.canvas.draw()
-	self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, len(Momo.expy)))    
-    """
     def placesubplot(self):
     	self.a = self.f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
         self.a.xaxis.set_visible(False)
@@ -749,6 +744,9 @@ class DataAnalysisImagePg(tk.Frame):
     	else:
 		Appa.set_exptime(self.totaltime) #create experiment object
 		controller.show_frameCharlie(ConfirmPg)
+    def qfa(self):
+    	plt.plot(range(len(Momo.expy)),Momo.expy)
+    	plt.show()
 class DataDelPg(tk.Frame):
 
     """Allows data retrieval"""
