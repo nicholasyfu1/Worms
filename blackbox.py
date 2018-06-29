@@ -50,8 +50,8 @@ class Experiment():
 		self.savefile = str()
 		self.capturerate=5
 		self.x = range(4)
-		self.controly =  [5,2,5,1,4]
-		self.expy = [6,3,7,3,5]
+		self.controly =  []
+		self.expy = []
 	def set_number(self, number):
 		self.expnumber = str(number)
 	def set_type(self, exptype):
@@ -85,7 +85,6 @@ class BehaviorBox(tk.Tk, Experiment):
             frame = F(self.container, self)
             self.frames[F] = frame 
             frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
-#    	self.startfresh() #Calls command to initalize all pages
     	self.show_frame(StartPage)
     
     #Initalize all pages
@@ -145,13 +144,24 @@ class BehaviorBox(tk.Tk, Experiment):
 	#Image capturing
 	for i in range(int(Appa.exptime/Appa.capturerate+1)):
     		camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(i) + ".jpg")
+    		Appa.expy.append("")
 		if i != int(Appa.exptime/Appa.capturerate):
 			sleep(Appa.capturerate)
 	camera.stop_preview()
+    
     def show_frameFoxtrot(self, cont):
-   	frame = self.frames[cont]
-	frame.update_idletasks()
+   	frame = cont(self.container, self)
+   	self.frames[cont] = frame 
+        frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
 	frame.tkraise() #raise to front
+    
+    #Load Appa object for exp and pull up first image from chosen experiment
+    def show_frameLima(self, cont, chosenexp):
+        frame = self.frames[cont]
+       	global Momo
+       	Momo = getobject(chosenexp)
+       	frame.ChangePic(1)
+       	frame.tkraise() #raise to front
     
     def show_frameRhino(self, cont):
    	frame = self.frames[cont]
@@ -531,8 +541,8 @@ class PageTest(tk.Frame):
 		button1 = ttk.Button(self,text="Back", command=lambda: controller.show_frame(ExpFinishPg))
 		button1.grid(row=1, column = 0, sticky="NS")
 		
-#		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frameStingray(StartPage)) 
-		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frame(StartPage)) 
+		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frameStingray(StartPage)) 
+#		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frame(StartPage)) 
 		button2.grid(row=1, column = 4, sticky= "NS")
 
 		button3 = ttk.Button(self,text="Discard", command=lambda: controller.show_frameRhino(StartPage)) 
@@ -597,8 +607,8 @@ class PageTen(tk.Frame):
 	self.List1.config(scrollregion=self.List1.bbox("active"))
 	scrollbar.config(command=self.List1.yview)
 
-#	button2 = ttk.Button(self, text="Continue", command = lambda List1=self.List1: self.asdf(List1))
-	button2 = ttk.Button(self, text="Continue", command = lambda: controller.show_frame(DataAnalysisImagePg))
+
+	button2 = ttk.Button(self, text="Continue", command=lambda List1=self.List1: controller.show_frameLima(DataAnalysisImagePg, self.asdf(List1)))
 	button2.grid(row=1, column = 3, sticky="NS")
 
 	self.explist = []
@@ -614,7 +624,7 @@ class PageTen(tk.Frame):
     def asdf(self, List1):
 	items = map(int, List1.curselection())
 	itemindex = List1.curselection()[0]
-	print(self.explist[itemindex])
+	return(self.explist[itemindex])
 	
 	
 class DataAnalysisImagePg(tk.Frame):
@@ -626,35 +636,36 @@ class DataAnalysisImagePg(tk.Frame):
 
         #button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
         #button1.grid(row=14, column=3, sticky="NS", columnspan=2)
-        #button2 = ttk.Button(self, text="Next\nPicture", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
-        button2 = ttk.Button(self, text="Next\nPicture", command=lambda: self.qf2()) #create a button to return to home screen
+
+        button2 = ttk.Button(self, text="Next\nPicture", command=lambda: self.ChangePic(1)) #create a button to return to home screen
         button2.grid(row=10, column=6, sticky="NESW", rowspan=4, columnspan=3)
-        #button3 = ttk.Button(self, text="Previous\nPicture", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
-        button3 = ttk.Button(self, text="Previous\nPicture", command=lambda: self.qf1(parent)) #create a button to return to home screen
+
+        button3 = ttk.Button(self, text="Previous\nPicture", command=lambda: self.ChangePic(-1)) #create a button to return to home screen
         button3.grid(row=10, column=3, sticky="NESW", rowspan=4, columnspan=3)
         
-        self.totaltime = ""
-        """Creates display for time inputed"""
-        self.totaltimetext = tk.Label(self, text = "", font=LARGE_FONT) 
-        self.totaltimetext.grid(row=2, column=3, rowspan=2, columnspan=7, sticky="EW")
-        self.totaltimetext.configure(text = "Number of worms:\n%.5s" % self.totaltime)
+
+        """Creates display for worms counted"""
+        self.wormscounted = ""
+        self.wormscountedtext = tk.Label(self, text = "", font=LARGE_FONT) 
+        self.wormscountedtext.grid(row=2, column=3, rowspan=2, columnspan=7, sticky="EW")
+        self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % self.wormscounted)
+        
+        """Creates display for page currently on"""
+	self.currentimagenum = -1
+        self.imagenumtext = tk.Label(self, text = "", font=LARGE_FONT) 
+        self.imagenumtext.grid(row=0, column=3, rowspan=2, columnspan=7, sticky="EW")
+        self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, 5))
+        
         
         
         self.grid_columnconfigure(2, minsize=20) #spacer
 	for column in range(3,9):
 	        self.grid_columnconfigure(column, minsize=30) 
-        
-        
-        
-        
+
         self.f = Figure(figsize = (1,1))#define figure		
-        self.a = self.f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
-        self.a.xaxis.set_visible(False)
-        self.a.yaxis.set_visible(False)
-        self.a.set_position([0,0,1,1])
-	self.a.set_aspect(1)
-        img = mpimg.imread("/home/pi/Desktop/ExperimentFolder/PictureFolder/image0.jpg") #read in image
-        self.a.imshow(img) #Renders image
+        self.placesubplot()
+        #img = mpimg.imread("/home/pi/Desktop/ExperimentFolder/PictureFolder/image0.jpg") #read in image
+        #self.a.imshow(img) #Renders image
 
                 
         #add canvas which is what we intend to render graph to and fill it with figure
@@ -685,34 +696,59 @@ class DataAnalysisImagePg(tk.Frame):
                 r += 1
     """method to save user inputs and display them"""
     def click(self, z):
-        currentnum = self.totaltime
+        currentnum = self.wormscounted
         if currentnum == '0':
-            self.totaltime = z
+            self.wormscounted = z
         if z == 'x':
-            self.totaltime = currentnum[:-1]
+            self.wormscounted = currentnum[:-1]
         else:
-            if len(self.totaltime) > 2:
+            if len(self.wormscounted) > 2:
                 tkMessageBox.showwarning("Error", "There's no way that there are that many worms")
             else:
-                self.totaltime = currentnum + z
-        self.totaltimetext.configure(text = "Number of worms:\n%.5s" % self.totaltime)
+                self.wormscounted = currentnum + z
+        self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % self.wormscounted)
+
+    
+    
+    def ChangePic(self, direction):
+    	#Store the number of counted worms 
+    	if self.currentimagenum != -1:
+    		Momo.expy[self.currentimagenum]=self.wormscounted
+    	#Go to next screen
+    	if self.currentimagenum < len(Momo.expy)-1:
+		self.currentimagenum = self.currentimagenum + direction
+		print(self.currentimagenum)
+		self.f.clf()
+		self.placesubplot()
+		img = mpimg.imread(Momo.savefile + "/ExpDataPictures/image" + str(self.currentimagenum) + ".jpg") #read in image
+		self.a.imshow(img) #Renders image
+		self.canvas.draw()
+    	if self.currentimagenum = len(Momo.expy)-1:
+    		tkMessageBox.showwarning("Error", "Last Image")
+	self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, len(Momo.expy)))    
+    """
+    def PreviousPic(self):
+    	self.currentimagenum -= 1
+    	self.f.clf()
+    	self.placesubplot()
+    	img = mpimg.imread(Momo.savefile + "/ExpDataPictures/image" + str(self.currentimagenum) + ".jpg") #read in image
+        self.a.imshow(img) #Renders image
+        self.canvas.draw()
+	self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, len(Momo.expy)))    
+    """
+    def placesubplot(self):
+    	self.a = self.f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
+        self.a.xaxis.set_visible(False)
+        self.a.yaxis.set_visible(False)
+        self.a.set_position([0,0,1,1])
+	self.a.set_aspect(1)
+	
     def checkvalidexptime(self, parent, controller):
    	if len(self.totaltime) == 0: #user did not enter a number
     		tkMessageBox.showwarning("Error", "Must enter an experiment duration")
     	else:
 		Appa.set_exptime(self.totaltime) #create experiment object
 		controller.show_frameCharlie(ConfirmPg)
-    def qf1(self, parent):
-    	start_time = time()
-    	img = mpimg.imread("/home/pi/Desktop/ExperimentFolder/PictureFolder/image3.jpg") #read in image
-        self.a.imshow(img) #Renders image
-        self.canvas.draw()
-        #self.canvas.get_tk_widget().update_idletasks() #canvas raise
-        print(time() - start_time)
-    def qf2(self):
-    	img = mpimg.imread("/home/pi/Desktop/ExperimentFolder/PictureFolder/image2.jpg") #read in image
-        self.a.imshow(img) #Renders image
-        self.canvas.get_tk_widget().update_idletasks()
 class DataDelPg(tk.Frame):
 
     """Allows data retrieval"""
@@ -727,9 +763,6 @@ class DataDelPg(tk.Frame):
 
   	button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
         button1.grid(row=1, column = 0, sticky="NS")
-	
-	def testbutton(self):
-            print("Hi")	
 	
 	self.explist = []
 	
