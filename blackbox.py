@@ -81,7 +81,7 @@ class BehaviorBox(tk.Tk, Experiment):
         self.container.grid_columnconfigure(0, weight=1) 
 
         self.frames = {}
-	for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTest, DataDelPg, DataAnalysisImagePg, PageTen):
+	for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTest, DataDelPg, DataAnalysisImagePg, PageTen, GraphPage):
             frame = F(self.container, self)
             self.frames[F] = frame 
             frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
@@ -157,15 +157,18 @@ class BehaviorBox(tk.Tk, Experiment):
     
     #Load Appa object for exp and pull up first image from chosen experiment
     def show_frameLima(self, cont, chosenexp):
-        frame = self.frames[cont]
+       	frame = cont(self.container, self)
+   	self.frames[cont] = frame 
+   	frame.grid(row=0, column=0, sticky="nsew")
        	global Momo
        	Momo = getobject(chosenexp)
        	frame.ChangePic(1)
        	frame.tkraise() #raise to front
+
     
     def show_frameRhino(self, cont):
    	frame = self.frames[cont]
-	confirmdiscard()
+        saveobject(Momo)
 	frame.tkraise() #raise to front
 	
     #after keep data -> store appa object and reset appa	
@@ -174,18 +177,13 @@ class BehaviorBox(tk.Tk, Experiment):
     	frame = self.frames[cont]
         frame.tkraise() #raise to front
         
-    """
-    #from: numberpad/"choose exp to analyze" to image
-    def show_frameTango(self, cont):
-	frame = self.frames[cont]
-    	if next image exists (check using length of Momo.expY to get image directory): #Case of not final image
-    		configure text of DataAnalysisNumPg to show "Next Image"
-       else: #case final image
-           configure text of DataAnalysisNumPg to show "Generate Graph"
-       configure image
-       frame.update_idletasks()
-       frame.tkraise()
-    """
+    def show_frameShark(self, cont):
+        frame = self.frames[cont]
+        Momo.expy = list(map(int, Momo.expy))
+        frame.a.plot(range(len(Momo.expy)),Momo.expy)
+        frame.label.configure(text = "Graph of Exp%s" %Momo.expnumber, font=LARGE_FONT)
+	frame.canvas.draw() #raise canvas
+        frame.tkraise() #raise to front
 		
 class StartPage(tk.Frame):
 
@@ -204,10 +202,10 @@ class StartPage(tk.Frame):
         button3.grid(row=3, column=1, sticky="nsew")
 
 	self.grid_columnconfigure(0, minsize=100)
+	
 class ExpNumPg(tk.Frame, Experiment):
 
     """Gets user input for experiment number for name file"""
-        
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -642,9 +640,12 @@ class DataAnalysisImagePg(tk.Frame):
 
         self.button2 = ttk.Button(self, text="Previous\nPicture", command=lambda: self.ChangePic(-1)) #create a button to return to home screen
         self.button2.grid(row=10, column=3, sticky="NESW", rowspan=4, columnspan=3)
-        
-	self.button3 = ttk.Button(self, text="Generate\nGraph", command=lambda: self.qfa()) #create a button to return to home screen
+
+        self.button3 = ttk.Button(self, text="Generate\nGraph", command=lambda: controller.show_frameShark(GraphPage)) #create a button to return to home screen
 	self.button3.grid(row=10, column=6, sticky="NESW", rowspan=4, columnspan=3)
+	
+	self.button4 = ttk.Button(self, text="Back to\nExperiment\nSelection", command=lambda: controller.show_frameFoxtrot(PageTen)) #create a button to return to home screen
+	self.button4.grid(row=10, column=3, sticky="NESW", rowspan=4, columnspan=3)
 	
         """Creates display for worms counted"""
         self.wormscounted = ""
@@ -657,22 +658,15 @@ class DataAnalysisImagePg(tk.Frame):
         self.imagenumtext = tk.Label(self, text = "", font=LARGE_FONT) 
         self.imagenumtext.grid(row=0, column=3, rowspan=2, columnspan=7, sticky="EW")
         self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, 5))
-        
-        
-        
+	        
         self.grid_columnconfigure(2, minsize=20) #spacer
 	for column in range(3,9):
 	        self.grid_columnconfigure(column, minsize=30) 
 
         self.f = Figure(figsize = (1,1))#define figure		
-        self.placesubplot()
-        #img = mpimg.imread("/home/pi/Desktop/ExperimentFolder/PictureFolder/image0.jpg") #read in image
-        #self.a.imshow(img) #Renders image
-
-                
-        #add canvas which is what we intend to render graph to and fill it with figure
-        self.canvas = FigureCanvasTkAgg(self.f, self) 
-        self.canvas.draw() #canvas raise
+        self.placesubplot()             
+        self.canvas = FigureCanvasTkAgg(self.f, self) #add canvas which is what we intend to render graph to and fill it with figure
+        self.canvas.draw() #bring canvas to front
         self.canvas.get_tk_widget().grid(row=0, column=0, rowspan = 15) #Fill options: BOTH, X, Y Expand options:  
         self.canvas.get_tk_widget().config(width=580, height=480)
 
@@ -681,14 +675,11 @@ class DataAnalysisImagePg(tk.Frame):
         btn_numbers = [ '7', '8', '9', '4', '5', '6', '1', '2', '3', ' ', '0', 'x'] #create list of numbers to be displayed
         r = 5 
         c = 3
-  
-
         for num in btn_numbers:
             if num == ' ':
                 self.num = ttk.Button(self, text=num, width=5)
                 self.num.grid(row=r, column=c, sticky= "nsew", columnspan=2)
                 c += 2
-
             else: 
                 self.num = ttk.Button(self, text=num, width=5, command=lambda b = num: self.click(b))
                 self.num.grid(row=r, column=c, sticky= "nsew", columnspan=2)
@@ -696,6 +687,7 @@ class DataAnalysisImagePg(tk.Frame):
             if c > 7:
                 c = 3
                 r += 1
+    
     """method to save user inputs and display them"""
     def click(self, z):
         currentnum = self.wormscounted
@@ -708,48 +700,84 @@ class DataAnalysisImagePg(tk.Frame):
                 tkMessageBox.showwarning("Error", "There's no way that there are that many worms")
             else:
                 self.wormscounted = currentnum + z
-        Momo.expy[self.currentimagenum]=int(self.wormscounted)#store number of counted worms
-        self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % str(Momo.expy[self.currentimagenum]))
+        Momo.expy[self.currentimagenum]=self.wormscounted #store number of counted worms
+        self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % str(Momo.expy[self.currentimagenum])) #configure text so user can see what they entered
 
     
     
     def ChangePic(self, direction):
 	
     	#Go to next screen
-    	if self.currentimagenum <= len(Momo.expy)-1:
-		self.button3.lower()
-		self.button2.lift()
-		self.currentimagenum = self.currentimagenum + direction
-		self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % str(Momo.expy[self.currentimagenum]))
-		self.wormscounted = Momo.expy[self.currentimagenum]
-		self.f.clf()
-		self.placesubplot()
+	self.button3.lower()
+	self.button2.lift()
+	if self.currentimagenum != -1 and self.wormscounted == "" and direction == 1: #Make sure they entered a number
+    		tkMessageBox.showwarning("Error", "Must enter a number")
+    		
+	else: #they did enter a number
+		print("in else")
+		self.currentimagenum = self.currentimagenum + direction #change index depending on if user chose next image or previous image
+		self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % str(Momo.expy[self.currentimagenum])) #configure text so user can see any previously entered values 
+		self.wormscounted = Momo.expy[self.currentimagenum] #store value of just entered number
+		self.f.clf() #clear plot
+		self.placesubplot() #place plot again
 		img = mpimg.imread(Momo.savefile + "/ExpDataPictures/image" + str(self.currentimagenum) + ".jpg") #read in image
 		self.a.imshow(img) #Renders image
 		self.canvas.draw()
-    	if self.currentimagenum == len(Momo.expy)-1:
-        	self.button3.lift()
-        	self.button2.lower()
-	self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, len(Momo.expy)))    
+		self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, len(Momo.expy))) #Update text so user knows what image number they are on
+		if self.currentimagenum == len(Momo.expy)-1: #if last image show "generate graph" button
+			self.button3.lift()
+    		if self.currentimagenum == 0: #first image
+    			self.button4.lift()
     def placesubplot(self):
     	self.a = self.f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
-        self.a.xaxis.set_visible(False)
-        self.a.yaxis.set_visible(False)
+        self.a.xaxis.set_visible(True)
+        self.a.yaxis.set_visible(True)
         self.a.set_position([0,0,1,1])
 	self.a.set_aspect(1)
 	
-    def checkvalidexptime(self, parent, controller):
-   	if len(self.totaltime) == 0: #user did not enter a number
-    		tkMessageBox.showwarning("Error", "Must enter an experiment duration")
-    	else:
-		Appa.set_exptime(self.totaltime) #create experiment object
-		controller.show_frameCharlie(ConfirmPg)
-    def qfa(self):
-    	plt.plot(range(len(Momo.expy)),Momo.expy)
-    	plt.show()
+
+
+
+
+class GraphPage(tk.Frame):
+	
+	"""Page to generate graph"""
+	
+	def __init__(self, parent, controller):
+		tk.Frame.__init__(self, parent)
+		self.label = tk.Label(self, text = "Graph of" , font=LARGE_FONT)
+		self.label.grid(row = 0, column=1, columnspan = 2, sticky="NSEW")
+		
+		button1 = ttk.Button(self,text="Back", command=lambda: controller.show_frame(DataAnalysisImagePg))
+		button1.grid(row=1, column = 0, sticky="NS")
+		
+		button2 = ttk.Button(self,text="Back to home", command=lambda: controller.show_frame(StartPage)) 
+		button2.grid(row=1, column = 4, sticky= "NS")
+
+		button3 = ttk.Button(self,text="Save Graph", command=lambda: controller.show_frameRhino(StartPage)) 
+		button3.grid(row=2, column = 4, sticky="NS")
+
+
+		#This code is to load the figure but ignore for now to load faster
+
+		f = Figure(figsize = (1,1))#define figure		
+		self.a = f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
+
+		self.a.xaxis.set_visible(True)
+		#self.a.yaxis.set_visible(False)
+		self.a.set_position([0,0,1,1])
+		
+		#add canvas which is what we intend to render graph to and fill it with figure
+		self.canvas = FigureCanvasTkAgg(f, self) 
+		self.canvas.get_tk_widget().grid(row=1, column=1, rowspan = 3, sticky="NS") #Fill options: BOTH, X, Y Expand options:  
+		self.canvas.get_tk_widget().config(width=580, height=480)
+
+
+
+
 class DataDelPg(tk.Frame):
 
-    """Allows data retrieval"""
+    """Allows data deletion"""
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
