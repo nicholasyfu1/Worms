@@ -782,47 +782,70 @@ class DataDelPg(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Data Review \n Please choose experiment to delete", font=LARGE_FONT) #create object
-        label.grid(row = 0, column=1, columnspan = 2, sticky="NSEW")
+        label.grid(row = 0, column=1, columnspan = 3, sticky="NSEW")
         
         button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
         button1.grid(row=1, column = 0, sticky="NS")
 
-  	button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
-        button1.grid(row=1, column = 0, sticky="NS")
-	
-	self.explist = []
-	
-	
-        	
-	scrollbar = AutoScrollbar(self)
-	scrollbar.grid(row=1, column=2, sticky="NSW", rowspan=2)
+	button2 = ttk.Button(self, text="Continue", command = lambda: self.yoga())
+	button2.grid(row=1, column = 3, sticky="NS")
 
-	self.checkbox_text = tk.Text(self, height=10, width=10, yscrollcommand=scrollbar.set)
+	self.explist = []
+	self.listofbuttons = []
+        	
+	self.vscrollbar = AutoScrollbar(self)
+	self.vscrollbar.grid(row=1, column=2, sticky="NSW", rowspan=2)
 	
-	#self.check1=tk.Checkbutton(canvas, yscrollcommand = scrollbar.set)
-	self.checkbox_text.grid(row=1, column=1, rowspan = 1, sticky="NSEW")
-	scrollbar.config(command=self.checkbox_text.yview)
+	####################################
+	
+        self.canvas = tk.Canvas(self, bg = '#444444', bd=0, height=350, width=40, highlightthickness=0, yscrollcommand=self.vscrollbar.set)
+        self.canvas.grid(row=1, column=1, rowspan = 1, columnspan=1, sticky="NSEW")
+        self.vscrollbar.config(command=self.canvas.yview)
+	
+	self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+	
+	self.interior = tk.Frame(self.canvas)
+        self.canvas.create_window(0, 0, window=self.interior, anchor="nw")
+	
+        
+       
+	
+	#########################
+	
+	#self.checkbox_text = tk.Text(self, height=10, width=10, yscrollcommand=scrollbar.set)
+	
+	##self.check1=tk.Checkbutton(canvas, yscrollcommand = scrollbar.set)
+	#self.checkbox_text.grid(row=1, column=1, rowspan = 1, sticky="NSEW")
+	#scrollbar.config(command=self.checkbox_text.yview)
 	
 	
-	
-	b = ttk.Button(self, text="Continue") #command = lambda: print("none"))
-	b.grid(row=1, column = 3, sticky="NS")
 	i=0
 	for item in os.listdir("/home/pi/Desktop/ExperimentFolder/"):
 		self.explist.append(item)
 	self.explist.sort()
+	
 	for experiment in self.explist:
-		cb = tk.Checkbutton(self.checkbox_text, text=experiment, variable=self.explist[i])
-		self.checkbox_text.window_create(tk.END, window=cb)
-		self.checkbox_text.insert(tk.END, "\n")
+		cb = ttk.Checkbutton(self.canvas, text=experiment, variable=self.explist[i])
+		cb.grid(row=2*i, column=0, rowspan=2, sticky="NSEW")
+		self.listofbuttons.append(cb)
 		i+=1
+		
 
-    def asdf(self, List1):
-	items = map(int, List1.curselection())
-	itemindex = List1.curselection()[0]
-	print(self.explist[itemindex])
-        
+  
+    def yoga(self):
+	result = tkMessageBox.askquestion("Discard", "Are you sure you want \nto discard these data?")
+	if result == "yes":
+		for button in self.listofbuttons:
+			if button.instate(['selected']):
+				shutil.rmtree("/home/pi/Desktop/ExperimentFolder/" + button['text'] + "/")
+				app.show_frameFoxtrot(DataDelPg)
+				
 
+
+			
+	
+		
+       
 
 
 
