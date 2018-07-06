@@ -25,6 +25,8 @@ matplotlib.use("TkAgg")
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+from matplotlib.patches import Circle
+from matplotlib.patches import Arc
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
@@ -48,7 +50,7 @@ class Experiment():
 		self.exptype = str()
 		self.exptime = int()
 		self.savefile = str()
-		self.capturerate=5
+		self.capturerate=2
 		self.x = range(4)
 		self.controly =  []
 		self.expy = []
@@ -106,9 +108,7 @@ class BehaviorBox(tk.Tk, Experiment):
         Appa.exptype = str()
 	Appa.exptime = int()
 	Appa.savefile = str()
-	
 	app.startfresh() #Reinitalize all pages to starting state
-	
         frame = self.frames[cont]
         frame.tkraise() #raise to front
 
@@ -165,10 +165,40 @@ class BehaviorBox(tk.Tk, Experiment):
        	frame.ChangePic(1)
        	frame.tkraise() #raise to front
 
-    
+    def show_frameMarlin(self, cont):
+    	i=1
+	numpics = len(os.listdir(Appa.savefile + "ExpDataPictures"))
+	wubdub= float(1.0/numpics)
+    	frame = self.frames[cont]
+    	frame.f = Figure(figsize = (10,40), facecolor = "R")#define figure	
+    	#for picture in os.listdir("/home/pi/Desktop/ExperimentFolder/Exp3/ExpDataPictures"):
+    	for picture in  os.listdir(Appa.savefile + "/ExpDataPictures"):
+		a = frame.f.add_subplot(numpics,1,i) #add subplot RCP. Pth pos on grid with R rows and C columns
+		img = mpimg.imread(Appa.savefile+ "/ExpDataPictures/image" + str(numpics-i) + ".jpg") #read in image
+		a.xaxis.set_visible(False)
+		a.yaxis.set_visible(False)
+		a.set_position([0,0+wubdub*(i-1),1,wubdub])
+		a.imshow(img) #Renders image
+		i+=1
+	#add canvas which is what we intend to render graph to and fill it with figure
+	canvas = FigureCanvasTkAgg(frame.f, frame) 
+	canvas.draw() #raise canvas
+	canvas.get_tk_widget().grid(row=1, column=1, rowspan = 10, sticky="NS") #Fill options: BOTH, X, Y Expand options:  
+
+
+	#Add scrollbar
+	scrollbar = tk.Scrollbar(frame)
+	scrollbar.config(command=canvas.get_tk_widget().yview)
+#	canvas.get_tk_widget().config(scrollregion=(canvas.get_tk_widget().bbox("all")))
+	canvas.get_tk_widget().config(width=630, height=numpics*450)
+	canvas.get_tk_widget().config(scrollregion=(0,0,1260,numpics*900))
+	scrollbar.grid(row=1, column=3, sticky="NS", rowspan = 2)
+	canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
+	frame.tkraise()
+	
     def show_frameRhino(self, cont):
    	frame = self.frames[cont]
-        saveobject(Momo)
+        confirmdiscard()
 	frame.tkraise() #raise to front
 	
     #after keep data -> store appa object and reset appa	
@@ -521,10 +551,10 @@ class ExpFinishPg(tk.Frame):
         label = tk.Label(self, text="Experiment Finished", font=LARGE_FONT) #create object
         label.grid(row=0, column=0, columnspan=100) #grid object into window
         
-    	button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frameAlpha(ExpNumPg)) #create a button to start a new experiment       
+    	button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frameAlpha(ExpNumPg)) #create a button to start a new experiment    #TODO save appa  
         button1.grid(row=1, column=0, columnspan=100) #grid object into window
 
-        button2 = ttk.Button(self, text="Review This\nExperiment's Data", command=lambda: controller.show_frame(PageTest)) #create a button to start a new experiment 
+        button2 = ttk.Button(self, text="Review This\nExperiment's Data", command=lambda: controller.show_frameMarlin(PageTest)) #create a button to start a new experiment 
         button2.grid(row=2, column=0, columnspan=100) #grid object into window
     
 class PageTest(tk.Frame):
@@ -540,7 +570,6 @@ class PageTest(tk.Frame):
 		button1.grid(row=1, column = 0, sticky="NS")
 		
 		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frameStingray(StartPage)) 
-#		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frame(StartPage)) 
 		button2.grid(row=1, column = 4, sticky= "NS")
 
 		button3 = ttk.Button(self,text="Discard", command=lambda: controller.show_frameRhino(StartPage)) 
@@ -548,13 +577,14 @@ class PageTest(tk.Frame):
 
 
 		#This code is to load the figure but ignore for now to load faster
-
-		f = Figure(figsize = (1,1))#define figure		
+		"""
+		self.f = Figure(figsize = (1,1))#define figure		
+		
 		i=1
 		wubdub = .2
-		for picture in  os.listdir("/home/pi/Desktop/ExperimentFolder/PictureFolder"):
-			a = f.add_subplot(5,1,i) #add subplot RCP. Pth pos on grid with R rows and C columns
-			img = mpimg.imread("/home/pi/Desktop/ExperimentFolder/PictureFolder/" + picture) #read in image
+		for picture in  Appa.savefile + "/ExpDataPictures/":
+			a = f.add_subplot(i,1,i) #add subplot RCP. Pth pos on grid with R rows and C columns
+			img = mpimg.imread(Appa.savefile + "/ExpDataPictures/" + picture) #read in image
 			a.xaxis.set_visible(False)
 			a.yaxis.set_visible(False)
 			a.set_position([0,0+wubdub*(i-1),.5,wubdub])
@@ -562,7 +592,7 @@ class PageTest(tk.Frame):
 			i+=1
 			
 		#add canvas which is what we intend to render graph to and fill it with figure
-		canvas = FigureCanvasTkAgg(f, self) 
+		canvas = FigureCanvasTkAgg(self.f, self) 
 		canvas.draw() #raise canvas
 		canvas.get_tk_widget().grid(row=1, column=1, rowspan = 3, sticky="NS") #Fill options: BOTH, X, Y Expand options:  
 
@@ -575,7 +605,7 @@ class PageTest(tk.Frame):
 		canvas.get_tk_widget().config(scrollregion=(0,0,1260,720*3))
 		scrollbar.grid(row=1, column=3, sticky="NS", rowspan = 3)
 		canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
-		
+		"""
 def confirmdiscard():
 	result = tkMessageBox.askquestion("Discard", "Are you sure you want \nto discard these data?")
 	if result == "yes":
@@ -647,6 +677,9 @@ class DataAnalysisImagePg(tk.Frame):
 	self.button4 = ttk.Button(self, text="Back to\nExperiment\nSelection", command=lambda: controller.show_frameFoxtrot(PageTen)) #create a button to return to home screen
 	self.button4.grid(row=10, column=3, sticky="NESW", rowspan=4, columnspan=3)
 	
+	self.circ = Circle((400,800),150, fill=False, edgecolor = "R")
+	self.arc = Arc((400,800), width=200, height=200, theta1=0, theta2=180, edgecolor = "B")
+	
         """Creates display for worms counted"""
         self.wormscounted = ""
         self.wormscountedtext = tk.Label(self, text = "", font=LARGE_FONT) 
@@ -714,7 +747,6 @@ class DataAnalysisImagePg(tk.Frame):
     		tkMessageBox.showwarning("Error", "Must enter a number")
     		
 	else: #they did enter a number
-		print("in else")
 		self.currentimagenum = self.currentimagenum + direction #change index depending on if user chose next image or previous image
 		self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % str(Momo.expy[self.currentimagenum])) #configure text so user can see any previously entered values 
 		self.wormscounted = Momo.expy[self.currentimagenum] #store value of just entered number
@@ -722,6 +754,20 @@ class DataAnalysisImagePg(tk.Frame):
 		self.placesubplot() #place plot again
 		img = mpimg.imread(Momo.savefile + "/ExpDataPictures/image" + str(self.currentimagenum) + ".jpg") #read in image
 		self.a.imshow(img) #Renders image
+		if Momo.exptype == "0":
+    			#words = "None"
+    			shape = self.circ
+    		elif Momo.exptype == "1":
+    			#words = "Thermotaxis"
+    			shape = self.circ
+		elif Momo.exptype == "2":
+  	  		#words = "Chemotaxis"
+  	  		shape = self.circ
+		elif Momo.exptype == "3":
+			#words = "Phototaxis"
+			shape = self.arc
+			self.a.plot([300,500], [800,800], color = "R")
+		self.a.add_patch(shape)		
 		self.canvas.draw()
 		self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, len(Momo.expy))) #Update text so user knows what image number they are on
 		if self.currentimagenum == len(Momo.expy)-1: #if last image show "generate graph" button
@@ -734,6 +780,8 @@ class DataAnalysisImagePg(tk.Frame):
         self.a.yaxis.set_visible(True)
         self.a.set_position([0,0,1,1])
 	self.a.set_aspect(1)
+
+
 	
 
 
@@ -754,11 +802,8 @@ class GraphPage(tk.Frame):
 		button2 = ttk.Button(self,text="Back to home", command=lambda: controller.show_frame(StartPage)) 
 		button2.grid(row=1, column = 4, sticky= "NS")
 
-		button3 = ttk.Button(self,text="Save Graph", command=lambda: controller.show_frameRhino(StartPage)) 
+		button3 = ttk.Button(self,text="Save Graph", command=lambda: controller.show_frameStingray(StartPage)) 
 		button3.grid(row=2, column = 4, sticky="NS")
-
-
-		#This code is to load the figure but ignore for now to load faster
 
 		f = Figure(figsize = (1,1))#define figure		
 		self.a = f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
@@ -782,7 +827,7 @@ class DataDelPg(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Data Review \n Please choose experiment to delete", font=LARGE_FONT) #create object
-        label.grid(row = 0, column=1, columnspan = 3, sticky="NSEW")
+        label.grid(row = 0, column=0, columnspan = 4, sticky="NSEW")
         
         button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
         button1.grid(row=1, column = 0, sticky="NS")
@@ -793,30 +838,23 @@ class DataDelPg(tk.Frame):
 	self.explist = []
 	self.listofbuttons = []
         	
-	self.vscrollbar = AutoScrollbar(self)
-	self.vscrollbar.grid(row=1, column=2, sticky="NSW", rowspan=2)
 	
-	####################################
 	
-        self.canvas = tk.Canvas(self, bg = '#444444', bd=0, height=350, width=40, highlightthickness=0, yscrollcommand=self.vscrollbar.set)
-        self.canvas.grid(row=1, column=1, rowspan = 1, columnspan=1, sticky="NSEW")
-        self.vscrollbar.config(command=self.canvas.yview)
-	
-	self.canvas.configure(scrollregion=self.canvas.bbox('all'))
-	
-	self.interior = tk.Frame(self.canvas)
-        self.canvas.create_window(0, 0, window=self.interior, anchor="nw")
-	
+        self.canvas = tk.Canvas(self, bg = "white", height=100, width=100, highlightthickness=0)
+        self.frame = tk.Frame(self.canvas, background="#ffffff")
+        self.vscrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.vscrollbar.set)
         
-       
+        self.canvas.grid(row=1, column=1, rowspan = 2, columnspan=1, sticky="NSEW")
+	self.vscrollbar.grid(row=1, column=2, sticky="NSW", rowspan=2, columnspan=2)      
+
+
+	self.canvas.create_window((4,4), window=self.frame, anchor="center", tags="self.frame")
 	
-	#########################
+	self.frame.bind("<Configure>", self.onFrameConfigure)
+
 	
-	#self.checkbox_text = tk.Text(self, height=10, width=10, yscrollcommand=scrollbar.set)
 	
-	##self.check1=tk.Checkbutton(canvas, yscrollcommand = scrollbar.set)
-	#self.checkbox_text.grid(row=1, column=1, rowspan = 1, sticky="NSEW")
-	#scrollbar.config(command=self.checkbox_text.yview)
 	
 	
 	i=0
@@ -825,11 +863,10 @@ class DataDelPg(tk.Frame):
 	self.explist.sort()
 	
 	for experiment in self.explist:
-		cb = ttk.Checkbutton(self.canvas, text=experiment, variable=self.explist[i])
+		cb = ttk.Checkbutton(self.frame, text=experiment, variable=self.explist[i])
 		cb.grid(row=2*i, column=0, rowspan=2, sticky="NSEW")
 		self.listofbuttons.append(cb)
 		i+=1
-		
 
   
     def yoga(self):
@@ -839,7 +876,9 @@ class DataDelPg(tk.Frame):
 			if button.instate(['selected']):
 				shutil.rmtree("/home/pi/Desktop/ExperimentFolder/" + button['text'] + "/")
 				app.show_frameFoxtrot(DataDelPg)
-				
+	
+    def onFrameConfigure(self, event):
+	self.canvas.configure(scrollregion=self.canvas.bbox("all"))			
 
 
 			
