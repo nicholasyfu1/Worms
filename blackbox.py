@@ -108,6 +108,8 @@ class BehaviorBox(tk.Tk, Experiment):
         Appa.exptype = str()
 	Appa.exptime = int()
 	Appa.savefile = str()
+#	Appa.expy = []
+	print(Appa.expy)
 	app.startfresh() #Reinitalize all pages to starting state
         frame = self.frames[cont]
         frame.tkraise() #raise to front
@@ -145,6 +147,7 @@ class BehaviorBox(tk.Tk, Experiment):
 	for i in range(int(Appa.exptime/Appa.capturerate+1)):
     		camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(i) + ".jpg")
     		Appa.expy.append("")
+    		print("hello?" + str(i))
 		if i != int(Appa.exptime/Appa.capturerate):
 			sleep(Appa.capturerate)
 	camera.stop_preview()
@@ -160,6 +163,7 @@ class BehaviorBox(tk.Tk, Experiment):
        	frame = cont(self.container, self)
    	self.frames[cont] = frame 
    	frame.grid(row=0, column=0, sticky="nsew")
+       	#create variable to store experiment object
        	global Momo
        	Momo = getobject(chosenexp)
        	frame.ChangePic(1)
@@ -209,25 +213,44 @@ class BehaviorBox(tk.Tk, Experiment):
     
         
     def show_frameShark(self, cont, listofbuttons):
-	#check to see if experiment has finished
-	frame = self.frames[cont]
+	frame = cont(self.container, self)
+   	self.frames[cont] = frame 
+        
 	ExpsToGraph = []
 	expnames = []
+	unanalyzedlist = []
+	result = True
 	
 	#Get list of experiments to plot
 	for button in listofbuttons:
 		if button.instate(['selected']):
 			ExpsToGraph.append(getobject(button['text']))
-	#Plot experiments
-        for experiment in ExpsToGraph:
-        	experiment.expy = list(map(int, experiment.expy))
-        	frame.a.plot(range(len(experiment.expy)),experiment.expy)
-        	expnames.append(experiment.expnumber)
-        expnames = ", Exp".join(expnames)
-        frame.label.configure(text = "Graph of Exp" + expnames, font=LARGE_FONT)
-	frame.canvas.draw() #raise canvas
-        frame.tkraise() #raise to front
-		
+	
+	#Check to see if chose an experiment
+	if len(ExpsToGraph) == 0: 
+		tkMessageBox.showwarning("Error", "No experiments selected") #show warning
+	else:
+		#Check to see if all experiments selected have been analyzed
+		for experiment in ExpsToGraph:
+			if experiment.expy[0] == "":
+				unanalyzedlist.append(experiment.expnumber)
+			else:
+				experiment.expy = list(map(int, experiment.expy))
+				frame.a.plot(range(len(experiment.expy)),experiment.expy)
+				expnames.append(experiment.expnumber)
+	       			
+	       #If unanalyzed experiments exist warn user
+		if len(unanalyzedlist) > 0:
+			unanalyzedlist = "Exp" + ", Exp".join(unanalyzedlist)
+			result = tkMessageBox.askquestion("Warning", "The following experiments have\nnot been analyzed yet\nand will not be graphed\n\n" +unanalyzedlist+ "\n\nProceed anyways?")
+			
+		if result !=  "no":
+			expnames = "Exp" + ", Exp".join(expnames)
+			frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
+			frame.label.configure(text = expnames, font=LARGE_FONT)
+			frame.canvas.draw() #raise canvas
+			frame.tkraise() #raise to front			
+				
 class StartPage(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -666,8 +689,6 @@ class DataAnalysisImagePg(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        #button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
-        #button1.grid(row=14, column=3, sticky="NS", columnspan=2)
 
         button1 = ttk.Button(self, text="Next\nPicture", command=lambda: self.ChangePic(1)) #create a button to return to home screen
         button1.grid(row=10, column=6, sticky="NESW", rowspan=4, columnspan=3)
@@ -681,8 +702,6 @@ class DataAnalysisImagePg(tk.Frame):
 	self.button4 = ttk.Button(self, text="Back to\nExperiment\nSelection", command=lambda: controller.show_frameFoxtrot(DataAnalysisPg)) #create a button to return to experiment selection
 	self.button4.grid(row=10, column=3, sticky="NESW", rowspan=4, columnspan=3)
 	
-	self.circ = Circle((400,800),150, fill=False, edgecolor = "R")
-	self.arc = Arc((400,800), width=200, height=200, theta1=0, theta2=180, edgecolor = "B")
 	
         """Creates display for worms counted"""
         self.wormscounted = ""
@@ -759,7 +778,24 @@ class DataAnalysisImagePg(tk.Frame):
 		img = mpimg.imread(Momo.savefile + "/ExpDataPictures/image" + str(self.currentimagenum) + ".jpg") #read in image
 		self.a.imshow(img) #Renders image
 		
+		if Momo.exptype == "0":
+		 	#words = "None"
+		    	circ = Circle((200,400),150, fill=False, edgecolor = "R")
+		    	shape = circ
+		elif Momo.exptype == "1":
+	   		#words = "Thermotaxis"
+	    		shape = Circle((200,400),150, fill=False, edgecolor = "R")
+		elif Momo.exptype == "2":
+	  		#words = "Chemotaxis"
+	   		shape = Circle((200,400),150, fill=False, edgecolor = "R")
+		elif Momo.exptype == "3":
+			#words = "Phototaxis"
+			shape = Arc((200,400), width=200, height=200, theta1=0, theta2=180, edgecolor = "B")
+			self.a.plot([100,300], [400,400], color = "B")	
+		self.a.add_patch(shape)
 
+		print(Momo.expy)
+		print(Momo)
 		
 		self.canvas.draw()
 		self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, len(Momo.expy))) #Update text so user knows what image number they are on
@@ -769,24 +805,10 @@ class DataAnalysisImagePg(tk.Frame):
     			self.button4.lift()
     def placesubplot(self):
     	self.a = self.f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
-        self.a.xaxis.set_visible(True)
-        self.a.yaxis.set_visible(True)
+        self.a.xaxis.set_visible(False)
+        self.a.yaxis.set_visible(False)
         self.a.set_position([0,0,1,1])
 	self.a.set_aspect(1)
-	if Momo.exptype == "0":
- 		#words = "None"
-    		shape = self.circ
-    	elif Momo.exptype == "1":
-    		#words = "Thermotaxis"
-    		shape = self.circ
-	elif Momo.exptype == "2":
-  		#words = "Chemotaxis"
-   		shape = self.circ
-	elif Momo.exptype == "3":
-		#words = "Phototaxis"
-		shape = self.arc
-		self.a.plot([300,500], [800,800], color = "R")
-	self.a.add_patch(shape)
 
 	
 class DataGraphChoice(tk.Frame):
