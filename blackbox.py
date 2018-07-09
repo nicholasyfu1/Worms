@@ -83,7 +83,7 @@ class BehaviorBox(tk.Tk, Experiment):
         self.container.grid_columnconfigure(0, weight=1) 
 
         self.frames = {}
-	for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTest, DataDelPg, DataAnalysisImagePg, PageTen, GraphPage):
+	for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTest, DataDelPg, DataAnalysisImagePg, DataAnalysisPg, GraphPage, DataRetrievalType, DataGraphChoice):
             frame = F(self.container, self)
             self.frames[F] = frame 
             frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
@@ -198,20 +198,33 @@ class BehaviorBox(tk.Tk, Experiment):
 	
     def show_frameRhino(self, cont):
    	frame = self.frames[cont]
-        confirmdiscard()
-	frame.tkraise() #raise to front
+        confirmdiscard(frame)
+	
 	
     #after keep data -> store appa object and reset appa	
-    def show_frameStingray(self, cont):
-	saveobject(Appa)
+    def show_frameStingray(self, cont, obj):
+	saveobject(obj)
     	frame = self.frames[cont]
         frame.tkraise() #raise to front
+    
         
-    def show_frameShark(self, cont):
-        frame = self.frames[cont]
-        Momo.expy = list(map(int, Momo.expy))
-        frame.a.plot(range(len(Momo.expy)),Momo.expy)
-        frame.label.configure(text = "Graph of Exp%s" %Momo.expnumber, font=LARGE_FONT)
+    def show_frameShark(self, cont, listofbuttons):
+	#check to see if experiment has finished
+	frame = self.frames[cont]
+	ExpsToGraph = []
+	expnames = []
+	
+	#Get list of experiments to plot
+	for button in listofbuttons:
+		if button.instate(['selected']):
+			ExpsToGraph.append(getobject(button['text']))
+	#Plot experiments
+        for experiment in ExpsToGraph:
+        	experiment.expy = list(map(int, experiment.expy))
+        	frame.a.plot(range(len(experiment.expy)),experiment.expy)
+        	expnames.append(experiment.expnumber)
+        expnames = ", Exp".join(expnames)
+        frame.label.configure(text = "Graph of Exp" + expnames, font=LARGE_FONT)
 	frame.canvas.draw() #raise canvas
         frame.tkraise() #raise to front
 		
@@ -225,10 +238,10 @@ class StartPage(tk.Frame):
         button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frameAlpha(ExpNumPg)) #Create a button to start a new experiment       
         button1.grid(row=1, column=1, sticky="nsew")
 
-        button2 = ttk.Button(self, text="Data Retrieval", command=lambda: controller.show_frameFoxtrot(PageTen)) #Create a button to go to 'data retrieval' page
+        button2 = ttk.Button(self, text="Data Retrieval", command=lambda: controller.show_frame(DataRetrievalType)) #Create a button to go to 'data retrieval' page
         button2.grid(row=2, column=1, sticky="nsew")
         
-        button3 = ttk.Button(self, text="Delete Data", command=lambda: controller.show_frameFoxtrot(DataDelPg)) #Create a button to go to 'data retrieval' page
+        button3 = ttk.Button(self, text="Delete Data", command=lambda: controller.show_frameFoxtrot(DataDelPg)) #Create a button to go to 'data deletion' page
         button3.grid(row=3, column=1, sticky="nsew")
 
 	self.grid_columnconfigure(0, minsize=100)
@@ -550,11 +563,8 @@ class ExpFinishPg(tk.Frame):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Experiment Finished", font=LARGE_FONT) #create object
         label.grid(row=0, column=0, columnspan=100) #grid object into window
-        
-    	button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frameAlpha(ExpNumPg)) #create a button to start a new experiment    #TODO save appa  
-        button1.grid(row=1, column=0, columnspan=100) #grid object into window
 
-        button2 = ttk.Button(self, text="Review This\nExperiment's Data", command=lambda: controller.show_frameMarlin(PageTest)) #create a button to start a new experiment 
+        button2 = ttk.Button(self, text="Continue to\nreview this\nexperiment's data", command=lambda: controller.show_frameMarlin(PageTest)) #create a button to start a new experiment 
         button2.grid(row=2, column=0, columnspan=100) #grid object into window
     
 class PageTest(tk.Frame):
@@ -569,60 +579,54 @@ class PageTest(tk.Frame):
 		button1 = ttk.Button(self,text="Back", command=lambda: controller.show_frame(ExpFinishPg))
 		button1.grid(row=1, column = 0, sticky="NS")
 		
-		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frameStingray(StartPage)) 
+		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frameStingray(StartPage, Appa)) 
 		button2.grid(row=1, column = 4, sticky= "NS")
 
 		button3 = ttk.Button(self,text="Discard", command=lambda: controller.show_frameRhino(StartPage)) 
 		button3.grid(row=2, column = 4, sticky="NS")
 
 
-		#This code is to load the figure but ignore for now to load faster
-		"""
-		self.f = Figure(figsize = (1,1))#define figure		
-		
-		i=1
-		wubdub = .2
-		for picture in  Appa.savefile + "/ExpDataPictures/":
-			a = f.add_subplot(i,1,i) #add subplot RCP. Pth pos on grid with R rows and C columns
-			img = mpimg.imread(Appa.savefile + "/ExpDataPictures/" + picture) #read in image
-			a.xaxis.set_visible(False)
-			a.yaxis.set_visible(False)
-			a.set_position([0,0+wubdub*(i-1),.5,wubdub])
-			a.imshow(img) #Renders image
-			i+=1
-			
-		#add canvas which is what we intend to render graph to and fill it with figure
-		canvas = FigureCanvasTkAgg(self.f, self) 
-		canvas.draw() #raise canvas
-		canvas.get_tk_widget().grid(row=1, column=1, rowspan = 3, sticky="NS") #Fill options: BOTH, X, Y Expand options:  
-
-
-		#Add scrollbar
-		scrollbar = tk.Scrollbar(self)
-		scrollbar.config(command=canvas.get_tk_widget().yview)
-#		canvas.get_tk_widget().config(scrollregion=(canvas.get_tk_widget().bbox("all")))
-		canvas.get_tk_widget().config(width=630, height=720)
-		canvas.get_tk_widget().config(scrollregion=(0,0,1260,720*3))
-		scrollbar.grid(row=1, column=3, sticky="NS", rowspan = 3)
-		canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
-		"""
-def confirmdiscard():
+def confirmdiscard(frame):
 	result = tkMessageBox.askquestion("Discard", "Are you sure you want \nto discard these data?")
 	if result == "yes":
 		shutil.rmtree(Appa.savefile)
+		frame.tkraise() #raise to front
+	
+class DataRetrievalType(tk.Frame):
+    
+    """Choose what to do with data"""
+    
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self,parent)
+        
+        label = tk.Label(self, text="Choose an Option", font=LARGE_FONT) #Create label object
+        label.grid(row=0, column=1, sticky="nsew") #pack label into window
+	
+	for i in range(1,4):
+		self.grid_rowconfigure(i, minsize=40) 
+	
+        button1 = ttk.Button(self, text="Back to Start Page", command=lambda: controller.show_frame(StartPage)) #Create a button to start a new experiment       
+        button1.grid(row=1, column=1, sticky="nsew")
 
+        button2 = ttk.Button(self, text="Analyze an Experiment", command=lambda: controller.show_frameFoxtrot(DataAnalysisPg)) #Create a button to go to 'data retrieval' page
+        button2.grid(row=2, column=1, sticky="nsew")
+        
+        button3 = ttk.Button(self, text="Graph Experiments", command=lambda: controller.show_frameFoxtrot(DataGraphChoice)) #Create a button to go to 'data deletion' page
+        button3.grid(row=3, column=1, sticky="nsew")
 
-			
-class PageTen(tk.Frame):
+	self.grid_columnconfigure(0, minsize=100)		
+	
+		
+class DataAnalysisPg(tk.Frame):
 
-    """Allows data retrieval"""
+    """Let's user choose experiment to analyze"""
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Data Review \n Please choose experiment to analyze", font=LARGE_FONT) #create object
         label.grid(row = 0, column=1, columnspan = 2, sticky="NSEW")
         
-        button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage)) #create a button to return to home screen
+        button1 = ttk.Button(self, text="Back to\nPrevious Page", command=lambda: controller.show_frame(DataRetrievalType)) #create a button to return to home screen
         button1.grid(row=1, column = 0, sticky="NS")
 
 	
@@ -671,10 +675,10 @@ class DataAnalysisImagePg(tk.Frame):
         self.button2 = ttk.Button(self, text="Previous\nPicture", command=lambda: self.ChangePic(-1)) #create a button to return to home screen
         self.button2.grid(row=10, column=3, sticky="NESW", rowspan=4, columnspan=3)
 
-        self.button3 = ttk.Button(self, text="Generate\nGraph", command=lambda: controller.show_frameShark(GraphPage)) #create a button to return to home screen
+        self.button3 = ttk.Button(self, text="Finish", command=lambda: controller.show_frameStingray(StartPage, Momo)) #create a button to return to home screen
 	self.button3.grid(row=10, column=6, sticky="NESW", rowspan=4, columnspan=3)
 	
-	self.button4 = ttk.Button(self, text="Back to\nExperiment\nSelection", command=lambda: controller.show_frameFoxtrot(PageTen)) #create a button to return to home screen
+	self.button4 = ttk.Button(self, text="Back to\nExperiment\nSelection", command=lambda: controller.show_frameFoxtrot(DataAnalysisPg)) #create a button to return to experiment selection
 	self.button4.grid(row=10, column=3, sticky="NESW", rowspan=4, columnspan=3)
 	
 	self.circ = Circle((400,800),150, fill=False, edgecolor = "R")
@@ -754,20 +758,9 @@ class DataAnalysisImagePg(tk.Frame):
 		self.placesubplot() #place plot again
 		img = mpimg.imread(Momo.savefile + "/ExpDataPictures/image" + str(self.currentimagenum) + ".jpg") #read in image
 		self.a.imshow(img) #Renders image
-		if Momo.exptype == "0":
-    			#words = "None"
-    			shape = self.circ
-    		elif Momo.exptype == "1":
-    			#words = "Thermotaxis"
-    			shape = self.circ
-		elif Momo.exptype == "2":
-  	  		#words = "Chemotaxis"
-  	  		shape = self.circ
-		elif Momo.exptype == "3":
-			#words = "Phototaxis"
-			shape = self.arc
-			self.a.plot([300,500], [800,800], color = "R")
-		self.a.add_patch(shape)		
+		
+
+		
 		self.canvas.draw()
 		self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, len(Momo.expy))) #Update text so user knows what image number they are on
 		if self.currentimagenum == len(Momo.expy)-1: #if last image show "generate graph" button
@@ -780,10 +773,75 @@ class DataAnalysisImagePg(tk.Frame):
         self.a.yaxis.set_visible(True)
         self.a.set_position([0,0,1,1])
 	self.a.set_aspect(1)
-
+	if Momo.exptype == "0":
+ 		#words = "None"
+    		shape = self.circ
+    	elif Momo.exptype == "1":
+    		#words = "Thermotaxis"
+    		shape = self.circ
+	elif Momo.exptype == "2":
+  		#words = "Chemotaxis"
+   		shape = self.circ
+	elif Momo.exptype == "3":
+		#words = "Phototaxis"
+		shape = self.arc
+		self.a.plot([300,500], [800,800], color = "R")
+	self.a.add_patch(shape)
 
 	
+class DataGraphChoice(tk.Frame):
 
+    """Allows user to choose experiments to graph"""
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text="Graph Data \n Please choose experiment(s) to graph", font=LARGE_FONT) #create object
+        label.grid(row = 0, column=0, columnspan = 4, sticky="NSEW")
+        
+        button1 = ttk.Button(self, text="Back to\nPrevious Page", command=lambda: controller.show_frame(DataRetrievalType)) #create a button to return to home screen
+        button1.grid(row=1, column = 0, sticky="NS")
+
+	button2 = ttk.Button(self, text="Continue", command = lambda: controller.show_frameShark(GraphPage, self.listofbuttons))
+	button2.grid(row=1, column = 3, sticky="NS")
+
+	self.explist = []
+	self.listofbuttons = []
+        	
+	
+	
+        self.canvas = tk.Canvas(self, bg = "white", height=100, width=100, highlightthickness=0)
+        self.frame = tk.Frame(self.canvas, background="#ffffff")
+        self.vscrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.vscrollbar.set)
+        
+        self.canvas.grid(row=1, column=1, rowspan = 2, columnspan=1, sticky="NSEW")
+	self.vscrollbar.grid(row=1, column=2, sticky="NSW", rowspan=2, columnspan=2)      
+
+
+	self.canvas.create_window((4,4), window=self.frame, anchor="center", tags="self.frame")
+	
+	self.frame.bind("<Configure>", self.onFrameConfigure)
+
+	
+	
+	
+	
+	i=0
+	for item in os.listdir("/home/pi/Desktop/ExperimentFolder/"):
+		self.explist.append(item)
+	self.explist.sort()
+	
+	for experiment in self.explist:
+		cb = ttk.Checkbutton(self.frame, text=experiment, variable=self.explist[i])
+		cb.grid(row=2*i, column=0, rowspan=2, sticky="NSEW")
+		self.listofbuttons.append(cb)
+		i+=1
+
+  
+
+    
+    def onFrameConfigure(self, event):
+	self.canvas.configure(scrollregion=self.canvas.bbox("all"))			
 
 
 
@@ -796,13 +854,13 @@ class GraphPage(tk.Frame):
 		self.label = tk.Label(self, text = "Graph of" , font=LARGE_FONT)
 		self.label.grid(row = 0, column=1, columnspan = 2, sticky="NSEW")
 		
-		button1 = ttk.Button(self,text="Back", command=lambda: controller.show_frame(DataAnalysisImagePg))
+		button1 = ttk.Button(self,text="Back", command=lambda: controller.show_frameFoxtrot(DataGraphChoice))
 		button1.grid(row=1, column = 0, sticky="NS")
 		
 		button2 = ttk.Button(self,text="Back to home", command=lambda: controller.show_frame(StartPage)) 
 		button2.grid(row=1, column = 4, sticky= "NS")
 
-		button3 = ttk.Button(self,text="Save Graph", command=lambda: controller.show_frameStingray(StartPage)) 
+		button3 = ttk.Button(self,text="Save Graph??", command=lambda: controller.show_frame(StartPage))  #stingray
 		button3.grid(row=2, column = 4, sticky="NS")
 
 		f = Figure(figsize = (1,1))#define figure		
