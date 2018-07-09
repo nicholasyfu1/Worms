@@ -108,8 +108,7 @@ class BehaviorBox(tk.Tk, Experiment):
         Appa.exptype = str()
 	Appa.exptime = int()
 	Appa.savefile = str()
-#	Appa.expy = []
-	print(Appa.expy)
+	Appa.expy = []
 	app.startfresh() #Reinitalize all pages to starting state
         frame = self.frames[cont]
         frame.tkraise() #raise to front
@@ -147,7 +146,6 @@ class BehaviorBox(tk.Tk, Experiment):
 	for i in range(int(Appa.exptime/Appa.capturerate+1)):
     		camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(i) + ".jpg")
     		Appa.expy.append("")
-    		print("hello?" + str(i))
 		if i != int(Appa.exptime/Appa.capturerate):
 			sleep(Appa.capturerate)
 	camera.stop_preview()
@@ -158,16 +156,28 @@ class BehaviorBox(tk.Tk, Experiment):
         frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
 	frame.tkraise() #raise to front
     
+    def show_frameFoxtrot2(self, cont):
+   	result = tkMessageBox.askquestion("Warning", "All progess will be lost.\nProceed anyways?")
+   	if result == "yes":
+	   	frame = cont(self.container, self)
+	   	self.frames[cont] = frame 
+		frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
+		frame.tkraise() #raise to front
+    
     #Load Appa object for exp and pull up first image from chosen experiment
     def show_frameLima(self, cont, chosenexp):
-       	frame = cont(self.container, self)
-   	self.frames[cont] = frame 
-   	frame.grid(row=0, column=0, sticky="nsew")
-       	#create variable to store experiment object
+	#create variable to store experiment object
+	result = True       
        	global Momo
        	Momo = getobject(chosenexp)
-       	frame.ChangePic(1)
-       	frame.tkraise() #raise to front
+       	if Momo.expy[0] != "":
+       		result = tkMessageBox.askquestion("Warning", "The selected experiment has already been analyzed.\nChanges may overwrite exisiting data.\nProceed anyways?")
+       	if result != "no":
+	       	frame = cont(self.container, self)
+	   	self.frames[cont] = frame 
+	   	frame.grid(row=0, column=0, sticky="nsew")
+	       	frame.ChangePic(1)
+	       	frame.tkraise() #raise to front
 
     def show_frameMarlin(self, cont):
     	i=1
@@ -236,7 +246,8 @@ class BehaviorBox(tk.Tk, Experiment):
 				unanalyzedlist.append(experiment.expnumber)
 			else:
 				experiment.expy = list(map(int, experiment.expy))
-				frame.a.plot(range(len(experiment.expy)),experiment.expy)
+				#plt.plot(range(len(experiment.expy)),experiment.expy, label="Exp" + experiment.expnumber)
+				frame.a.plot(range(len(experiment.expy)),experiment.expy, label="Exp" + experiment.expnumber)
 				expnames.append(experiment.expnumber)
 	       			
 	       #If unanalyzed experiments exist warn user
@@ -245,9 +256,12 @@ class BehaviorBox(tk.Tk, Experiment):
 			result = tkMessageBox.askquestion("Warning", "The following experiments have\nnot been analyzed yet\nand will not be graphed\n\n" +unanalyzedlist+ "\n\nProceed anyways?")
 			
 		if result !=  "no":
-			expnames = "Exp" + ", Exp".join(expnames)
+			graphtitle = "Graph of Exp" + ", Exp".join(expnames)
 			frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
-			frame.label.configure(text = expnames, font=LARGE_FONT)
+			frame.label.configure(text = graphtitle, font=LARGE_FONT)
+			
+			frame.a.legend(loc='best', fontsize=15)
+			#plt.show()
 			frame.canvas.draw() #raise canvas
 			frame.tkraise() #raise to front			
 				
@@ -696,10 +710,10 @@ class DataAnalysisImagePg(tk.Frame):
         self.button2 = ttk.Button(self, text="Previous\nPicture", command=lambda: self.ChangePic(-1)) #create a button to return to home screen
         self.button2.grid(row=10, column=3, sticky="NESW", rowspan=4, columnspan=3)
 
-        self.button3 = ttk.Button(self, text="Finish", command=lambda: controller.show_frameStingray(StartPage, Momo)) #create a button to return to home screen
+        self.button3 = ttk.Button(self, text="Save\nand\nFinish", command=lambda: controller.show_frameStingray(StartPage, Momo)) #create a button to return to home screen
 	self.button3.grid(row=10, column=6, sticky="NESW", rowspan=4, columnspan=3)
 	
-	self.button4 = ttk.Button(self, text="Back to\nExperiment\nSelection", command=lambda: controller.show_frameFoxtrot(DataAnalysisPg)) #create a button to return to experiment selection
+	self.button4 = ttk.Button(self, text="Back to\nExperiment\nSelection", command=lambda: controller.show_frameFoxtrot2(DataAnalysisPg)) #create a button to return to experiment selection
 	self.button4.grid(row=10, column=3, sticky="NESW", rowspan=4, columnspan=3)
 	
 	
@@ -793,9 +807,6 @@ class DataAnalysisImagePg(tk.Frame):
 			shape = Arc((200,400), width=200, height=200, theta1=0, theta2=180, edgecolor = "B")
 			self.a.plot([100,300], [400,400], color = "B")	
 		self.a.add_patch(shape)
-
-		print(Momo.expy)
-		print(Momo)
 		
 		self.canvas.draw()
 		self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, len(Momo.expy))) #Update text so user knows what image number they are on
@@ -889,7 +900,7 @@ class GraphPage(tk.Frame):
 		self.a = f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
 
 		self.a.xaxis.set_visible(True)
-		#self.a.yaxis.set_visible(False)
+		self.a.yaxis.set_visible(True)
 		self.a.set_position([0,0,1,1])
 		
 		#add canvas which is what we intend to render graph to and fill it with figure
