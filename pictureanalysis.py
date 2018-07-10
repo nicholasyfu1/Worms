@@ -18,26 +18,17 @@ def getobject(expname):
 	with open(filepath, "rb") as input:
 		variablename = pickle.load(input)
 	return  variablename
-"""	
-#function to 
-def 
-	#Pull up image
-	#Draw circle based on exp type
-	#Enter number of worms
-	
-	
 
-		for picture in  os.listdir("/home/pi/Desktop/ExperimentFolder/PictureFolder"):
-			a = f.add_subplot(5,1,i) #add subplot RCP. Pth pos on grid with R rows and C columns
-			img = mpimg.imread("/home/pi/Desktop/ExperimentFolder/PictureFolder/" + picture) #read in image
-			a.xaxis.set_visible(False)
-			a.yaxis.set_visible(False)
-			a.set_position([0,0+wubdub*(i-1),.5,wubdub])
-			a.imshow(img) #Renders image
-			i+=1	
-"""	
+def getpreviouslyanalyzed(Momo):
 	
-	
+	if Momo.exptype =="1":
+	    	return("Thermotaxis")
+	if Momo.exptype == "2":
+	    	return("Chemotaxis")
+	if Momo.exptype == "3":
+	    	return("Phototaxis")
+
+
 	
 	
 	

@@ -52,7 +52,8 @@ class Experiment():
 		self.savefile = str()
 		self.capturerate=2
 		self.x = range(4)
-		self.controly =  []
+		self.iscontrol = False
+		self.controly = ["","",""]
 		self.expy = []
 	def set_number(self, number):
 		self.expnumber = str(number)
@@ -83,7 +84,7 @@ class BehaviorBox(tk.Tk, Experiment):
         self.container.grid_columnconfigure(0, weight=1) 
 
         self.frames = {}
-	for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTest, DataDelPg, DataAnalysisImagePg, DataAnalysisPg, GraphPage, DataRetrievalType, DataGraphChoice):
+	for F in (StartPage, ExpNumPg, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, PageTest, DataDelPg, DataAnalysisImagePg, DataAnalysisPg, GraphPage, DataRetrievalType, DataGraphChoice, AnalysisTypeForNone):
             frame = F(self.container, self)
             self.frames[F] = frame 
             frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
@@ -164,21 +165,45 @@ class BehaviorBox(tk.Tk, Experiment):
 		frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
 		frame.tkraise() #raise to front
     
-    #Load Appa object for exp and pull up first image from chosen experiment
+    #Load Appa object for exp and pull up first image from chosen experiment        	 WHATWHAT
     def show_frameLima(self, cont, chosenexp):
 	#create variable to store experiment object
 	result = True       
+	result2 = True
        	global Momo
        	Momo = getobject(chosenexp)
-       	if Momo.expy[0] != "":
-       		result = tkMessageBox.askquestion("Warning", "The selected experiment has already been analyzed.\nChanges may overwrite exisiting data.\nProceed anyways?")
-       	if result != "no":
-	       	frame = cont(self.container, self)
-	   	self.frames[cont] = frame 
-	   	frame.grid(row=0, column=0, sticky="nsew")
-	       	frame.ChangePic(1)
-	       	frame.tkraise() #raise to front
+       	if Momo.iscontrol: #analyzing control 
+       		if Momo.exptype != "0": #not first time analyzing
+			result2 = tkMessageBox.askquestion("Warning", "This control experiment has already\nbeen analyzed as %s.\nChanges may overwrite exisiting data.\nProceed anyways?" % getpreviouslyanalyzed(Momo))
+		if result2 != "no":
+			frame = self.frames[AnalysisTypeForNone]
+			for button in [frame.thermobutton, frame.chemobutton, frame.photobutton]:
+				if getpreviouslyanalyzed(Momo) == button['text']:
+					button.state(["focus","selected"])
+					print(getpreviouslyanalyzed(Momo))
+				else:
+					button.state(["!focus",'!selected'])
+					print(getpreviouslyanalyzed(Momo))
+			frame.tkraise()
+			
+       	
+       	else: #not control
+	       	if Momo.expy[0] != "": #already analyzed
+	       		result = tkMessageBox.askquestion("Warning", "The selected experiment has already been analyzed.\nChanges may overwrite exisiting data.\nProceed anyways?")
+	       	if result != "no": 
+		       	frame = cont(self.container, self)
+		   	self.frames[cont] = frame 
+		   	frame.grid(row=0, column=0, sticky="nsew")
+		       	frame.ChangePic(1)
+		       	frame.tkraise() #raise to front
 
+    def show_frameBean(self, cont):
+	frame = cont(self.container, self)
+	self.frames[cont] = frame 
+	frame.grid(row=0, column=0, sticky="nsew")
+	frame.ChangePic(1)
+	frame.tkraise() #raise to front
+	
     def show_frameMarlin(self, cont):
     	i=1
 	numpics = len(os.listdir(Appa.savefile + "ExpDataPictures"))
@@ -392,6 +417,8 @@ class ExpSelPg(tk.Frame, Experiment):
     	if self.userexpchoice == int():
     		tkMessageBox.showwarning("Error", "Must select an experiment type")
     	else:
+		if self.userexpchoice == "0":
+			Appa.iscontrol = True
     		Appa.set_type(self.userexpchoice) #set experiment object's type to user's choice
     		controller.show_frame(TimeSelPg)
     		
@@ -972,7 +999,48 @@ class DataDelPg(tk.Frame):
 	self.canvas.configure(scrollregion=self.canvas.bbox("all"))			
 
 
-			
+class AnalysisTypeForNone(tk.Frame, Experiment):
+
+    """Allows experiment selection if control"""
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text="This experiment had no stimulus.\nChoose analysis type to be done.", font=LARGE_FONT) #create object
+        label.grid(row=0, column=0, columnspan=100) #pack object into window
+        
+        self.userexpchoice = int()
+        
+        
+	button1 = ttk.Button(self, text="Back to\nChoose an Experiment\nto Analyze", command=lambda: controller.show_frameFoxtrot2(DataAnalysisPg)) #create a button to return to run time
+        button1.grid(row=7, column= 0, sticky="w")
+        
+        button2 = ttk.Button(self, text="Next", command=lambda: self.checkchosenexp(parent, controller)) #create a button to time entry
+        button2.grid(row=7, column= 10, sticky="e")
+
+        self.thermobutton = ttk.Radiobutton(self, text="Thermotaxis", variable = "ExpOption", value = 1, command = lambda: self.qfb(1)) #indicatoron = 0)
+        self.chemobutton = ttk.Radiobutton(self, text="Chemotaxis", variable = "ExpOption", value = 2, command = lambda: self.qfb(2)) #indicatoron = 0)
+        self.photobutton = ttk.Radiobutton(self, text="Phototaxis", variable = "ExpOption", value = 3, command = lambda: self.qfb(3)) #indicatoron = 0)
+	for button in [self.thermobutton, self.chemobutton, self.photobutton]:
+		button.state(["!focus",'!selected'])
+
+	
+        self.thermobutton.grid(row=3, column= 3, sticky="nsew")
+        self.chemobutton.grid(row=4, column= 3, sticky="nsew")
+        self.photobutton.grid(row=5, column= 3, sticky="nsew")
+        
+    def qfb(self, ExpOptionChosen): #stores the selection
+        self.userexpchoice = str(ExpOptionChosen)
+    def checkchosenexp(self, parent, controller):
+    	if self.userexpchoice == int():
+    		tkMessageBox.showwarning("Error", "Must select an experiment type")
+    	else:
+    		Momo.set_type(self.userexpchoice) #set experiment object's type to user's choice
+    		print("he is here")
+    		controller.show_frameBean(DataAnalysisImagePg)
+		#endoftimes
+	
+    		
+    				
 	
 		
        
