@@ -36,9 +36,12 @@ from pictureanalysis import *
 
 camera = PiCamera()
 
-LARGE_FONT = ("Verdana", 12)
-SMALL_FONT = ("Verdana", 8)
-
+#Font Sizes
+LARGE_FONT = ("Verdana", 36)
+MEDIUM_FONT = ("Verdana", 28)
+SMALL_FONT = ("Verdana", 24)
+TINY_FONT = ("Verdana", 20)
+VERYTINY_FONT = ("Verdana", 15)
 
 
 
@@ -296,17 +299,22 @@ class StartPage(tk.Frame):
         tk.Frame.__init__(self,parent)
         label = tk.Label(self, text="Start Page", font=LARGE_FONT) #Create label object
         label.grid(row=0, column=1, sticky="nsew") #pack label into window
-
-        button1 = ttk.Button(self, text="New Experiment", command=lambda: controller.show_frameAlpha(ExpNumPg)) #Create a button to start a new experiment       
+	
+	s = ttk.Style()
+	s.configure("my.TButton", font=(SMALL_FONT))
+	
+        button1 = ttk.Button(self, text="New Experiment", style='my.TButton', command=lambda: controller.show_frameAlpha(ExpNumPg)) #Create a button to start a new experiment       
         button1.grid(row=1, column=1, sticky="nsew")
 
-        button2 = ttk.Button(self, text="Data Retrieval", command=lambda: controller.show_frame(DataRetrievalType)) #Create a button to go to 'data retrieval' page
+        button2 = ttk.Button(self, text="Data Retrieval", style='my.TButton', command=lambda: controller.show_frame(DataRetrievalType)) #Create a button to go to 'data retrieval' page
         button2.grid(row=2, column=1, sticky="nsew")
         
-        button3 = ttk.Button(self, text="Delete Data", command=lambda: controller.show_frameFoxtrot(DataDelPg)) #Create a button to go to 'data deletion' page
+        button3 = ttk.Button(self, text="Delete Data", style='my.TButton', command=lambda: controller.show_frameFoxtrot(DataDelPg)) #Create a button to go to 'data deletion' page
         button3.grid(row=3, column=1, sticky="nsew")
-
-	self.grid_columnconfigure(0, minsize=100)
+	for i in range(4):
+		self.grid_rowconfigure(i, minsize=100)
+	self.grid_columnconfigure(0, minsize=20)
+	self.grid_columnconfigure(1, minsize=760)
 	
 class ExpNumPg(tk.Frame, Experiment):
 
@@ -314,32 +322,39 @@ class ExpNumPg(tk.Frame, Experiment):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Enter Experiment Number", font=LARGE_FONT) #create object
-        label.grid(row=0, column=0, columnspan=100, sticky="ew") #pack object into window
-        self.grid_columnconfigure(0, minsize=20)
-        self.grid_columnconfigure(1, minsize=20)
-        self.grid_rowconfigure(2, minsize=20) 
-        self.grid_rowconfigure(3, minsize=20) 
-        self.grid_rowconfigure(4, minsize=20) 
+        label = tk.Label(self, text="Enter Experiment Number", font=MEDIUM_FONT) #create object
+        label.grid(row=0, column=1, columnspan=3, sticky="NSEW") #pack object into window
+        #self.grid_rowconfigure(2, minsize=50) 
+        self.grid_rowconfigure(3, minsize=50) 
+        self.grid_rowconfigure(4, minsize=50) 
+        self.grid_rowconfigure(5, minsize=50) 
+        self.grid_rowconfigure(6, minsize=50) 
+	for column in range(6):
+		self.grid_columnconfigure(column, minsize=160, weight=1)
 
+	
+	s = ttk.Style()
+	s.configure("TINYFONT.TButton", font=(TINY_FONT))
+	
+	
 	self.usernumchoice = str()
 	
-        button1 = ttk.Button(self, text="Back to\nMain Menu", command=lambda: controller.show_frame(StartPage)) #create a button to return to main menu
-        button1.grid(row=8, column= 0, sticky="nsew")
+        button1 = ttk.Button(self, text="Back to\nMain Menu", style='TINYFONT.TButton', command=lambda: controller.show_frame(StartPage)) #create a button to return to main menu
+        button1.grid(row=3, column= 0, rowspan=4, sticky="nsew")
         
-        button2 = ttk.Button(self, text="Next", command=lambda: self.checkvalidexpnum(parent, controller)) #create a button to experiment type
-        button2.grid(row=8, column= 6, sticky="nsew")
+        button2 = ttk.Button(self, text="Next", style='TINYFONT.TButton', command=lambda: self.checkvalidexpnum(parent, controller)) #create a button to experiment type
+        button2.grid(row=3, column= 4, rowspan=4, sticky="nsew")
         
         """Creates display for number inputed"""
-        self.usernumtext = tk.Label(self, text = "", font=LARGE_FONT) 
-        self.usernumtext.grid(row = 1, column = 0, columnspan = 100, sticky="w")
+        self.usernumtext = tk.Label(self, text = "", font=SMALL_FONT) 
+        self.usernumtext.grid(row = 1, column = 1, columnspan = 3, sticky="w")
         self.usernumtext.configure(text = "Experiment Number: %3s" % self.usernumchoice)
-
+	#kitty
 
         """ Number Pad """
         btn_numbers = [ '7', '8', '9', '4', '5', '6', '1', '2', '3', ' ', '0', 'x'] #create list of numbers to be displayed
         r = 3
-        c = 2
+        c = 1
   
 
         for num in btn_numbers:
@@ -349,11 +364,11 @@ class ExpNumPg(tk.Frame, Experiment):
                 c += 1
 
             else: 
-                self.num = ttk.Button(self, text=num, width=5, command=lambda b = num: self.click(b))
+                self.num = ttk.Button(self, text=num, width=5, style='TINYFONT.TButton', command=lambda b = num: self.click(b))
                 self.num.grid(row=r, column=c, sticky= "nsew")
                 c += 1
-            if c > 4:
-                c = 2
+            if c > 3:
+                c = 1
                 r += 1
     """method to save user inputs and display them"""
     def click(self, z):
@@ -667,18 +682,20 @@ class DataRetrievalType(tk.Frame):
         label.grid(row=0, column=1, sticky="nsew") #pack label into window
 	
 	for i in range(1,4):
-		self.grid_rowconfigure(i, minsize=40) 
-	
-        button1 = ttk.Button(self, text="Back to Start Page", command=lambda: controller.show_frame(StartPage)) #Create a button to start a new experiment       
+		self.grid_rowconfigure(i, minsize=100) 
+	self.grid_columnconfigure(0, minsize=20)
+	self.grid_columnconfigure(1, minsize=760)
+		
+        button1 = ttk.Button(self, text="Back to Start Page", style='my.TButton', command=lambda: controller.show_frame(StartPage)) #Create a button to start a new experiment       
         button1.grid(row=1, column=1, sticky="nsew")
 
-        button2 = ttk.Button(self, text="Analyze an Experiment", command=lambda: controller.show_frameFoxtrot(DataAnalysisPg)) #Create a button to go to 'data retrieval' page
+        button2 = ttk.Button(self, text="Analyze an Experiment", style='my.TButton', command=lambda: controller.show_frameFoxtrot(DataAnalysisPg)) #Create a button to go to 'data retrieval' page
         button2.grid(row=2, column=1, sticky="nsew")
         
-        button3 = ttk.Button(self, text="Graph Experiments", command=lambda: controller.show_frameFoxtrot(DataGraphChoice)) #Create a button to go to 'data deletion' page
+        button3 = ttk.Button(self, text="Graph Experiments", style='my.TButton', command=lambda: controller.show_frameFoxtrot(DataGraphChoice)) #Create a button to go to 'data deletion' page
         button3.grid(row=3, column=1, sticky="nsew")
 
-	self.grid_columnconfigure(0, minsize=100)		
+
 	
 		
 class DataAnalysisPg(tk.Frame):
@@ -687,10 +704,10 @@ class DataAnalysisPg(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Data Review \n Please choose experiment to analyze", font=LARGE_FONT) #create object
-        label.grid(row = 0, column=1, columnspan = 2, sticky="NSEW")
+        label = tk.Label(self, text="Data Analysis \n Please choose experiment to analyze", font=MEDIUM_FONT) #create object
+        label.grid(row = 0, column=0, columnspan = 4, sticky="NSEW")
         
-        button1 = ttk.Button(self, text="Back to\nPrevious Page", command=lambda: controller.show_frame(DataRetrievalType)) #create a button to return to home screen
+        button1 = ttk.Button(self, text="Back to\nPrevious Page", style='my.TButton', command=lambda: controller.show_frame(DataRetrievalType)) #create a button to return to home screen
         button1.grid(row=1, column = 0, sticky="NS")
 
 	
@@ -698,13 +715,13 @@ class DataAnalysisPg(tk.Frame):
 	scrollbar = AutoScrollbar(self)
 	scrollbar.grid(row=1, column=2, sticky="NSW", rowspan = 3)
 	
-	self.List1=tk.Listbox(self, yscrollcommand = scrollbar.set)
+	self.List1=tk.Listbox(self, font=TINY_FONT, yscrollcommand = scrollbar.set)
 	self.List1.grid(row=1, column=1, rowspan = 2, sticky="NSE")
 	self.List1.config(scrollregion=self.List1.bbox("active"))
 	scrollbar.config(command=self.List1.yview)
 
 
-	button2 = ttk.Button(self, text="Continue", command=lambda List1=self.List1: controller.show_frameLima(DataAnalysisImagePg, self.asdf(List1)))
+	button2 = ttk.Button(self, text="Continue", style='my.TButton', command=lambda List1=self.List1: controller.show_frameLima(DataAnalysisImagePg, self.asdf(List1)))
 	button2.grid(row=1, column = 3, sticky="NS")
 
 	self.explist = []
@@ -746,17 +763,17 @@ class DataAnalysisImagePg(tk.Frame):
 	
         """Creates display for worms counted"""
         self.wormscounted = ""
-        self.wormscountedtext = tk.Label(self, text = "", font=LARGE_FONT) 
+        self.wormscountedtext = tk.Label(self, text = "", font=VERYTINY_FONT) 
         self.wormscountedtext.grid(row=2, column=3, rowspan=2, columnspan=7, sticky="EW")
         self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % self.wormscounted)
         
         """Creates display for page currently on"""
 	self.currentimagenum = -1
-        self.imagenumtext = tk.Label(self, text = "", font=LARGE_FONT) 
+        self.imagenumtext = tk.Label(self, text = "", font=VERYTINY_FONT) 
         self.imagenumtext.grid(row=0, column=3, rowspan=2, columnspan=7, sticky="EW")
         self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, 5))
 	        
-        self.grid_columnconfigure(2, minsize=20) #spacer
+        self.grid_columnconfigure(2, minsize=50) #spacer
 	for column in range(3,9):
 	        self.grid_columnconfigure(column, minsize=30) 
 
@@ -765,7 +782,7 @@ class DataAnalysisImagePg(tk.Frame):
         self.canvas = FigureCanvasTkAgg(self.f, self) #add canvas which is what we intend to render graph to and fill it with figure
         self.canvas.draw() #bring canvas to front
         self.canvas.get_tk_widget().grid(row=0, column=0, rowspan = 15) #Fill options: BOTH, X, Y Expand options:  
-        self.canvas.get_tk_widget().config(width=580, height=480)
+        self.canvas.get_tk_widget().config(width=450, height=480)
 
 			
         """ Number Pad """
@@ -868,7 +885,6 @@ class DataGraphChoice(tk.Frame):
 	self.listofbuttons = []
         	
 	
-	
         self.canvas = tk.Canvas(self, bg = "white", height=100, width=100, highlightthickness=0)
         self.frame = tk.Frame(self.canvas, background="#ffffff")
         self.vscrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
@@ -896,7 +912,9 @@ class DataGraphChoice(tk.Frame):
 		cb.grid(row=2*i, column=0, rowspan=2, sticky="NSEW")
 		self.listofbuttons.append(cb)
 		i+=1
-
+	for button in self.listofbuttons:
+		button.state(["!focus",'!selected'])
+		
   
 
     
@@ -985,7 +1003,8 @@ class DataDelPg(tk.Frame):
 		cb.grid(row=2*i, column=0, rowspan=2, sticky="NSEW")
 		self.listofbuttons.append(cb)
 		i+=1
-
+	for button in self.listofbuttons:
+		button.state(["!focus",'!selected'])
   
     def yoga(self):
 	result = tkMessageBox.askquestion("Discard", "Are you sure you want \nto discard these data?")
