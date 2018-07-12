@@ -123,10 +123,13 @@ class BehaviorBox(tk.Tk, Experiment):
         frame = self.frames[cont]
         frame.tkraise() #raise to front
 
-    
+    def show_frameZebra(self, cont):
+    	frame = self.frames[cont]
+        camera.stop_preview()#this line stops the preview. 
+        frame.tkraise() #raise to front
     def show_frameFish(self, cont):
         frame = self.frames[cont]
-        camera.start_preview(fullscreen=False, window=(0,appheight/4,appwidth,appheight/2)) #this line starts the preview. TODO: insert coordinates and resize preview
+        camera.start_preview(fullscreen=False, window=(0,appheight/4,appwidth,appheight/2)) #this line starts the preview. 
         frame.tkraise() #raise to front
     
     #Save time choice -> confirmation and updates label values in confirmation based on previous user input
@@ -231,16 +234,16 @@ class BehaviorBox(tk.Tk, Experiment):
 	#add canvas which is what we intend to render graph to and fill it with figure
 	canvas = FigureCanvasTkAgg(frame.f, frame) 
 	canvas.draw() #raise canvas
-	canvas.get_tk_widget().grid(row=1, column=1, rowspan = 10, sticky="NS") #Fill options: BOTH, X, Y Expand options:  
+	canvas.get_tk_widget().grid(row=1, column=1, rowspan = 2, sticky="NS") #Fill options: BOTH, X, Y Expand options:  
 
 
 	#Add scrollbar
 	scrollbar = tk.Scrollbar(frame)
 	scrollbar.config(command=canvas.get_tk_widget().yview)
 #	canvas.get_tk_widget().config(scrollregion=(canvas.get_tk_widget().bbox("all")))
-	canvas.get_tk_widget().config(width=630, height=numpics*450)
-	canvas.get_tk_widget().config(scrollregion=(0,0,1260,numpics*900))
-	scrollbar.grid(row=1, column=3, sticky="NS", rowspan = 2)
+	canvas.get_tk_widget().config(width=appwidth*2/4, height=appheight)#numpics*450)
+	canvas.get_tk_widget().config(scrollregion=(0,0,appwidth,numpics*900))
+	scrollbar.grid(row=1, column=2, rowspan = 2, columnspan=2, sticky="NSEW")
 	canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
 	frame.tkraise()
 	
@@ -613,16 +616,16 @@ class InsertPg(tk.Frame):
         label2 = tk.Label(self, text="Select next once worms have settled down", font=SMALL_FONT) #create object
         label2.grid(row=1, column=0, columnspan=3) #grid object into window
 
-        button1 = ttk.Button(self, text="Back to\nConfirmation Page", style="TINYFONT.TButton", command=lambda: controller.show_frame(ConfirmPg)) #create a button to return to run time
+        button1 = ttk.Button(self, text="Back to\nConfirmation Page", style="TINYFONT.TButton", command=lambda: controller.show_frameZebra(ConfirmPg)) #create a button to return to run time
         button1.grid(row=3, column= 0, sticky="nsew", padx=xspacer, pady=yspacer)
         
         button2 = ttk.Button(self, text="Next", style="TINYFONT.TButton", command=lambda: controller.show_frameDelta(StimPrepPg)) #prepstimuli
         button2.grid(row=3, column= 2, sticky="nsew", padx=xspacer, pady=yspacer)
         
-        self.totaltimetext = tk.Label(self, text = "", font=LARGE_FONT) 
-        self.totaltimetext.grid(row = 1, column = 0, sticky="w")
-        
-        #Live preview of worms being inserted
+        #self.totaltimetext = tk.Label(self, text = "", font=LARGE_FONT) 
+        #self.totaltimetext.grid(row = 1, column = 0, sticky="w")
+        #What is this???
+
 	
     
 
@@ -637,20 +640,29 @@ class StimPrepPg(tk.Frame):
     """
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.label1 = tk.Label(self, text="", font=LARGE_FONT) #create object
-        self.label1.grid(row=0, column=5, columnspan=100) #grid object into window
+        
+        
+ 	self.grid_rowconfigure(3, minsize=appheight/3) #Next/back button rows       
+	self.grid_rowconfigure(2, weight=1) #Next/back button rows       
+	self.grid_columnconfigure(0, minsize=appwidth/2.5) #next button
+        self.grid_columnconfigure(2, minsize=appwidth/2.5) #next button
+        self.grid_columnconfigure(1, weight=1) #next button
+        
+        
+        self.label1 = tk.Label(self, text="", font=MEDIUM_FONT) #create object
+        self.label1.grid(row=0, column=0, columnspan=3) #grid object into window
     
 
         
-        label2 = tk.Label(self, text="Press 'Start' to begin experiment", font=LARGE_FONT) #create object
-        label2.grid(row=3, column=5, columnspan=100) #grid object into window
+        label2 = tk.Label(self, text="Press 'Start' to begin experiment", font=SMALL_FONT) #create object
+        label2.grid(row=1, column=0, columnspan=3) #grid object into window
         
         
-        button1 = ttk.Button(self, text="Back to\nInsert Worms", command=lambda: controller.show_frame(InsertPg)) #create a button to return to InsertPg
-        button1.grid(row=7, column= 0, sticky="w")
+        button1 = ttk.Button(self, text="Back to\nInsert Worms", style="TINYFONT.TButton", command=lambda: controller.show_frame(InsertPg)) #create a button to return to InsertPg
+        button1.grid(row=3, column= 0, sticky="nsew", padx=xspacer, pady=yspacer)
         
-        button2 = ttk.Button(self, text="Start", command=lambda: controller.show_frameEcho(ExpFinishPg)) #Start Experiment and raise experiment finished page
-        button2.grid(row=7, column= 10, sticky="e")
+        button2 = ttk.Button(self, text="Start", style="TINYFONT.TButton", command=lambda: controller.show_frameEcho(ExpFinishPg)) #Start Experiment and raise experiment finished page
+        button2.grid(row=3, column= 2, sticky="nsew", padx=xspacer, pady=yspacer)
     #Key: 0 = none; 1 = thermo; 2 = chemo; 3 = photo       
     def gettext(self):
         if Appa.exptype == "0" or Appa.exptype == "3":
@@ -680,11 +692,13 @@ class ExpFinishPg(tk.Frame):
     """
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Experiment Finished", font=LARGE_FONT) #create object
-        label.grid(row=0, column=0, columnspan=100) #grid object into window
+	self.grid_columnconfigure(0, weight=1)	
 
-        button2 = ttk.Button(self, text="Continue to\nreview this\nexperiment's data", command=lambda: controller.show_frameMarlin(PageTest)) #create a button to start a new experiment 
-        button2.grid(row=2, column=0, columnspan=100) #grid object into window
+        label = tk.Label(self, text="Experiment Finished", font=MEDIUM_FONT) #create object
+        label.grid(row=0, column=0) #grid object into window
+
+        button2 = ttk.Button(self, text="Continue to\nreview this\nexperiment's data", style="TINYFONT.TButton", command=lambda: controller.show_frameMarlin(PageTest)) #create a button to start a new experiment 
+        button2.grid(row=2, column=0) #grid object into window
     
 class PageTest(tk.Frame):
 	
@@ -693,10 +707,10 @@ class PageTest(tk.Frame):
 	def __init__(self, parent, controller):
 		tk.Frame.__init__(self, parent)
 		label = tk.Label(self, text = "Keep This Experiment's Data?", font=LARGE_FONT)
-		label.grid(row = 0, column=1, columnspan = 2, sticky="NSEW")
-		
-		button1 = ttk.Button(self,text="Back", command=lambda: controller.show_frame(ExpFinishPg))
-		button1.grid(row=1, column = 0, sticky="NS")
+		label.grid(row = 0, column=0, columnspan = 3, sticky="NSEW")
+		#chitty
+		#self.grid_rowconfigure(1, appheight/2)
+		#self.grid_rowconfigure(2, appheight/2)
 		
 		button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frameStingray(StartPage, Appa)) 
 		button2.grid(row=1, column = 4, sticky= "NS")
