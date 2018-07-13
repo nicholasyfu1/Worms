@@ -11,7 +11,7 @@ imglist = []
 canvas=tk.Canvas(root, width=600, height=400)
 canvas.grid(row=1, column=0, rowspan=2)
 for k in range(11):
-	canvas.create_text(20, k*100, text=(str(k*100)))
+	canvas.create_text(0, k*100, text=(str(k*100)))
 for picture in  os.listdir(savefile + "ExpDataPictures"):
 	img = Image.open(savefile+ "ExpDataPictures/image" + str(i) + ".jpg", mode="r") #read in image
 	tempimage = ImageTk.PhotoImage(img)

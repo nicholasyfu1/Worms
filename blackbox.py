@@ -223,47 +223,37 @@ class BehaviorBox(tk.Tk, Experiment):
         i=0
         savefile = "/home/pi/Desktop/ExperimentFolder/Exp547/"
         numpics = len(os.listdir(Appa.savefile + "ExpDataPictures"))
-        imagelist=[]
+        frame.imagelist=[]
 
-        for k in range(11):
-            frame.canvas.create_text(20, k*100, text=(str(k*100)))
-
-
+            
         for picture in  os.listdir(Appa.savefile + "ExpDataPictures"):
             img = Image.open(Appa.savefile+ "ExpDataPictures/image" + str(i) + ".jpg", mode="r") #read in image
-            tempimage = ImageTk.PhotoImage(img)
-            imagelist.append(tempimage)
-            tk.frame.canvas.create_image(0,0+480*(i),image=imagelist[i],anchor="nw")
+            frame.tempimage = ImageTk.PhotoImage(img)
+            frame.imagelist.append(frame.tempimage)
+            frame.canvas.create_image(0,0+480*(i),image=frame.imagelist[i],anchor="nw")
             i+=1
-            print[imagelist]
+        
+        ye = frame.canvas.bbox("all")[3]
+        he = frame.canvas.bbox("all")[2]
+        for k in range(ye/100):
+           frame.canvas.create_text(0, k*100, text=(str(k*100)))
+        for w in range(he/100):
+            frame.canvas.create_text(w*100, 0, text=(str(w*100)))
 
-        for k in range(11):
-            frame.canvas.create_text(k*100, 20, text=(str(k*100)))
 
         scrollbar = tk.Scrollbar(frame)
         scrollbar.config(command=frame.canvas.yview)
-        print(canvas.bbox("all"))
-        canvas.config(scrollregion=(canvas.bbox("all")))
-        print(canvas.bbox("all"))
-        frame.canvas.grid(row=1, column=0, rowspan=2)
+        frame.canvas.config(scrollregion=(frame.canvas.bbox("all")))
+
         scrollbar.grid(row=1, column=2, rowspan = 2, columnspan=1, sticky="NS")
         frame.canvas.config(yscrollcommand=scrollbar.set)
 
-
-        """
-        self.grid_rowconfigure(0, minsize=appheight/3)
-        self.grid_rowconfigure(1, minsize=appheight/3)
-        self.grid_rowconfigure(2, minsize=appheight/3)
-
-        #Add scrollbar
-        scrollbar = tk.Scrollbar(frame)
-        scrollbar.config(command=canvas.get_tk_widget().yview)
-#	canvas.get_tk_widget().config(scrollregion=(canvas.get_tk_widget().bbox("all")))
-        canvas.get_tk_widget().config(width=appwidth/2, height=numpics*appheight/2)
-        canvas.get_tk_widget().config(scrollregion=(0,0,appwidth/2,numpics*appheight*.75))
-        scrollbar.grid(row=1, column=2, rowspan = 2, columnspan=1, sticky="NS")
-        canvas.get_tk_widget().config(yscrollcommand=scrollbar.set)
-        """
+        #gaga
+        scrollbar2 = tk.Scrollbar(frame)
+        scrollbar2.config(command=frame.canvas.xview, orient="horizontal")
+        scrollbar2.grid(row=3, column=0, columnspan=1, sticky="EW")
+        frame.canvas.config(xscrollcommand=scrollbar2.set)
+        
         frame.tkraise()
 
     def show_frameRhino(self, cont):
@@ -362,7 +352,7 @@ class ExpNumPg(tk.Frame, Experiment):
             self.grid_rowconfigure(row, minsize=50) 
         for column in range(6):
             self.grid_columnconfigure(column, minsize=160, weight=1)
-        self.grid_rowconfigure(8, minsize=appheight/3) #Configure rowshow_frameMarlins/grids. 0 sets minimum size weight sets priority
+        self.grid_rowconfigure(8, minsize=appheight/3) #Configure rows/grids. 0 sets minimum size weight sets priority
 
         self.usernumchoice = str()
 
@@ -727,9 +717,6 @@ class PageTest(tk.Frame, BehaviorBox):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text = "Keep This Experiment's Data?", font=LARGE_FONT)
         label.grid(row = 0, column=0, columnspan = 3, sticky="NSEW")
-        #chitty
-        #self.grid_rowconfigure(1, appheight/2)
-        #self.grid_rowconfigure(2, appheight/2)
 
         button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frameStingray(StartPage, Appa)) 
         button2.grid(row=1, column = 4, sticky= "NS")
@@ -738,6 +725,9 @@ class PageTest(tk.Frame, BehaviorBox):
         button3.grid(row=2, column = 4, sticky="NS")
 
         self.canvas=tk.Canvas(self, width=400, height=300)
+        self.canvas.grid(row=1, column=0, rowspan=2)
+
+
 
 
 def confirmdiscard(frame):
