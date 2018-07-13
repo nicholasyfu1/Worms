@@ -182,6 +182,7 @@ class BehaviorBox(tk.Tk, Experiment):
     #Load Appa object for exp and pull up first image from chosen experiment        	 WHATWHAT
     def show_frameLima(self, cont, chosenexp):
         #create variable to store experiment object
+
         result = True       
         result2 = True
         global Momo
@@ -204,12 +205,12 @@ class BehaviorBox(tk.Tk, Experiment):
         else: #not control
             if Momo.expy[0] != "": #already analyzed
                 result = tkMessageBox.askquestion("Warning", "The selected experiment has already been analyzed.\nChanges may overwrite exisiting data.\nProceed anyways?")
-                if result != "no": 
-                    frame = cont(self.container, self)
-                    self.frames[cont] = frame 
-                    frame.grid(row=0, column=0, sticky="nsew")
-                    frame.ChangePic(1)
-                    frame.tkraise() #raise to front
+            if result != "no": 
+                frame = cont(self.container, self)
+                self.frames[cont] = frame 
+                frame.grid(row=0, column=0, sticky="nsew")
+                frame.ChangePic(1)
+                frame.tkraise() #raise to front
 
     def show_frameBean(self, cont):
         frame = cont(self.container, self)
@@ -228,32 +229,28 @@ class BehaviorBox(tk.Tk, Experiment):
             
         for picture in  os.listdir(Appa.savefile + "ExpDataPictures"):
             img = Image.open(Appa.savefile+ "ExpDataPictures/image" + str(i) + ".jpg", mode="r") #read in image
+            img = img.resize((frame.canvaswidth, frame.canvasheight))
+	    imwidth, imheight=img.size
             frame.tempimage = ImageTk.PhotoImage(img)
             frame.imagelist.append(frame.tempimage)
-            frame.canvas.create_image(0,0+480*(i),image=frame.imagelist[i],anchor="nw")
+            frame.canvas.create_image(0,(imheight+10)*i,image=frame.imagelist[i],anchor="nw")
             i+=1
-        
+        """
         ye = frame.canvas.bbox("all")[3]
         he = frame.canvas.bbox("all")[2]
         for k in range(ye/100):
            frame.canvas.create_text(0, k*100, text=(str(k*100)))
         for w in range(he/100):
             frame.canvas.create_text(w*100, 0, text=(str(w*100)))
-
+	"""
 
         scrollbar = tk.Scrollbar(frame)
         scrollbar.config(command=frame.canvas.yview)
         frame.canvas.config(scrollregion=(frame.canvas.bbox("all")))
 
-        scrollbar.grid(row=1, column=2, rowspan = 2, columnspan=1, sticky="NS")
+        scrollbar.grid(row=1, column=1, rowspan = 2, sticky="NSEW")
         frame.canvas.config(yscrollcommand=scrollbar.set)
 
-        #gaga
-        scrollbar2 = tk.Scrollbar(frame)
-        scrollbar2.config(command=frame.canvas.xview, orient="horizontal")
-        scrollbar2.grid(row=3, column=0, columnspan=1, sticky="EW")
-        frame.canvas.config(xscrollcommand=scrollbar2.set)
-        
         frame.tkraise()
 
     def show_frameRhino(self, cont):
@@ -716,16 +713,23 @@ class PageTest(tk.Frame, BehaviorBox):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text = "Keep This Experiment's Data?", font=LARGE_FONT)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, minsize=30)
         label.grid(row = 0, column=0, columnspan = 3, sticky="NSEW")
 
-        button2 = ttk.Button(self,text="Keep", command=lambda: controller.show_frameStingray(StartPage, Appa)) 
-        button2.grid(row=1, column = 4, sticky= "NS")
+        button2 = ttk.Button(self,text="Keep", style="TINYFONT.TButton", command=lambda: controller.show_frameStingray(StartPage, Appa)) 
+        button2.grid(row=1, column = 2, sticky= "NS", padx=xspacer, pady=yspacer)
 
-        button3 = ttk.Button(self,text="Discard", command=lambda: controller.show_frameRhino(StartPage)) 
-        button3.grid(row=2, column = 4, sticky="NS")
-
-        self.canvas=tk.Canvas(self, width=400, height=300)
+        button3 = ttk.Button(self,text="Discard", style="TINYFONT.TButton", command=lambda: controller.show_frameRhino(StartPage)) 
+        button3.grid(row=2, column = 2, sticky="NS", padx=xspacer, pady=yspacer)
+	
+	self.canvaswidth=appwidth*8/10
+        self.canvasheight=appheight*8/10
+        self.canvas=tk.Canvas(self, width=self.canvaswidth, height=self.canvasheight)
         self.canvas.grid(row=1, column=0, rowspan=2)
+        
+        
+
 
 
 
@@ -744,21 +748,20 @@ class DataRetrievalType(tk.Frame):
         tk.Frame.__init__(self,parent)
 
         label = tk.Label(self, text="Choose an Option", font=LARGE_FONT) #Create label object
-        label.grid(row=0, column=1, sticky="nsew") #pack label into window
+        label.grid(row=0, column=0, sticky="nsew") #pack label into window
 
         for i in range(1,4):
-            self.grid_rowconfigure(i, minsize=100) 
-        self.grid_columnconfigure(0, minsize=20)
-        self.grid_columnconfigure(1, minsize=760)
+            self.grid_rowconfigure(i, weight=1) 
+        self.grid_columnconfigure(0, weight=1)
 
         button1 = ttk.Button(self, text="Back to Start Page", style='my.TButton', command=lambda: controller.show_frame(StartPage)) #Create a button to start a new experiment       
-        button1.grid(row=1, column=1, sticky="nsew")
+        button1.grid(row=1, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
 
         button2 = ttk.Button(self, text="Analyze an Experiment", style='my.TButton', command=lambda: controller.show_frameFoxtrot(DataAnalysisPg)) #Create a button to go to 'data retrieval' page
-        button2.grid(row=2, column=1, sticky="nsew")
+        button2.grid(row=2, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
 
         button3 = ttk.Button(self, text="Graph Experiments", style='my.TButton', command=lambda: controller.show_frameFoxtrot(DataGraphChoice)) #Create a button to go to 'data deletion' page
-        button3.grid(row=3, column=1, sticky="nsew")
+        button3.grid(row=3, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
 
 
 
@@ -769,26 +772,27 @@ class DataAnalysisPg(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(2, minsize=appwidth/30)
         label = tk.Label(self, text="Data Analysis \n Please choose experiment to analyze", font=MEDIUM_FONT) #create object
         label.grid(row = 0, column=0, columnspan = 4, sticky="NSEW")
 
-        button1 = ttk.Button(self, text="Back to\nPrevious Page", style='my.TButton', command=lambda: controller.show_frame(DataRetrievalType)) #create a button to return to home screen
-        button1.grid(row=1, column = 0, sticky="NS")
+        button1 = ttk.Button(self, text="Back to\nPrevious Page", style='TINYFONT.TButton', command=lambda: controller.show_frame(DataRetrievalType)) #create a button to return to home screen
+        button1.grid(row=1, column = 0, sticky="NSEW", padx=xspacer)
 
-
-
-        scrollbar = AutoScrollbar(self)
-        scrollbar.grid(row=1, column=2, sticky="NSW", rowspan = 3)
+        scrollbar = tk.Scrollbar(self)
+        scrollbar.grid(row=1, column=2, rowspan=2, sticky="NSEW")
 
         self.List1=tk.Listbox(self, font=TINY_FONT, yscrollcommand = scrollbar.set)
-        self.List1.grid(row=1, column=1, rowspan = 2, sticky="NSE")
+        self.List1.grid(row=1, column=1, rowspan = 2, sticky="NSEW", padx=xspacer)
         self.List1.config(scrollregion=self.List1.bbox("active"))
         scrollbar.config(command=self.List1.yview)
+        
+#        button2 = ttk.Button(self, text="Continue", style='TINYFONT.TButton', command=lambda List1=self.List1: controller.show_frameLima(DataAnalysisImagePg, self.asdf(List1)))
 
-
-        button2 = ttk.Button(self, text="Continue", style='my.TButton', command=lambda List1=self.List1: controller.show_frameLima(DataAnalysisImagePg, self.asdf(List1)))
-        button2.grid(row=1, column = 3, sticky="NS")
-
+        button2 = ttk.Button(self, text="Continue", style='TINYFONT.TButton', command=lambda List1=self.List1: self.asdf(parent, controller, List1))
+        button2.grid(row=1, column = 3, sticky="NSEW", padx=xspacer)
+        
         self.explist = []
         i=0
 
@@ -798,13 +802,19 @@ class DataAnalysisPg(tk.Frame):
         for experiment in self.explist:
             self.List1.insert(i, experiment)
             i+=1
-
+    """
     def asdf(self, List1):
         items = map(int, List1.curselection())
         itemindex = List1.curselection()[0]
         return(self.explist[itemindex])
-
-
+    """
+    def asdf(self, parent, controller, List1):
+        if List1.curselection() == ():
+            tkMessageBox.showwarning("Error", "Must select an experiment to analyze")
+        else:
+            itemindex = List1.curselection()[0]
+            controller.show_frameLima(DataAnalysisImagePg, self.explist[itemindex])
+            
 class DataAnalysisImagePg(tk.Frame):
 
     #WIll pull up images and super impose circles
@@ -1120,7 +1130,6 @@ class AnalysisTypeForNone(tk.Frame, Experiment):
             tkMessageBox.showwarning("Error", "Must select an experiment type")
         else:
             Momo.set_type(self.userexpchoice) #set experiment object's type to user's choice
-            print("he is here")
             controller.show_frameBean(DataAnalysisImagePg)
             #endoftimes
 
@@ -1141,23 +1150,10 @@ class AnalysisTypeForNone(tk.Frame, Experiment):
 
 
 
-class AutoScrollbar(tk.Scrollbar):
-    # a scrollbar that hides itself if it's not needed.  only
-    # works if you use the grid geometry manager.
-    def set(self, lo, hi):
-        if float(lo) <= 0.0 and float(hi) >= 1.0:
-            # grid_remove is currently missing from Tkinter!
-            self.tk.call("grid", "remove", self)
-        else:
-            self.grid()
-        tk.Scrollbar.set(self, lo, hi)
-    def pack(self, **kw):
-        raise TclError, "cannot use pack with this widget"
-    def place(self, **kw):
-        raise TclError, "cannot use place with this widget"
+
 
 app = BehaviorBox()
-#app.attributes('-fullscreen', True)
+app.attributes('-fullscreen', True)
 app.bind("<Escape>", lambda e: app.destroy())
 app.mainloop()
 
