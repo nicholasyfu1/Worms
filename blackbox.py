@@ -1001,7 +1001,7 @@ class GraphPage(tk.Frame):
         button2 = ttk.Button(self,text="Back\nto home", style='TINYFONT.TButton', command=lambda: controller.show_frame(StartPage)) 
         button2.grid(row=1, column = 2, sticky= "NSEW", padx=xspacer, pady=yspacer)
 
-        button3 = ttk.Button(self,text="Save\nGraph??", style='TINYFONT.TButton', command=lambda: self.savethegraph(controller))  #stingray
+        button3 = ttk.Button(self,text="Save\nGraph", style='TINYFONT.TButton', command=lambda: self.savethegraph(controller))  #stingray
         button3.grid(row=2, column = 2, sticky="nsew", padx=xspacer, pady=yspacer)
 
         self.f = Figure(figsize = (1,1), tight_layout=True)#define figure		
@@ -1019,11 +1019,20 @@ class GraphPage(tk.Frame):
         self.canvas.get_tk_widget().grid(row=1, column=1, rowspan = 2, sticky="NSEW", pady=yspacer) #Fill options: BOTH, X, Y Expand options:  
 
     def savethegraph(self, controller):
+        ticker=1
         currtime = datetime.datetime.now()
         dateandtime = currtime.strftime("%Y%m%d-%H%M")
-        self.f.savefig("/home/pi/Desktop/Graph" +dateandtime + ".png", dpi=300)
-        tkMessageBox.showwarning("Done", "Graph saved to desktop as:\n"+ "'Graph" +dateandtime + ".png'")
-        controller.show_frame(StartPage)
+        tempaddress = "/home/pi/Desktop/Graph" +dateandtime
+        nextattempt = tempaddress
+        while True:
+            if os.path.exists(nextattempt + ".png"): #file name already used
+                nextattempt = tempaddress +"(" + str(ticker) + ")"
+                ticker += 1
+            else: #file name not used
+                self.f.savefig(nextattempt + ".png", dpi=300) #save pic
+                tkMessageBox.showwarning("Done", "Graph saved to desktop as:\n"+ "'" + nextattempt[17:] + "'")
+                controller.show_frame(StartPage)
+                break
 
 
 
