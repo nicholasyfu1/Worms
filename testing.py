@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import Tkinter as tk
 class ExampleApp(tk.Tk):
 	def __init__(self):

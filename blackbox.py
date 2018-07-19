@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 
 Andrew Huynh '20
@@ -302,10 +303,8 @@ class BehaviorBox(tk.Tk, Experiment):
                     unanalyzedlist.append(experiment.expnumber)
                 else:
                     experiment.expy = list(map(int, experiment.expy))
-                    #plt.plot(range(len(experiment.expy)),experiment.expy, label="Exp" + experiment.expnumber)
-                    frame.a.plot(range(len(experiment.expy)),experiment.expy, label= experiment.expnumber)
+                    frame.a.plot(range(len(experiment.expy)),experiment.expy, label=experiment.expnumber)
                     expnames.append(experiment.expnumber)
-
            #If unanalyzed experiments exist warn user
             if len(unanalyzedlist) > 0:
                 unanalyzedlist = ", ".join(unanalyzedlist)
@@ -407,8 +406,7 @@ class ExpSelPg(tk.Frame, Experiment):
             Appa.set_type(self.userexpchoice) #set experiment object's type to user's choice
 
             currtime = datetime.datetime.now()
-            dateandtime = str(currtime.year)+str(currtime.month)+str(currtime.day)+"_"+str(currtime.hour)+str(currtime.minute)
-            print(currtime.year)
+            dateandtime = currtime.strftime("%Y%m%d-%H%M")
             savetofile = "/home/pi/Desktop/ExperimentFolder/" + typeofexp + dateandtime + "/"
             Appa.set_savefile(savetofile)
             Appa.set_number(typeofexp + dateandtime) #Configure experiment object's expnumber            
@@ -505,8 +503,8 @@ class ConfirmPg(tk.Frame, Experiment):
         self.grid_rowconfigure(6, weight=1) #Next/back button rows
 
         self.grid_rowconfigure(7, minsize=appheight/3) #Next/back button rows
-        self.grid_columnconfigure(0, minsize=appwidth/2.5*.6) #back button
-        self.grid_columnconfigure(1, minsize=appwidth/2.5*.4) #back button
+        self.grid_columnconfigure(0, minsize=appwidth/2.5*.5) #back button
+        self.grid_columnconfigure(1, minsize=appwidth/2.5*.5) #back button
         self.grid_columnconfigure(3, minsize=appwidth/2.5) #next button
         self.grid_columnconfigure(2, weight=1) #next button
 
@@ -992,29 +990,40 @@ class GraphPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.label = tk.Label(self, text = "Graph of" , font=LARGE_FONT)
-        self.label.grid(row = 0, column=1, columnspan = 2, sticky="NSEW")
+        self.label.grid(row = 0, column=0, columnspan = 3, sticky="NSEW")
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=1)       
+        self.grid_rowconfigure(3, minsize=yspacer*1)                
+        button1 = ttk.Button(self,text="Back", style='TINYFONT.TButton', command=lambda: controller.show_frameFoxtrot(DataGraphChoice))
+        button1.grid(row=1, column = 0, sticky="NSEW", padx=xspacer, pady=yspacer)
 
-        button1 = ttk.Button(self,text="Back", command=lambda: controller.show_frameFoxtrot(DataGraphChoice))
-        button1.grid(row=1, column = 0, sticky="NS")
+        button2 = ttk.Button(self,text="Back\nto home", style='TINYFONT.TButton', command=lambda: controller.show_frame(StartPage)) 
+        button2.grid(row=1, column = 2, sticky= "NSEW", padx=xspacer, pady=yspacer)
 
-        button2 = ttk.Button(self,text="Back to home", command=lambda: controller.show_frame(StartPage)) 
-        button2.grid(row=1, column = 4, sticky= "NS")
+        button3 = ttk.Button(self,text="Save\nGraph??", style='TINYFONT.TButton', command=lambda: self.savethegraph(controller))  #stingray
+        button3.grid(row=2, column = 2, sticky="nsew", padx=xspacer, pady=yspacer)
 
-        button3 = ttk.Button(self,text="Save Graph??", command=lambda: controller.show_frame(StartPage))  #stingray
-        button3.grid(row=2, column = 4, sticky="NS")
-
-        f = Figure(figsize = (1,1))#define figure		
-        self.a = f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
-
-        self.a.xaxis.set_visible(True)
-        self.a.yaxis.set_visible(True)
+        self.f = Figure(figsize = (1,1), tight_layout=True)#define figure		
+        self.a = self.f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
+        self.a.spines["top"].set_color("none")
+        self.a.spines["right"].set_color("none")
+        self.a.set_ylabel("Number of Worms")
+        self.a.set_xlabel("Time")
+#        self.a.xaxis.set_visible(True)
+#        self.a.yaxis.set_visible(True)
         self.a.set_position([0,0,1,1])
 
         #add canvas which is what we intend to render graph to and fill it with figure
-        self.canvas = FigureCanvasTkAgg(f, self) 
-        self.canvas.get_tk_widget().grid(row=1, column=1, rowspan = 3, sticky="NS") #Fill options: BOTH, X, Y Expand options:  
-        self.canvas.get_tk_widget().config(width=580, height=480)
+        self.canvas = FigureCanvasTkAgg(self.f, self) 
+        self.canvas.get_tk_widget().grid(row=1, column=1, rowspan = 2, sticky="NSEW", pady=yspacer) #Fill options: BOTH, X, Y Expand options:  
 
+    def savethegraph(self, controller):
+        currtime = datetime.datetime.now()
+        dateandtime = currtime.strftime("%Y%m%d-%H%M")
+        self.f.savefig("/home/pi/Desktop/Graph" +dateandtime + ".png", dpi=300)
+        tkMessageBox.showwarning("Done", "Graph saved to desktop as:\n"+ "'Graph" +dateandtime + ".png'")
+        controller.show_frame(StartPage)
 
 
 
@@ -1154,7 +1163,7 @@ class AnalysisTypeForNone(tk.Frame, Experiment):
 
 
 app = BehaviorBox()
-app.attributes('-fullscreen', True)
+#app.attributes('-fullscreen', True)
 app.bind("<Escape>", lambda e: app.destroy())
 app.mainloop()
 
