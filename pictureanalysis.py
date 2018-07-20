@@ -19,14 +19,18 @@ def getobject(expname):
 		variablename = pickle.load(input)
 	return  variablename
 
-def getpreviouslyanalyzed(Momo):
-	
-	if Momo.exptype =="1":
+# Function to return text for experiment type
+def getpreviouslyanalyzed(expobj):
+	if expobj.exptype =="0":
+	    	return("No Stimulus")
+	if expobj.exptype =="1":
 	    	return("Thermotaxis")
-	if Momo.exptype == "2":
+	if expobj.exptype == "2":
 	    	return("Chemotaxis")
-	if Momo.exptype == "3":
+	if expobj.exptype == "3":
 	    	return("Phototaxis")
+	if expobj.exptype == "4":
+	    	return("Scrunching")	    	
 
 
 	
