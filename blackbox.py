@@ -36,8 +36,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import numpy as np
 
-from pictureanalysis import *
-
 camera = PiCamera()
 
 #Font Sizes
@@ -53,7 +51,7 @@ appwidth=800
 xspacer=appheight/80
 yspacer=appheight/80
 
-
+imagecapturerate = 2 # How often a picture is taken in seconds
 
 
 class Experiment():
@@ -63,10 +61,8 @@ class Experiment():
         self.exptype = str()
         self.exptime = int()
         self.savefile = str()
-        self.capturerate=2
-        self.x = range(4)
+        self.capturerate = imagecapturerate
         self.iscontrol = False
-        self.controly = ["","",""]
         self.expy = []
     def set_number(self, number):
         self.expnumber = str(number)
@@ -98,7 +94,7 @@ class BehaviorBox(tk.Tk, Experiment):
 
         #Initalize/render all pages
         self.frames = {}
-        for F in (StartPage, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, ReviewData, DataDelPg, DataAnalysisImagePg, DataAnalysisPg, GraphPage, DataMenu, DataGraphChoice, AnalysisTypeForNone, AfterAnalysisPg):
+        for F in (StartPage, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, ReviewData, DataDelPg, DataAnalysisImagePg, DataAnalysisPg, GraphPage, DataMenu, DataGraphChoice, AnalysisTypeForNone, AfterAnalysisPg, CameraPreviewPg):
             frame = F(self.container, self)
             self.frames[F] = frame 
             frame.grid(row=0, column=0, sticky="nsew")         
@@ -148,7 +144,7 @@ class BehaviorBox(tk.Tk, Experiment):
     # Confirm Page -> Insert Page; starts camera preview
     def show_frameFish(self, cont):
         frame = self.frames[cont]
-        camera.start_preview(fullscreen=False, window=(0,appheight/4,appwidth,appheight/2)) # Starts the preview. 
+        camera.start_preview(fullscreen=False, window=(0,appheight/4,appwidth,appheight/2)) #this line starts the preview. 
         frame.tkraise()
 
     # TimeSelPg -> Confirm Pg; save time choice -> confirmation and updates label values in confirmation based on previous user input
@@ -276,9 +272,9 @@ class BehaviorBox(tk.Tk, Experiment):
 
 
     def show_frameStingray(self, cont, obj):
-    # ReviewData(keep) -> StartPage; stores data
+        """ReviewData(keep) -> StartPage; stores data"""
         saveobject(obj)
-        tkMessageBox.showwarning("Done", "Data has been saved for:" + Appa.expnumber) #show warning
+        tkMessageBox.showwarning("Done", "Data has been saved for:" + obj.expnumber) #show warning
         frame = self.frames[cont]
         frame.tkraise() #raise to front
 
@@ -331,7 +327,12 @@ class BehaviorBox(tk.Tk, Experiment):
                 frame.canvas.draw() 
                 frame.tkraise() 
 
-
+    def show_frameSquid(self, cont):
+            frame = self.frames[cont]
+            frame.tkraise() 
+            camera.start_preview(fullscreen=False, window=(appwidth/800, appheight/4, appwidth-(2*appwidth/800), appheight*9/10)) # This line starts the preview. 
+            
+            
 class StartPage(tk.Frame):
     """Main menu"""   
     def __init__(self, parent, controller):
@@ -349,12 +350,11 @@ class StartPage(tk.Frame):
         button2 = ttk.Button(self, text="Data Menu", style='my.TButton', command=lambda: controller.show_frame(DataMenu))
         button2.grid(row=2, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
 
-        button3 = ttk.Button(self, text="Delete Data", style='my.TButton', command=lambda: controller.show_frameFoxtrot(DataDelPg)) 
+        button3 = ttk.Button(self, text="Preview Camera", style='my.TButton', command=lambda: controller.show_frameSquid(CameraPreviewPg))
         button3.grid(row=3, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
-        
-        button3 = ttk.Button(self, text="Quit", style='my.TButton', command=lambda: app.destroy())
-        button3.grid(row=4, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
 
+        button4 = ttk.Button(self, text="Quit", style='my.TButton', command=lambda: app.destroy())
+        button4.grid(row=4, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
 
 class ExpSelPg(tk.Frame, Experiment):
     """Choose experiment type to run"""
@@ -486,7 +486,7 @@ class TimeSelPg(tk.Frame):
             tkMessageBox.showwarning("Error", "Must enter an experiment duration")
         if self.totaltime == "0": # User entered 0
             tkMessageBox.showwarning("Error", "Duration can not be 0")
-        else:
+        if len(self.totaltime) != 0 and self.totaltime != "0":
             Appa.set_exptime(self.totaltime)
             controller.show_frameCharlie(ConfirmPg)
 
@@ -562,36 +562,31 @@ class StimPrepPg(tk.Frame):
         tk.Frame.__init__(self, parent)
         
         self.grid_rowconfigure(3, minsize=appheight/3) #Next/back button rows       
-        self.grid_rowconfigure(2, weight=1) #Next/back button rows       
-        self.grid_columnconfigure(0, minsize=appwidth/2.5) #next button
-        self.grid_columnconfigure(2, minsize=appwidth/2.5) #next button
-        self.grid_columnconfigure(1, weight=1) #next button
+        self.grid_rowconfigure(2, weight=1) # Spacer   
+        self.grid_columnconfigure(0, minsize=appwidth/2.5) # Back button
+        self.grid_columnconfigure(2, minsize=appwidth/2.5) # Next button
+        self.grid_columnconfigure(1, weight=1) # Central column
 
-#chuck
         self.label1 = tk.Label(self, text="", font=MEDIUM_FONT) #create object
         self.label1.grid(row=0, column=0, columnspan=3) #grid object into window
 
         self.label2 = tk.Label(self, text="Press 'Start' to begin experiment", font=SMALL_FONT) #create object
         self.label2.grid(row=1, column=0, columnspan=3) #grid object into window
         
-
-
         self.button1 = ttk.Button(self, text="Back to\nInsert Worms", style="TINYFONT.TButton", command=lambda: controller.show_frame(InsertPg)) #create a button to return to InsertPg
         self.button1.grid(row=3, column= 0, sticky="nsew", padx=xspacer, pady=yspacer)
 
         self.button2 = ttk.Button(self, text="Start", style="TINYFONT.TButton", command=lambda: self.beginexp(parent, controller)) #Start Experiment and raise experiment finished page
         self.button2.grid(row=3, column= 2, sticky="nsew", padx=xspacer, pady=yspacer)
         
-
-        
     def beginexp(self, parent, controller):
         camera.stop_preview()
         result = tkMessageBox.askquestion("Start Experiment", "This experiment will run for \n%s seconds. Once started, you\ncan not quit.\nBegin experiment?" %Appa.exptime)
         if result == "yes":
-            camera.start_preview(fullscreen=False, window=(0,appheight/4,appwidth,appheight/2)) #this line starts the preview. 
+            camera.start_preview(fullscreen=False, window=(appwidth/800, appheight/4, appwidth-(2*appwidth/800), appheight*9/10)) # This line starts the preview. 
             controller.show_frameEcho(ExpFinishPg)
         else:
-            camera.start_preview(fullscreen=False, window=(0,appheight/4,appwidth,appheight/2)) #this line starts the preview. 
+            camera.start_preview(fullscreen=False, window=(0, appheight/4, appwidth, appheight/2)) #this line starts the preview. 
             
     def gettext(self):
         """Configure text depending on if user needs to insert simulus
@@ -643,7 +638,7 @@ class DataMenu(tk.Frame):
     """Choose what to do with data"""
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
-        for i in range(1,4): # Button rows
+        for i in range(1,5): # Button rows
             self.grid_rowconfigure(i, weight=1) 
         self.grid_columnconfigure(0, weight=1) # Central column
 
@@ -656,8 +651,11 @@ class DataMenu(tk.Frame):
         button2 = ttk.Button(self, text="Graph Experiments", style='my.TButton', command=lambda: controller.show_frameFoxtrot(DataGraphChoice)) # Graph experiment(s)
         button2.grid(row=2, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
 
-        button3 = ttk.Button(self, text="Back to Start Page", style='my.TButton', command=lambda: controller.show_frame(StartPage))   
+        button3 = ttk.Button(self, text="Delete Data", style='my.TButton', command=lambda: controller.show_frameFoxtrot(DataDelPg)) 
         button3.grid(row=3, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
+
+        button4 = ttk.Button(self, text="Back to Start Page", style='my.TButton', command=lambda: controller.show_frame(StartPage))   
+        button4.grid(row=4, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
 
 
 class DataAnalysisPg(tk.Frame):
@@ -715,7 +713,7 @@ class DataAnalysisImagePg(tk.Frame):
         self.button2 = ttk.Button(self, text="Previous\nPicture", style="TINYFONT.TButton", command=lambda: self.ChangePic(-1))
         self.button2.grid(row=10, column=3, sticky="NESW", padx=xspacer, rowspan=4, columnspan=3)
 
-        self.button3 = ttk.Button(self, text="Save\nand\nFinish", style="TINYFONT.TButton", command=lambda: controller.show_frameStingray(AfterAnalysisPg, Momo)) # Save data and provide options
+        self.button3 = ttk.Button(self, text="Save\nand\nFinish", style="TINYFONT.TButton", command=lambda: self.finalpic(controller)) # Save data and provide options
         self.button3.grid(row=10, column=6, sticky="NESW", padx=xspacer, rowspan=4, columnspan=3)
 
         self.button4 = ttk.Button(self, text="Back to\nExperiment\nSelection", style="VERYTINYFONT.TButton", command=lambda: controller.show_frameFoxtrot2(DataAnalysisPg))
@@ -773,24 +771,20 @@ class DataAnalysisImagePg(tk.Frame):
         Momo.expy[self.currentimagenum]=self.wormscounted # Store number of counted worms
         self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % str(Momo.expy[self.currentimagenum])) # Configure text so user can see what they entered
 
-
-
     def ChangePic(self, direction):
         """Go to next or previous screen"""
         self.button3.lower()
         self.button2.lift()
         if self.currentimagenum != -1 and self.wormscounted == "" and direction == 1: # Prohibit going forward without enter a number first
             tkMessageBox.showwarning("Error", "Must enter a number")
-
         else: # If user did enter a number
-            self.currentimagenum = self.currentimagenum + direction #change index depending on if user chose next image or previous image
+            self.currentimagenum = self.currentimagenum + direction # Set current image index to next/previous depending on button clicked
             self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % str(Momo.expy[self.currentimagenum])) # Configure text so user can see any previously entered values 
-            self.wormscounted = Momo.expy[self.currentimagenum] # Store value of just entered number
+            self.wormscounted = Momo.expy[self.currentimagenum] # Get any previously entered value for current image index or "" if first time entering
             self.f.clf() # Clear plot
             self.placesubplot() # Place plot again
-            img = mpimg.imread(Momo.savefile + "/ExpDataPictures/image" + str(self.currentimagenum) + ".jpg") # Read in next image
+            img = mpimg.imread(Momo.savefile + "/ExpDataPictures/image" + str(self.currentimagenum) + ".jpg") # Read in image based on current image index
             self.a.imshow(img) # Renders image
-
             if Momo.exptype == "1": # Thermotaxis
                 shape = Circle((200,400),150, fill=False, edgecolor = "R")
             elif Momo.exptype == "2": # Chemotaxis
@@ -800,10 +794,10 @@ class DataAnalysisImagePg(tk.Frame):
                 self.a.plot([100,300], [400,400], color = "B")	
             elif Momo.exptype == "4": # Scrunching
             	shape = Circle((200,400),150, fill=False, edgecolor = "R")
+            
             self.a.add_patch(shape)
             self.canvas.draw()
-
-            self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, len(Momo.expy))) # Update text so user knows what image number they are on
+            self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, len(Momo.expy))) # Update text so user knows what image number they are on. +1 accounts for index starting at 0
             if self.currentimagenum == len(Momo.expy)-1: # If last image, show "generate graph" button
                 self.button3.lift()
             if self.currentimagenum == 0: # If first image, show "back to experiment selection" button
@@ -816,6 +810,13 @@ class DataAnalysisImagePg(tk.Frame):
         self.a.yaxis.set_visible(False)
         self.a.set_position([0,0,1,1])
         self.a.set_aspect(1)
+        
+    def finalpic(self, controller):
+        if self.wormscounted == "": # Prohibit going forward without enter a number first
+            tkMessageBox.showwarning("Error", "Must enter a number")
+        else:
+            self.wormscounted = Momo.expy[self.currentimagenum] # Store value of just entered number
+            controller.show_frameStingray(AfterAnalysisPg, Momo)
 
 
 class AfterAnalysisPg(tk.Frame):
@@ -1034,6 +1035,46 @@ class AnalysisTypeForNone(tk.Frame, Experiment):
             Momo.set_type(self.userexpchoice) # Store pseudo exptype in control's object
             controller.show_frameBean(DataAnalysisImagePg) # Go to actual data analysis
 
+
+class CameraPreviewPg(tk.Frame):
+    """Preview page to adjust focus"""
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.grid_columnconfigure(0, weight=1)	
+
+        label = tk.Label(self, text="Preview Camera", font=MEDIUM_FONT) 
+        label.grid(row=0, column=0)
+
+        button2 = ttk.Button(self, text="Back to Start Page", style="TINYFONT.TButton", command=lambda: controller.show_frameZebra(StartPage)) # Stop preview and show start page
+        button2.grid(row=2, column=0)
+
+
+def saveobject(obj):
+    """Save experiment object"""
+    filename = obj.savefile + "ExpParamObj"
+    with open(filename, "wb") as output:
+        pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
+
+def getobject(expname):
+    """Return experiment object from experiment name"""
+    filepath = "/home/pi/Desktop/ExperimentFolder/" + expname + "/ExpParamObj"
+    with open(filepath, "rb") as input:
+        variablename = pickle.load(input)
+    return  variablename
+
+
+def getpreviouslyanalyzed(expobj):
+    """Return text for experiment type"""
+    if expobj.exptype =="0":
+        	return("No Stimulus")
+    if expobj.exptype =="1":
+        	return("Thermotaxis")
+    if expobj.exptype == "2":
+        	return("Chemotaxis")
+    if expobj.exptype == "3":
+        	return("Phototaxis")
+    if expobj.exptype == "4":
+        	return("Scrunching")	    	
 
 
 app = BehaviorBox()
