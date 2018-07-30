@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=BehaviorBox
+Comment= Execute BehaviorBox
+Exec=/home/pi/BlackBoxFiles/Sweet-Chicken/blackbox.py
+Icon=/home/pi/BlackBoxFiles/Sweet-Chicken/image0.jpg
+Terminal=false
+Type=Application
+Categories=Development
+
