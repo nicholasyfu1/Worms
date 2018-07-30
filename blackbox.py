@@ -53,6 +53,8 @@ yspacer=appheight/80
 
 imagecapturerate = 2 # How often a picture is taken in seconds
 
+if not os.path.exists( "/home/pi/Desktop/ExperimentFolder/"): #Makes folder for data if doesn't exist
+    os.makedirs( "/home/pi/Desktop/ExperimentFolder/")
 
 class Experiment():
 
@@ -100,8 +102,6 @@ class BehaviorBox(tk.Tk, Experiment):
             frame.grid(row=0, column=0, sticky="nsew")         
         self.show_frame(StartPage) #Raise Start Page
     
-        if not os.path.exists( "/home/pi/Desktop/ExperimentFolder/"): #Makes folder for data if doesn't exist
-            os.makedirs( "/home/pi/Desktop/ExperimentFolder/")
 
     #Create button styles/fontsizes
 	s = ttk.Style()
@@ -323,7 +323,7 @@ class BehaviorBox(tk.Tk, Experiment):
                 frame.grid(row=0, column=0, sticky="nsew") 
                 frame.label.configure(text = graphtitle, font=LARGE_FONT)
 
-                frame.a.legend(loc='best', fontsize=15)
+                frame.a.legend(loc='upper right', fontsize=8)
                 frame.canvas.draw() 
                 frame.tkraise() 
 
