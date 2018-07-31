@@ -96,7 +96,7 @@ class BehaviorBox(tk.Tk, Experiment):
 
         #Initalize/render all pages
         self.frames = {}
-        for F in (StartPage, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, ReviewData, DataDelPg, DataAnalysisImagePg, DataAnalysisPg, GraphPage, DataMenu, DataGraphChoice, AnalysisTypeForNone, AfterAnalysisPg, CameraPreviewPg):
+        for F in (StartPage, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, ReviewData, DataDelPg, DataAnalysisImagePg, DataAnalysisPg, GraphPage, DataMenu, DataGraphChoice, AnalysisTypeForNone, CameraPreviewPg):
             frame = F(self.container, self)
             self.frames[F] = frame 
             frame.grid(row=0, column=0, sticky="nsew")         
@@ -313,16 +313,13 @@ class BehaviorBox(tk.Tk, Experiment):
                     frame.a.plot(range(len(experiment.expy)),experiment.expy, label=experiment.expnumber)
                     expnames.append(experiment.expnumber)
 
-           #If unanalyzed experiments exist warn user
-            if len(unanalyzedlist) > 0:
+
+            if len(unanalyzedlist) > 0: # If unanalyzed experiments exist warn user
                 unanalyzedlist = ", ".join(unanalyzedlist)
                 result = tkMessageBox.askquestion("Warning", "The following experiments have\nnot been analyzed yet\nand will not be graphed\n\n" +unanalyzedlist+ "\n\nProceed anyways?")
 
-            if result !=  "no": # Override or all experiments have been analyzed
-                graphtitle = "Graph of worms vs time"
+            if result !=  "no": # Override or all experiments have been analyzed                
                 frame.grid(row=0, column=0, sticky="nsew") 
-                frame.label.configure(text = graphtitle, font=LARGE_FONT)
-
                 frame.a.legend(loc='upper right', fontsize=8)
                 frame.canvas.draw() 
                 frame.tkraise() 
@@ -341,7 +338,7 @@ class StartPage(tk.Frame):
 		    self.grid_rowconfigure(i, weight=1)
     	self.grid_columnconfigure(0, weight=1)
         
-        label = tk.Label(self, text="Start Page", font=LARGE_FONT) 
+        label = tk.Label(self, text="Main Menu", font=LARGE_FONT) 
         label.grid(row=0, column=0, sticky="nsew") 
         
         button1 = ttk.Button(self, text="New Experiment", style='my.TButton', command=lambda: controller.show_frameAlpha(ExpSelPg)) 
@@ -436,12 +433,12 @@ class TimeSelPg(tk.Frame):
         
         self.totaltime = str()
         
-        label = tk.Label(self, text="Enter Run Time (seconds)", font=MEDIUM_FONT) 
+        label = tk.Label(self, text="Enter Experiment Duration (seconds)", font=MEDIUM_FONT) 
         label.grid(row=0, column=1, columnspan=3, sticky="NSEW") 
         
         self.totaltimetext = tk.Label(self, text = "", font=SMALL_FONT) 
         self.totaltimetext.grid(row = 1, column = 1, columnspan=3, sticky="W")
-        self.totaltimetext.configure(text = "Run time: %.5s" % self.totaltime)
+        self.totaltimetext.configure(text = "Duration: %.5s" % self.totaltime)
         
         button1 = ttk.Button(self, text="Back to\nExperiment\nSelection", style="TINYFONT.TButton", command=lambda: controller.show_frame(ExpSelPg)) 
         button1.grid(row=8, column= 0, columnspan=2, sticky="nsew", padx=xspacer, pady=yspacer)
@@ -654,7 +651,7 @@ class DataMenu(tk.Frame):
         button3 = ttk.Button(self, text="Delete Data", style='my.TButton', command=lambda: controller.show_frameFoxtrot(DataDelPg)) 
         button3.grid(row=3, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
 
-        button4 = ttk.Button(self, text="Back to Start Page", style='my.TButton', command=lambda: controller.show_frame(StartPage))   
+        button4 = ttk.Button(self, text="Back to Main Menu", style='my.TButton', command=lambda: controller.show_frame(StartPage))   
         button4.grid(row=4, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
 
 
@@ -816,28 +813,8 @@ class DataAnalysisImagePg(tk.Frame):
             tkMessageBox.showwarning("Error", "Must enter a number")
         else:
             self.wormscounted = Momo.expy[self.currentimagenum] # Store value of just entered number
-            controller.show_frameStingray(AfterAnalysisPg, Momo)
+            controller.show_frameStingray(DataMenu, Momo) 
 
-
-class AfterAnalysisPg(tk.Frame):
-    """Let's user know they are done with analysis and allows options"""
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self,parent)
-        for i in range(1,4):
-            self.grid_rowconfigure(i, weight=1) 
-        self.grid_columnconfigure(0, weight=1)
-        
-        label = tk.Label(self, text="Analysis Completed\nChoose an Option", font=MEDIUM_FONT)
-        label.grid(row=0, column=0, sticky="nsew")
-
-        button1 = ttk.Button(self, text="Start Page", style='my.TButton', command=lambda: controller.show_frame(StartPage)) 
-        button1.grid(row=1, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
-
-        button2 = ttk.Button(self, text="Analyze Another Experiment", style='my.TButton', command=lambda: controller.show_frameFoxtrot(DataAnalysisPg)) # Create a button to choose another experiment to analyze
-        button2.grid(row=2, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
-
-        button3 = ttk.Button(self, text="Graph Experiments", style='my.TButton', command=lambda: controller.show_frameFoxtrot(DataGraphChoice)) # Create a button to go to graph selection page
-        button3.grid(row=3, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
         
 class DataGraphChoice(tk.Frame):
     """Allows user to choose experiments to graph"""
@@ -894,13 +871,13 @@ class GraphPage(tk.Frame):
         self.grid_rowconfigure(2, weight=1) # Graph row
         self.grid_rowconfigure(3, minsize=yspacer*1) # Spacer            
 
-        self.label = tk.Label(self, text = "Graph of" , font=LARGE_FONT)
+        self.label = tk.Label(self, text = "Graph of worms vs time" , font=LARGE_FONT)
         self.label.grid(row = 0, column=0, columnspan = 3, sticky="NSEW")
         
-        button1 = ttk.Button(self,text="Back", style='TINYFONT.TButton', command=lambda: controller.show_frameFoxtrot(DataGraphChoice))
+        button1 = ttk.Button(self,text="Back to\nExperiment\nSelection", style='TINYFONT.TButton', command=lambda: controller.show_frameFoxtrot(DataGraphChoice))
         button1.grid(row=1, column = 0, sticky="NSEW", padx=xspacer, pady=yspacer)
 
-        button2 = ttk.Button(self,text="Back\nto home", style='TINYFONT.TButton', command=lambda: controller.show_frame(StartPage)) 
+        button2 = ttk.Button(self,text="Main\nMenu", style='TINYFONT.TButton', command=lambda: self.returntomenu(controller)) 
         button2.grid(row=1, column = 2, sticky= "NSEW", padx=xspacer, pady=yspacer)
 
         button3 = ttk.Button(self,text="Save\nGraph", style='TINYFONT.TButton', command=lambda: self.savethegraph(controller))  # Save graph then show start page
@@ -915,9 +892,13 @@ class GraphPage(tk.Frame):
         self.a.set_position([0,0,1,1])
         self.canvas = FigureCanvasTkAgg(self.f, self) # Create canvas and fill with figure
         self.canvas.get_tk_widget().grid(row=1, column=1, rowspan = 2, sticky="NSEW", pady=yspacer) 
-
+    
+    def returntomenu(self, controller):
+        result = tkMessageBox.askquestion("Warning", "Returning to main menu will\nnot save the graph.\nReturn to main menu?")
+        if result == "yes":
+            controller.show_frame(StartPage)
     def savethegraph(self, controller):
-        # Create file name based on date and time to save graph
+        """Create file name based on date and time and save graph"""
         ticker=1
         currtime = datetime.datetime.now()
         dateandtime = currtime.strftime("%Y%m%d-%H%M")
@@ -941,10 +922,10 @@ class DataDelPg(tk.Frame):
         self.grid_columnconfigure(2, minsize=appwidth/30)
         self.grid_columnconfigure(1, weight=1)
 
-        label = tk.Label(self, text="Data Review \n Please choose experiment to delete", font=MEDIUM_FONT) 
+        label = tk.Label(self, text="Data Deletion \n Please choose experiment to delete", font=MEDIUM_FONT) 
         label.grid(row = 0, column=0, columnspan = 4, sticky="NSEW")
 
-        button1 = ttk.Button(self, text="Back to Home", style='TINYFONT.TButton', command=lambda: controller.show_frame(StartPage)) 
+        button1 = ttk.Button(self, text="Main\nMenu", style='TINYFONT.TButton', command=lambda: controller.show_frame(StartPage)) 
         button1.grid(row=1, column = 0, sticky="NS", padx=xspacer)
 
         button2 = ttk.Button(self, text="Continue", style='TINYFONT.TButton', command = lambda: self.yoga())
@@ -978,11 +959,15 @@ class DataDelPg(tk.Frame):
 
     def yoga(self):
         """Deletes experiments and refreshes page"""
-        result = tkMessageBox.askquestion("Discard", "Are you sure you want \nto discard these data?")
+        datatodelete = []
+        for button in self.listofbuttons:
+            if button.instate(['selected']):
+                datatodelete.append(button['text'])
+        datatodelete = ", ".join(datatodelete)
+        result = tkMessageBox.askquestion("Discard", "Are you sure you want \nto discard these data:\n\n" + datatodelete + "\n")
         if result == "yes":
-            for button in self.listofbuttons:
-                if button.instate(['selected']):
-                    shutil.rmtree("/home/pi/Desktop/ExperimentFolder/" + button['text'] + "/")
+            for experiment in datatodelete:
+                    shutil.rmtree("/home/pi/Desktop/ExperimentFolder/" + experiment + "/")
                     app.show_frameFoxtrot(DataDelPg)
 
     def onFrameConfigure(self, event):
@@ -1045,7 +1030,7 @@ class CameraPreviewPg(tk.Frame):
         label = tk.Label(self, text="Preview Camera", font=MEDIUM_FONT) 
         label.grid(row=0, column=0)
 
-        button2 = ttk.Button(self, text="Back to Start Page", style="TINYFONT.TButton", command=lambda: controller.show_frameZebra(StartPage)) # Stop preview and show start page
+        button2 = ttk.Button(self, text="Back to Main Menu", style="TINYFONT.TButton", command=lambda: controller.show_frameZebra(StartPage)) # Stop preview and show start page
         button2.grid(row=2, column=0)
 
 
