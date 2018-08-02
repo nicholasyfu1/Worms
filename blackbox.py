@@ -29,6 +29,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from matplotlib.patches import Circle
 from matplotlib.patches import Arc
+from matplotlib.patches import Rectangle
 
 from PIL import ImageTk, Image
 
@@ -81,7 +82,7 @@ Appa = Experiment()
 class BehaviorBox(tk.Tk, Experiment):
 
     """ Base line code to initialize everything """
-    coi = []
+    #coi = [] not sure if this is needed
 
     def __init__(self, *args, **kwargs):
 
@@ -185,28 +186,27 @@ class BehaviorBox(tk.Tk, Experiment):
         camera.stop_preview()
         frame.tkraise() 
 
-    # Reinitalize a specific page        
     def show_frameFoxtrot(self, cont):
+        """Reinitalize a page without prompting for confirmation""" 
         frame = cont(self.container, self)
         self.frames[cont] = frame 
         frame.grid(row=0, column=0, sticky="nsew")
         frame.tkraise()
     
-    # Confirm if want to reinitalize page and the reinitalize
     def show_frameFoxtrot2(self, cont):
+        """Confirm if want to reinitalize page and the reinitalize"""
         result = tkMessageBox.askquestion("Warning", "All progess will be lost.\nProceed anyways?")
         if result == "yes":
             frame = cont(self.container, self)
             self.frames[cont] = frame 
-            frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
-            frame.tkraise() #raise to front
+            frame.grid(row=0, column=0, sticky="nsew") 
+            frame.tkraise() 
 
-    # DataAnalysisPg -> DataAnalysisImagePg; load Appa object for exp and pull up first image from chosen experiment        	 
     def show_frameLima(self, cont, chosenexp):
-        #create variable to store experiment object
+        """DataAnalysisPg -> DataAnalysisImagePg; load Appa object for exp and pull up first image from chosen experiment"""
         result = True       
         result2 = True
-        global Momo
+        global Momo # Create variable to store experiment object
         Momo = getobject(chosenexp)
         
         # Case of analyzing control
@@ -227,12 +227,20 @@ class BehaviorBox(tk.Tk, Experiment):
             if Momo.expy[0] != "": # Already analyzed
                 result = tkMessageBox.askquestion("Warning", "The selected experiment has already been analyzed.\nChanges may overwrite exisiting data.\nProceed anyways?")
             if result != "no": # First time analyzing or want to override
-                frame = cont(self.container, self)
-                self.frames[cont] = frame 
-                frame.grid(row=0, column=0, sticky="nsew")
-                frame.ChangePic(1) # Go to first picture
-                frame.tkraise() 
-
+                if Momo.exptype != "4": # Not strunching
+                    frame = cont(self.container, self)
+                    self.frames[cont] = frame 
+                    frame.grid(row=0, column=0, sticky="nsew")
+                    frame.ChangePic(1) # Go to first picture
+                    frame.tkraise() 
+                else:
+                    tkMessageBox.showwarning("Scrunching analysis not implimented yet") #show warning
+                    """
+                    frame = SrunchingAnalysis(self.container, self) # Create fresh page in case of old data
+                    self.frames[cont] = frame 
+                    frame.grid(row=0, column=0, sticky="nsew")
+                    frame.tkraise() 
+                    """
 
     def show_frameBean(self, cont):
         """AnalysisTypeForNone -> DataAnalysisImagePg"""
@@ -286,8 +294,8 @@ class BehaviorBox(tk.Tk, Experiment):
             shutil.rmtree(Appa.savefile)
             frame.tkraise() 
 
-    # DataGraphChoice -> GraphPage; checks to see if experiments were chosen to graph and will graph
     def show_frameShark(self, cont, listofbuttons):
+        """    # DataGraphChoice -> GraphPage; checks to see if experiments were chosen to graph and will graph"""
         frame = cont(self.container, self)
         self.frames[cont] = frame 
 
@@ -704,8 +712,8 @@ class DataAnalysisImagePg(tk.Frame):
         self.grid_columnconfigure(2, minsize=xspacer) # Spacer
         self.grid_columnconfigure(9, minsize=xspacer) # Spacer
         
-        button1 = ttk.Button(self, text="Next\nPicture", style="TINYFONT.TButton", command=lambda: self.ChangePic(1)) 
-        button1.grid(row=10, column=6, sticky="NESW", padx=xspacer, rowspan=4, columnspan=3)
+        self.button1 = ttk.Button(self, text="Next\nPicture", style="TINYFONT.TButton", command=lambda: self.ChangePic(1)) 
+        self.button1.grid(row=10, column=6, sticky="NESW", padx=xspacer, rowspan=4, columnspan=3)
 
         self.button2 = ttk.Button(self, text="Previous\nPicture", style="TINYFONT.TButton", command=lambda: self.ChangePic(-1))
         self.button2.grid(row=10, column=3, sticky="NESW", padx=xspacer, rowspan=4, columnspan=3)
@@ -715,6 +723,11 @@ class DataAnalysisImagePg(tk.Frame):
 
         self.button4 = ttk.Button(self, text="Back to\nExperiment\nSelection", style="VERYTINYFONT.TButton", command=lambda: controller.show_frameFoxtrot2(DataAnalysisPg))
         self.button4.grid(row=10, column=3, sticky="NESW", padx=xspacer, rowspan=4, columnspan=3)
+
+#        self.button3.lower() # Save and finish
+#        self.button2.lift() # Previous picture
+
+
         # Label for number of worms counted
         self.wormscounted = ""
         self.wormscountedtext = tk.Label(self, text = "", font=VERYTINY_FONT) 
@@ -754,7 +767,7 @@ class DataAnalysisImagePg(tk.Frame):
 
 
     def click(self, z):
-        """Save user inputs and display them"""
+        """Save user inputs and display them"""                
         currentnum = self.wormscounted
         if currentnum == '0':
             self.wormscounted = z
@@ -770,12 +783,20 @@ class DataAnalysisImagePg(tk.Frame):
 
     def ChangePic(self, direction):
         """Go to next or previous screen"""
-        self.button3.lower()
-        self.button2.lift()
+        flag=True
+        self.button3.lower() # Save and finish
+        self.button2.lift() # Previous picture
         if self.currentimagenum != -1 and self.wormscounted == "" and direction == 1: # Prohibit going forward without enter a number first
             tkMessageBox.showwarning("Error", "Must enter a number")
         else: # If user did enter a number
-            self.currentimagenum = self.currentimagenum + direction # Set current image index to next/previous depending on button clicked
+            if self.currentimagenum + direction < 0:
+                self.currentimagenum=0
+                flag=False
+            if self.currentimagenum + direction > len(Momo.expy)-1:
+                self.currentimagenum=len(Momo.expy)-1
+                flag=False
+            if flag:
+                self.currentimagenum = self.currentimagenum + direction # Set current image index to next/previous depending on button clicked
             self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % str(Momo.expy[self.currentimagenum])) # Configure text so user can see any previously entered values 
             self.wormscounted = Momo.expy[self.currentimagenum] # Get any previously entered value for current image index or "" if first time entering
             self.f.clf() # Clear plot
@@ -783,13 +804,13 @@ class DataAnalysisImagePg(tk.Frame):
             img = mpimg.imread(Momo.savefile + "/ExpDataPictures/image" + str(self.currentimagenum) + ".jpg") # Read in image based on current image index
             self.a.imshow(img) # Renders image
             if Momo.exptype == "1": # Thermotaxis
-                shape = Circle((200,400),150, fill=False, edgecolor = "R")
+                shape = Circle((200,400),150, fill=False, edgecolor="R")
             elif Momo.exptype == "2": # Chemotaxis
-                shape = Circle((200,400),150, fill=False, edgecolor = "R")
+                shape = Circle((200,400),150, fill=False, edgecolor="R")
             elif Momo.exptype == "3": # Phototaxis
-                shape = Rectangle((200,400), width=200, height=200, edgecolor = "B")
+                shape = Rectangle((80,200), width=200, height=200, fill=False, edgecolor="R")
             elif Momo.exptype == "4": # Scrunching
-            	shape = Circle((200,400),150, fill=False, edgecolor = "R")
+            	shape = Circle((200,400),150, fill=False, edgecolor="R")
             
             self.a.add_patch(shape)
             self.canvas.draw()
@@ -797,8 +818,8 @@ class DataAnalysisImagePg(tk.Frame):
             if self.currentimagenum == len(Momo.expy)-1: # If last image, show "generate graph" button
                 self.button3.lift()
             if self.currentimagenum == 0: # If first image, show "back to experiment selection" button
-                self.button4.lift()
-    
+                self.button4.lift()                
+                
     def placesubplot(self):
         """Add subplot to figure"""
         self.a = self.f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
