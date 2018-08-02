@@ -434,10 +434,10 @@ class TimeSelPg(tk.Frame):
         self.totaltime = str()
         
         label = tk.Label(self, text="Enter Experiment Duration (seconds)", font=MEDIUM_FONT) 
-        label.grid(row=0, column=1, columnspan=3, sticky="NSEW") 
+        label.grid(row=0, column=0, columnspan=5, sticky="NSEW") 
         
         self.totaltimetext = tk.Label(self, text = "", font=SMALL_FONT) 
-        self.totaltimetext.grid(row = 1, column = 1, columnspan=3, sticky="W")
+        self.totaltimetext.grid(row = 1, column = 1, columnspan=3, sticky="w")
         self.totaltimetext.configure(text = "Duration: %.5s" % self.totaltime)
         
         button1 = ttk.Button(self, text="Back to\nExperiment\nSelection", style="TINYFONT.TButton", command=lambda: controller.show_frame(ExpSelPg)) 
@@ -475,7 +475,7 @@ class TimeSelPg(tk.Frame):
                 tkMessageBox.showwarning("Error", "Time too long")
             else:
                 self.totaltime = currentnum + z
-        self.totaltimetext.configure(text = "Run time:  %.5s" % self.totaltime)
+        self.totaltimetext.configure(text = "Duration:  %.5s" % self.totaltime)
     
     def checkvalidexptime(self, parent, controller):
         """Check to see if time entered is valid, save the time, then show confirmation page"""
@@ -787,8 +787,7 @@ class DataAnalysisImagePg(tk.Frame):
             elif Momo.exptype == "2": # Chemotaxis
                 shape = Circle((200,400),150, fill=False, edgecolor = "R")
             elif Momo.exptype == "3": # Phototaxis
-                shape = Arc((200,400), width=200, height=200, theta1=0, theta2=180, edgecolor = "B")
-                self.a.plot([100,300], [400,400], color = "B")	
+                shape = Rectangle((200,400), width=200, height=200, edgecolor = "B")
             elif Momo.exptype == "4": # Scrunching
             	shape = Circle((200,400),150, fill=False, edgecolor = "R")
             
@@ -1066,6 +1065,7 @@ app = BehaviorBox()
 app.attributes('-fullscreen', True)
 app.bind("<Escape>", lambda e: app.destroy())
 app.mainloop()
+
 
 
 
