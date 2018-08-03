@@ -1,10 +1,17 @@
 #!/usr/bin/env python
 """
 
-Andrew Huynh '20
+Andrew Huynh '20 ahuynh1@swarthmore.edu
 Summer 2018
 Behavior Box Project
 
+This program is to run experiments on the black box. It is designed to be run on a 800x480 screen.
+The UI is designed using TKinter.
+Basic overview:
+    Create experiment object that stores experiment parameters
+    Create class pages
+    Buttons on page use specific "show_frame<name.()" commands to raise the next page as well as start 
+    fuctions such as imaging
 """
 try:
     import Tkinter as tk
@@ -39,7 +46,7 @@ import numpy as np
 
 camera = PiCamera()
 
-#Font Sizes
+# Font Sizes
 LARGE_FONT = ("Verdana", 36)
 MEDIUM_FONT = ("Verdana", 28)
 SMALL_FONT = ("Verdana", 24)
@@ -88,23 +95,23 @@ class BehaviorBox(tk.Tk, Experiment):
 
         tk.Tk.__init__(self, *args, **kwargs)
 
-        tk.Tk.wm_title(self, "Behavior Box") #Set window title
+        tk.Tk.wm_title(self, "Behavior Box") # Set window title
 
-        self.container = tk.Frame(self) #Define frame/edge of window
-        self.container.pack(side="top", fill="both", expand=True) #Fill will fill space you have allotted pack. Expand will take up all white space.
-        self.container.grid_rowconfigure(0, weight=1) #Configure rows/grids. 0 sets minimum size weight sets priority
+        self.container = tk.Frame(self) # Define frame/edge of window
+        self.container.pack(side="top", fill="both", expand=True) # Fill will fill space you have allotted pack. Expand will take up all white space.
+        self.container.grid_rowconfigure(0, weight=1) # Configure rows/grids. 0 sets minimum size weight sets priority
         self.container.grid_columnconfigure(0, weight=1) 
 
-        #Initalize/render all pages
+        # Initalize/render all pages
         self.frames = {}
         for F in (StartPage, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, ReviewData, DataDelPg, DataAnalysisImagePg, DataAnalysisPg, GraphPage, DataMenu, DataGraphChoice, AnalysisTypeForNone, CameraPreviewPg):
             frame = F(self.container, self)
             self.frames[F] = frame 
             frame.grid(row=0, column=0, sticky="nsew")         
-        self.show_frame(StartPage) #Raise Start Page
+        self.show_frame(StartPage) # Raise Start Page
     
 
-    #Create button styles/fontsizes
+    # Create button styles/fontsizes
 	s = ttk.Style()
 	s.configure("VERYTINYFONT.TButton", font=(VERYTINY_FONT))
 	s.configure("TINYFONT.TButton", font=(TINY_FONT))
@@ -113,19 +120,20 @@ class BehaviorBox(tk.Tk, Experiment):
 	s.configure("radio.TRadiobutton", font=(SMALL_FONT))
 
 
-    def startfresh(self): #Use to reinitalize pages that have updating values
+    def startfresh(self):
+        """Reinitalize pages that have updating values"""
         for F in (StartPage, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, DataDelPg):
             frame = F(self.container, self)
             self.frames[F] = frame 
             frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
 
-    #Function to raise frame to the front
     def show_frame(self, cont):
+        """Basic function to raise frame to front"""
         frame = self.frames[cont]
         frame.tkraise() #raise to front
 
-    #Main menu -> new experiment. Resets all of Appa's values
     def show_frameAlpha(self, cont):
+        """Main menu -> new experiment. Resets all of Appa's values"""
         #Reset all of experiment-class variables
         Appa.expnumber = str()
         Appa.exptype = str()
@@ -136,32 +144,35 @@ class BehaviorBox(tk.Tk, Experiment):
         frame = self.frames[cont]
         frame.tkraise() #raise to front
     
-    #Confirm Page <- Insert Page; ends camera preview
     def show_frameZebra(self, cont):
+        """Confirm Page <- Insert Page; ends camera preview"""
         frame = self.frames[cont]
         camera.stop_preview()#Stops the preview window
         frame.tkraise() #raise to front
 
-    # Confirm Page -> Insert Page; starts camera preview
     def show_frameFish(self, cont):
+        """Confirm Page -> Insert Page; starts camera preview"""
         frame = self.frames[cont]
         camera.start_preview(fullscreen=False, window=(0,appheight/4,appwidth,appheight/2)) #this line starts the preview. 
         frame.tkraise()
 
-    # TimeSelPg -> Confirm Pg; save time choice -> confirmation and updates label values in confirmation based on previous user input
     def show_frameCharlie(self, cont):
+        """TimeSelPg -> Confirm Pg; 
+            save time choice -> confirmation and updates label values in confirmation based on previous user   
+            input
+        """
         frame = self.frames[cont]
         frame.confirmlabels()
         frame.tkraise()
 
-  # InsertPg -> StimPrepPg and displays either "Ready" or "Insert stimuli" based on experiment type
     def show_frameDelta(self, cont):
+        """InsertPg -> StimPrepPg and displays either "Ready" or "Insert stimuli" based on experiment type"""
         frame = self.frames[cont]
         frame.gettext() #Displays either "Ready" or "Insert stimuli" based on experiment type
         frame.tkraise()
 
-    # StimPrepPg -> start imaging and count down
     def show_frameEcho(self, cont):
+        """StimPrepPg -> start imaging and count down"""
         self.frames[StimPrepPg].button1.grid_remove()
         self.frames[StimPrepPg].button2.grid_remove()
         self.frames[StimPrepPg].label1.configure(text="Experiment in progress")
@@ -286,8 +297,8 @@ class BehaviorBox(tk.Tk, Experiment):
         frame = self.frames[cont]
         frame.tkraise() #raise to front
 
-    # ReviewData(discard) -> StartPage; deletes data
     def show_frameRhino(self, cont):
+        """ReviewData(discard) -> StartPage; deletes data"""
         frame = self.frames[cont]
         result = tkMessageBox.askquestion("Discard", "Are you sure you want \nto discard these data?")
         if result == "yes":
@@ -295,7 +306,7 @@ class BehaviorBox(tk.Tk, Experiment):
             frame.tkraise() 
 
     def show_frameShark(self, cont, listofbuttons):
-        """    # DataGraphChoice -> GraphPage; checks to see if experiments were chosen to graph and will graph"""
+        """DataGraphChoice -> GraphPage; checks to see if experiments were chosen to graph and will graph"""
         frame = cont(self.container, self)
         self.frames[cont] = frame 
 
@@ -333,6 +344,7 @@ class BehaviorBox(tk.Tk, Experiment):
                 frame.tkraise() 
 
     def show_frameSquid(self, cont):
+            """Main menu -> CameraPreviewPg; starts preview and raises frame"""
             frame = self.frames[cont]
             frame.tkraise() 
             camera.start_preview(fullscreen=False, window=(appwidth/800, appheight/4, appwidth-(2*appwidth/800), appheight*9/10)) # This line starts the preview. 
@@ -789,6 +801,7 @@ class DataAnalysisImagePg(tk.Frame):
         if self.currentimagenum != -1 and self.wormscounted == "" and direction == 1: # Prohibit going forward without enter a number first
             tkMessageBox.showwarning("Error", "Must enter a number")
         else: # If user did enter a number
+            # The next 3 if statements make sure the user can not break the program by hitting next/back too quickly
             if self.currentimagenum + direction < 0:
                 self.currentimagenum=0
                 flag=False
@@ -1086,11 +1099,6 @@ app = BehaviorBox()
 app.attributes('-fullscreen', True)
 app.bind("<Escape>", lambda e: app.destroy())
 app.mainloop()
-
-
-
-
-
 
 
 
