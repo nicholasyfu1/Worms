@@ -2,8 +2,8 @@
 Version=1.0
 Name=BehaviorBox
 Comment= Execute BehaviorBox
-Exec=/home/pi/BlackBoxFiles/Sweet-Chicken/blackbox.py
-Icon=/home/pi/BlackBoxFiles/Sweet-Chicken/image0.jpg
+Exec=/home/pi/BlackBoxFiles/Worms/blackbox.py
+Icon=/home/pi/BlackBoxFiles/Worms/Logo.png
 Terminal=false
 Type=Application
 Categories=Development
