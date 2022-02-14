@@ -111,13 +111,13 @@ class BehaviorBox(tk.Tk, Experiment):
 		self.show_frame(StartPage) # Raise Start Page
 	
 
-	# Create button styles/fontsizes
-	s = ttk.Style()
-	s.configure("VERYTINYFONT.TButton", font=(VERYTINY_FONT))
-	s.configure("TINYFONT.TButton", font=(TINY_FONT))
-	s.configure("my.TButton", font=(SMALL_FONT))
-	s.configure("checkbuttonstyle.TCheckbutton", font=(TINY_FONT), background="white")
-	s.configure("radio.TRadiobutton", font=(SMALL_FONT))
+		# Create button styles/fontsizes
+		s = ttk.Style()
+		s.configure("VERYTINYFONT.TButton", font=(VERYTINY_FONT))
+		s.configure("TINYFONT.TButton", font=(TINY_FONT))
+		s.configure("my.TButton", font=(SMALL_FONT))
+		s.configure("checkbuttonstyle.TCheckbutton", font=(TINY_FONT), background="white")
+		s.configure("radio.TRadiobutton", font=(SMALL_FONT))
 
 
 	def startfresh(self):
