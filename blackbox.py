@@ -15,11 +15,8 @@ Basic overview:
 """
 try:
 	import Tkinter as tk
-	from Tkinter import font
-	
 except ImportError:
 	import tkinter as tk
-	from tkinter import font
 
 import ttk
 import tkMessageBox
@@ -50,11 +47,11 @@ import numpy as np
 camera = PiCamera()
 
 # Font Sizes
-LARGE_FONT = ("Helvetica", 36)
-MEDIUM_FONT = ("Helvetica", 28)
-SMALL_FONT = ("Helvetica", 24)
-TINY_FONT = ("Helvetica", 20)
-VERYTINY_FONT = ("Helvetica", 15)
+LARGE_FONT = ("Lato", 36)
+MEDIUM_FONT = ("Lato", 28)
+SMALL_FONT = ("Lato", 24)
+TINY_FONT = ("Lato", 20)
+VERYTINY_FONT = ("Lato", 15)
 
 appheight=400
 appwidth=800
