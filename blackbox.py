@@ -47,9 +47,9 @@ import numpy as np
 camera = PiCamera()
 
 # Font Sizes
-LARGE_FONT = ("Verdana", 36)
-MEDIUM_FONT = ("Verdana", 28)
-SMALL_FONT = ("Verdana", 24)
+LARGE_FONT = ("Helvetica Neue", 36)
+MEDIUM_FONT = ("Helvetica Neue", 28)
+SMALL_FONT = ("Helvetica Neue", 24)
 TINY_FONT = ("Verdana", 20)
 VERYTINY_FONT = ("Verdana", 15)
 
