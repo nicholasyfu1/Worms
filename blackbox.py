@@ -44,7 +44,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import numpy as np
 
-camera = PiCamera(resolution=(800,480))
+camera = PiCamera(resolution=(640,480))
 
 # Font Sizes
 LARGE_FONT = ("Lato", 36)
@@ -153,7 +153,6 @@ class BehaviorBox(tk.Tk, Experiment):
 	def show_frameFish(self, cont):
 		"""Confirm Page -> Insert Page; starts camera preview"""
 		frame = self.frames[cont]
-		camera.resolution = (800, 480)
 		camera.start_preview(fullscreen=False, window=(0,appheight/4,appwidth,appheight/2)) #this line starts the preview. 
 		frame.tkraise()
 
@@ -349,7 +348,6 @@ class BehaviorBox(tk.Tk, Experiment):
 			"""Main menu -> CameraPreviewPg; starts preview and raises frame"""
 			frame = self.frames[cont]
 			frame.tkraise() 
-			camera.resolution = (800, 480)
 			camera.start_preview(fullscreen=False, window=(appwidth/800, appheight/4, appwidth-(2*appwidth/800), appheight*9/10)) # This line starts the preview. 
 			
 			
@@ -603,11 +601,9 @@ class StimPrepPg(tk.Frame):
 		camera.stop_preview()
 		result = tkMessageBox.askquestion("Start Experiment", "This experiment will run for \n%s seconds. Once started, you\ncan not quit.\nBegin experiment?" %Appa.exptime)
 		if result == "yes":
-			camera.resolution = (800, 480)
 			camera.start_preview(fullscreen=False, window=(appwidth/800, appheight/4, appwidth-(2*appwidth/800), appheight*9/10)) # This line starts the preview. 
 			controller.show_frameEcho(ExpFinishPg)
 		else:
-			camera.resolution = (800, 480)
 			camera.start_preview(fullscreen=False, window=(0, appheight/4, appwidth, appheight/2)) #this line starts the preview. 
 			
 	def gettext(self):
