@@ -189,8 +189,9 @@ class BehaviorBox(tk.Tk, Experiment):
 			remaining = Appa.exptime-i # Calculate countdown
 			self.frames[StimPrepPg].label2.configure(text="Time remaining: %d" % remaining) # Set countdown
 			self.frames[StimPrepPg].update_idletasks() # Refresh page            
-			if i%Appa.capturerate == 0: # Calculate if need to capture pic 
-				camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", resize=(800,480))
+			if i%Appa.capturerate == 0: # Calculate if need to capture pic
+				camera.resolution = (640,480) 
+				camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", resize=(640,480))
 				Appa.expy.append("") # Append empty place holder for future analyssi
 				imgnum+=1
 			sleep(1-(clock()-start_time))
