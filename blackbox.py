@@ -275,7 +275,7 @@ class BehaviorBox(tk.Tk, Experiment):
 		
 		for picture in  os.listdir(Appa.savefile + "ExpDataPictures"):
 			img = Image.open(Appa.savefile+ "ExpDataPictures/image" + str(i) + ".jpg", mode="r") #read in image
-			img = img.resize((frame.canvaswidth, frame.canvasheight))
+			#img = img.resize((frame.canvaswidth, frame.canvasheight))
 			imwidth, imheight = img.size
 			frame.tempimage = ImageTk.PhotoImage(img)
 			frame.imagelist.append(frame.tempimage)
