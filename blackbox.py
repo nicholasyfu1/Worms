@@ -53,7 +53,7 @@ SMALL_FONT = ("Lato", 24)
 TINY_FONT = ("Lato", 20)
 VERYTINY_FONT = ("Lato", 15)
 
-appheight=400
+appheight=480
 appwidth=800
 
 xspacer=appheight/80
