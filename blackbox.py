@@ -153,6 +153,7 @@ class BehaviorBox(tk.Tk, Experiment):
 	def show_frameFish(self, cont):
 		"""Confirm Page -> Insert Page; starts camera preview"""
 		frame = self.frames[cont]
+		camera.resolution = (800, 480)
 		camera.start_preview(fullscreen=False, window=(0,appheight/4,appwidth,appheight/2)) #this line starts the preview. 
 		frame.tkraise()
 
@@ -189,6 +190,7 @@ class BehaviorBox(tk.Tk, Experiment):
 			self.frames[StimPrepPg].label2.configure(text="Time remaining: %d" % remaining) # Set countdown
 			self.frames[StimPrepPg].update_idletasks() # Refresh page            
 			if i%Appa.capturerate == 0: # Calculate if need to capture pic 
+				camera.resolution = (800, 480)
 				camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg")
 				Appa.expy.append("") # Append empty place holder for future analyssi
 				imgnum+=1
@@ -347,6 +349,7 @@ class BehaviorBox(tk.Tk, Experiment):
 			"""Main menu -> CameraPreviewPg; starts preview and raises frame"""
 			frame = self.frames[cont]
 			frame.tkraise() 
+			camera.resolution = (800, 480)
 			camera.start_preview(fullscreen=False, window=(appwidth/800, appheight/4, appwidth-(2*appwidth/800), appheight*9/10)) # This line starts the preview. 
 			
 			
@@ -600,9 +603,11 @@ class StimPrepPg(tk.Frame):
 		camera.stop_preview()
 		result = tkMessageBox.askquestion("Start Experiment", "This experiment will run for \n%s seconds. Once started, you\ncan not quit.\nBegin experiment?" %Appa.exptime)
 		if result == "yes":
+			camera.resolution = (800, 480)
 			camera.start_preview(fullscreen=False, window=(appwidth/800, appheight/4, appwidth-(2*appwidth/800), appheight*9/10)) # This line starts the preview. 
 			controller.show_frameEcho(ExpFinishPg)
 		else:
+			camera.resolution = (800, 480)
 			camera.start_preview(fullscreen=False, window=(0, appheight/4, appwidth, appheight/2)) #this line starts the preview. 
 			
 	def gettext(self):
