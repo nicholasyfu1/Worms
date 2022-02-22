@@ -44,7 +44,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import numpy as np
 
-camera = PiCamera(resolution=(640,480), awb_mode="sunlight")
+camera = PiCamera(resolution=(640,480))
+camera.awb_mode='sunlight'
 
 # Font Sizes
 LARGE_FONT = ("Lato", 36)
