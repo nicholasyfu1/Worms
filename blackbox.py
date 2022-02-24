@@ -45,7 +45,8 @@ from matplotlib.figure import Figure
 import numpy as np
 
 camera = PiCamera(resolution=(640,480))
-camera.awb_mode='sunlight'
+camera.awb_mode='off'
+camera.awb_gains=(1.2,1.2)
 
 # Font Sizes
 LARGE_FONT = ("Lato", 36)
