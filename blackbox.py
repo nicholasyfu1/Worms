@@ -46,7 +46,7 @@ import numpy as np
 
 camera = PiCamera(resolution=(640,480))
 camera.awb_mode='off'
-camera.awb_gains=(0.7,1.2)
+camera.awb_gains=(0.6,1.8)
 
 # Font Sizes
 LARGE_FONT = ("Lato", 36)
