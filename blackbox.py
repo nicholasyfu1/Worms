@@ -61,7 +61,7 @@ appwidth=800
 xspacer=appheight/80
 yspacer=appheight/80
 
-imagecapturerate = 1 # How often a picture is taken in seconds
+imagecapturerate = 0.5 # How often a picture is taken in seconds
 
 if not os.path.exists( "/home/pi/Desktop/ExperimentFolder/"): #Makes folder for data if doesn't exist
 	os.makedirs( "/home/pi/Desktop/ExperimentFolder/")
