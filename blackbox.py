@@ -61,7 +61,7 @@ appwidth=800
 xspacer=appheight/80
 yspacer=appheight/80
 
-imagecapturerate = 0.125 # How often a picture is taken in seconds
+imagecapturerate = 0.0625 # How often a picture is taken in seconds
 
 if not os.path.exists( "/home/pi/Desktop/ExperimentFolder/"): #Makes folder for data if doesn't exist
 	os.makedirs( "/home/pi/Desktop/ExperimentFolder/")
@@ -185,15 +185,17 @@ class BehaviorBox(tk.Tk, Experiment):
 
 		#Image capturing
 		imgnum=0
-		for i in range(Appa.exptime+1):
-			start_time = clock()
-			remaining = Appa.exptime-i # Calculate countdown
+		fps=1/Appa.capturerate
+		numFrames=Appa.exptime*fps
+		for i in range(numFrames):
+			#start_time = clock()
+			remaining = Appa.exptime-(i*Appa.capturerate) # Calculate countdown
 			self.frames[StimPrepPg].label2.configure(text="Time remaining: %d" % remaining) # Set countdown
 			self.frames[StimPrepPg].update_idletasks() # Refresh page            
-			if i%Appa.capturerate == 0: # Calculate if need to capture pic
-				camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", resize=(640,480), use_video_port=True)
-				Appa.expy.append("") # Append empty place holder for future analyssi
-				imgnum+=1
+			#if i%Appa.capturerate == 0: # Calculate if need to capture pic
+			camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", resize=(640,480), use_video_port=True)
+			Appa.expy.append("") # Append empty place holder for future analyssi
+			imgnum+=1
 			#sleep(0.1)
 
 		camera.stop_preview()
