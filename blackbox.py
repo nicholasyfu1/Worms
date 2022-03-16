@@ -61,7 +61,7 @@ appwidth=800
 xspacer=appheight/80
 yspacer=appheight/80
 
-imagecapturerate = 0.1 # How often a picture is taken in seconds
+imagecapturerate = 0.125 # How often a picture is taken in seconds
 
 if not os.path.exists( "/home/pi/Desktop/ExperimentFolder/"): #Makes folder for data if doesn't exist
 	os.makedirs( "/home/pi/Desktop/ExperimentFolder/")
@@ -194,7 +194,7 @@ class BehaviorBox(tk.Tk, Experiment):
 				camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", resize=(640,480), use_video_port=True)
 				Appa.expy.append("") # Append empty place holder for future analyssi
 				imgnum+=1
-			#sleep(1-(clock()-start_time))
+			sleep(1-(clock()-start_time))
 
 		camera.stop_preview()
 		frame.tkraise() 
