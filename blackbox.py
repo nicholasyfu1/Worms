@@ -73,7 +73,7 @@ class Experiment():
 		self.exptype = str()
 		self.exptime = int()
 		self.savefile = str()
-		self.capturerate = imagecapturerate
+		#self.capturerate = imagecapturerate
 		self.iscontrol = False
 		self.expy = []
 	def set_number(self, number):
