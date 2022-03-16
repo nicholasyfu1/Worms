@@ -194,7 +194,7 @@ class BehaviorBox(tk.Tk, Experiment):
 				camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", resize=(640,480), use_video_port=True)
 				Appa.expy.append("") # Append empty place holder for future analyssi
 				imgnum+=1
-			sleep((clock()-start_time))
+			sleep(0.1)
 
 		camera.stop_preview()
 		frame.tkraise() 
