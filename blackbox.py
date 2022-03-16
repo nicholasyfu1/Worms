@@ -186,14 +186,15 @@ class BehaviorBox(tk.Tk, Experiment):
 		#Image capturing
 		imgnum=0
 		fps=1/Appa.capturerate
-		numFrames=Appa.exptime*fps
+		numFrames=int(Appa.exptime*fps)
+		seconds=0
 		for i in range(numFrames):
 			#start_time = clock()
 			if i%fps==0:
-				seconds=int(i/fps)
 				remaining = Appa.exptime-seconds # Calculate countdown
 				self.frames[StimPrepPg].label2.configure(text="Time remaining: %d" % remaining) # Set countdown
-				self.frames[StimPrepPg].update_idletasks() # Refresh page            
+				self.frames[StimPrepPg].update_idletasks() # Refresh page  
+				seconds+=1          
 			#if i%Appa.capturerate == 0: # Calculate if need to capture pic
 			camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", resize=(640,480), use_video_port=True)
 			Appa.expy.append("") # Append empty place holder for future analyssi
