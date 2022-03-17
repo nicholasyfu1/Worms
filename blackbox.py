@@ -28,6 +28,7 @@ import pickle
 import datetime
 from time import *
 from picamera import PiCamera
+from datetime import datetime, timedelta
 
 import matplotlib
 matplotlib.use("TkAgg")
@@ -61,7 +62,7 @@ appwidth=800
 xspacer=appheight/80
 yspacer=appheight/80
 
-#(Don't need this anymore; adjust fps line 188) imagecapturerate = 0.0625 
+#(Don't need this anymore; adjust fps line 188) imagecapturerate = 0.0625
 
 if not os.path.exists( "/home/pi/Desktop/ExperimentFolder/"): #Makes folder for data if doesn't exist
 	os.makedirs( "/home/pi/Desktop/ExperimentFolder/")
@@ -185,10 +186,14 @@ class BehaviorBox(tk.Tk, Experiment):
 
 		#Image capturing
 		imgnum=0
-		fps=8
+		fps=5
 		numFrames=Appa.exptime*fps
 		seconds=0
+		now = 0
+		looptime = 0
 		for i in range(numFrames):
+			now = datetime.now()
+			nowmicro = now.microsecond
 			#start_time = clock()
 			if i%fps==0:
 				remaining = Appa.exptime-seconds # Calculate countdown
@@ -199,7 +204,16 @@ class BehaviorBox(tk.Tk, Experiment):
 			camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", resize=(640,480), use_video_port=True)
 			Appa.expy.append("") # Append empty place holder for future analyssi
 			imgnum+=1
-			sleep(0.125)
+
+			newnow = datetime.now()
+			newnowmicro = now.microsecond
+
+			if newnowmicro < nowmicro:
+				newnowmicro+=1000000
+			looptime = newnowmicro - nowmicro
+			
+			if looptime < 250000:
+				sleep(250000-looptime)
 
 		camera.stop_preview()
 		frame.tkraise() 
