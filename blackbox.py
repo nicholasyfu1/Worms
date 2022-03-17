@@ -192,8 +192,8 @@ class BehaviorBox(tk.Tk, Experiment):
 		now = 0
 		looptime = 0
 		for i in range(numFrames):
-			now = datetime.now()
-			nowmicro = now.microsecond
+			#now = datetime.now()
+			#nowmicro = now.microsecond
 			#start_time = clock()
 			if i%fps==0:
 				remaining = Appa.exptime-seconds # Calculate countdown
@@ -205,15 +205,15 @@ class BehaviorBox(tk.Tk, Experiment):
 			Appa.expy.append("") # Append empty place holder for future analyssi
 			imgnum+=1
 
-			newnow = datetime.now()
-			newnowmicro = now.microsecond
+			#newnow = datetime.now()
+			#newnowmicro = now.microsecond
 
-			if newnowmicro < nowmicro:
-				newnowmicro+=1000000
-			looptime = newnowmicro - nowmicro
+			#if newnowmicro < nowmicro:
+			#	newnowmicro+=1000000
+			#looptime = newnowmicro - nowmicro
 			
-			if looptime < 250000:
-				sleep(250000-looptime)
+			#if looptime < 250000:
+			#	sleep(250000-looptime)
 
 		camera.stop_preview()
 		frame.tkraise() 
