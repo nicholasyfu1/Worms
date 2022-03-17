@@ -185,7 +185,7 @@ class BehaviorBox(tk.Tk, Experiment):
 
 		#Image capturing
 		imgnum=0
-		fps=5
+		fps=1
 		numFrames=Appa.exptime*fps
 		seconds=0
 		for i in range(numFrames):
