@@ -185,9 +185,11 @@ class BehaviorBox(tk.Tk, Experiment):
 
 		#Image capturing
 		imgnum=0
-		fps=1
+		fps=5
 		numFrames=Appa.exptime*fps
 		seconds=0
+		now=datetime.datetime.now()
+		looptime=0
 		for i in range(numFrames):
 			#start_time = clock()
 			if i%fps==0:
@@ -199,7 +201,7 @@ class BehaviorBox(tk.Tk, Experiment):
 			camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", resize=(640,480), use_video_port=True)
 			Appa.expy.append("") # Append empty place holder for future analyssi
 			imgnum+=1
-			sleep(0.9)
+			
 
 		camera.stop_preview()
 		frame.tkraise() 
