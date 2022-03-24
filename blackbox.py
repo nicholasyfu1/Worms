@@ -201,10 +201,10 @@ class BehaviorBox(tk.Tk, Experiment):
 				self.frames[StimPrepPg].label2.configure(text="Time remaining: %d" % remaining) # Set countdown
 				self.frames[StimPrepPg].update_idletasks() # Refresh page 
 				seconds+=1 
-
-			camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", resize=(640,480), use_video_port=True)
-			Appa.expy.append("") # Append empty place holder for future analysis
-			imgnum+=1
+			if True:
+				camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", resize=(640,480), use_video_port=True)
+				Appa.expy.append("") # Append empty place holder for future analysis
+				imgnum+=1
 
 			endTime = time()
 			elapsed = endTime - startTime
