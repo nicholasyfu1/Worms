@@ -191,7 +191,7 @@ class BehaviorBox(tk.Tk, Experiment):
 
 		#Image capturing
 		imgnum=0
-		fps=1
+		fps=2
 		numFrames=Appa.exptime*fps
 		seconds=0
 		for i in range(numFrames):
@@ -206,7 +206,9 @@ class BehaviorBox(tk.Tk, Experiment):
 			Appa.expy.append("") # Append empty place holder for future analysis
 			imgnum+=1
 
-			sleep(1.0 - (clock()-startTime))
+			elapsed = clock() - startTime
+			if elapsed < 0.5:
+				sleep(0.5 - (elapsed))
 			
 			#clock() 1.0 is actually ~1.13
 			#time() 1.0 is actually 0.9 to 1.1
