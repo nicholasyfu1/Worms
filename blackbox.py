@@ -202,7 +202,7 @@ class BehaviorBox(tk.Tk, Experiment):
 				self.frames[StimPrepPg].update_idletasks() # Refresh page 
 				seconds+=1 
 			
-			camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", resize=(640,480), use_video_port=True)
+			camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", use_video_port=True)
 			Appa.expy.append("") # Append empty place holder for future analysis
 			imgnum+=1
 
@@ -214,7 +214,7 @@ class BehaviorBox(tk.Tk, Experiment):
 			#clock() 2 fps (0.50 frameTime) is actually: ~0.6
 			#clock() 3 fps (0.33 frameTime) is actually: ~0.42
 			#clock() 4 fps (0.25 frameTime) is actually: ~0.33
-			#clock() 4 fps (0.20 frameTime) is actually: 
+			#clock() 4 fps (0.20 frameTime) is actually: ~0.33
 			
 			#time() 1.0 is actually: 0.9 to 1.1
 				
