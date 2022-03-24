@@ -1,8 +1,14 @@
 #!/usr/bin/env python
 """
+# Authors:	Andrew Huynh '20
+			ahuynh1@swarthmore.edu
+			
+			Nicholas Fu '25
+			nfu1@swarthmore.edu
 
-Andrew Huynh '20 ahuynh1@swarthmore.edu
-Summer 2018
+			Yashvi Patel '24
+			ypatel1@swarthmore.edu
+
 Behavior Box Project
 
 This program is to run experiments on the black box. It is designed to be run on a 800x480 screen.
@@ -187,9 +193,8 @@ class BehaviorBox(tk.Tk, Experiment):
 		imgnum=0
 		fps=1
 		numFrames=Appa.exptime*fps
-		seconds=0
 		for i in range(numFrames):
-			#start_time = clock()
+			start_time = clock()
 			if i%fps==0:
 				remaining = Appa.exptime-seconds # Calculate countdown
 				self.frames[StimPrepPg].label2.configure(text="Time remaining: %d" % remaining) # Set countdown
@@ -199,7 +204,6 @@ class BehaviorBox(tk.Tk, Experiment):
 			camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", resize=(640,480), use_video_port=True)
 			Appa.expy.append("") # Append empty place holder for future analyssi
 			imgnum+=1
-			sleep(0.9)
 
 		camera.stop_preview()
 		frame.tkraise() 
