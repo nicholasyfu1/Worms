@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 """
-# Authors:	Andrew Huynh '20
-			ahuynh1@swarthmore.edu
+Andrew Huynh '20
+ahuynh1@swarthmore.edu
 			
-			Nicholas Fu '25
-			nfu1@swarthmore.edu
+Nicholas Fu '25
+nfu1@swarthmore.edu
 
-			Yashvi Patel '24
-			ypatel1@swarthmore.edu
+Yashvi Patel '24
+ypatel1@swarthmore.edu
 
 Behavior Box Project
 
@@ -191,21 +191,24 @@ class BehaviorBox(tk.Tk, Experiment):
 
 		#Image capturing
 		imgnum=0
-		fps=5
-		seconds=0
+		fps=2
 		numFrames=Appa.exptime*fps
 		for i in range(numFrames):
-			start_time = clock()
-			if i%fps==0:
+			startTime = clock()
+			if i%fps==0: #updates countdown clock every second
 				remaining = Appa.exptime-seconds # Calculate countdown
 				self.frames[StimPrepPg].label2.configure(text="Time remaining: %d" % remaining) # Set countdown
 				self.frames[StimPrepPg].update_idletasks() # Refresh page  
-				seconds+=1          
-			#if i%Appa.capturerate == 0: # Calculate if need to capture pic
+
 			camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", resize=(640,480), use_video_port=True)
-			Appa.expy.append("") # Append empty place holder for future analyssi
+			Appa.expy.append("") # Append empty place holder for future analysis
 			imgnum+=1
 
+			endTime = clock()
+			elapsed = endTime - startTime
+			if (elapsed < 1/fps):
+				sleep(1/fps - elapsed)
+				
 		camera.stop_preview()
 		frame.tkraise() 
 
