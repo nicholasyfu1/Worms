@@ -191,7 +191,7 @@ class BehaviorBox(tk.Tk, Experiment):
 
 		#Image capturing
 		imgnum=0
-		fps=2
+		fps=3
 		numFrames=Appa.exptime*fps
 		seconds=0
 		for i in range(numFrames):
@@ -207,11 +207,15 @@ class BehaviorBox(tk.Tk, Experiment):
 			imgnum+=1
 
 			elapsed = clock() - startTime
-			if elapsed < 0.5:
-				sleep(0.5 - (elapsed))
+			if elapsed < 0.33:
+				sleep(0.33 - (elapsed))
 			
-			#clock() 1.0 is actually ~1.13
-			#time() 1.0 is actually 0.9 to 1.1
+			#clock() 1 fps (1.00 frameTime) is actually: ~1.13
+			#clock() 2 fps (0.50 frameTime) is actually: ~0.6
+			#clock() 3 fps (0.33 frameTime) is actually: 
+			#clock() 4 fps (0.25 frameTime) is actually: 
+			
+			#time() 1.0 is actually: 0.9 to 1.1
 				
 		camera.stop_preview()
 		frame.tkraise() 
