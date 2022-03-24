@@ -195,7 +195,7 @@ class BehaviorBox(tk.Tk, Experiment):
 		numFrames=Appa.exptime*fps
 		seconds=0
 		for i in range(numFrames):
-			startTime = time()
+			startTime = clock()
 			if i%fps==0: #updates countdown clock every second
 				remaining = Appa.exptime-seconds # Calculate countdown
 				self.frames[StimPrepPg].label2.configure(text="Time remaining: %d" % remaining) # Set countdown
@@ -206,13 +206,10 @@ class BehaviorBox(tk.Tk, Experiment):
 			Appa.expy.append("") # Append empty place holder for future analysis
 			imgnum+=1
 
-			endTime = time()
-			elapsed = endTime - startTime
-			if (elapsed < 1.0):
-				sleep(1.0 - elapsed) 
+			sleep(1.0 - (clock()-startTime))
 			
 			#clock() 1.0 is actually ~1.13
-			#time() 1.0 is actually 
+			#time() 1.0 is actually 0.9 to 1.1
 				
 		camera.stop_preview()
 		frame.tkraise() 
