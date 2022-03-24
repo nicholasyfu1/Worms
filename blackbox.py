@@ -191,8 +191,7 @@ class BehaviorBox(tk.Tk, Experiment):
 
 		#Image capturing
 		imgnum=0
-		fps=2
-		frameTime=0.5
+		fps=4
 		numFrames=Appa.exptime*fps
 		seconds=0
 		for i in range(numFrames):
@@ -209,8 +208,8 @@ class BehaviorBox(tk.Tk, Experiment):
 
 			endTime = time()
 			elapsed = endTime - startTime
-			if (elapsed < frameTime):
-				sleep(frameTime - elapsed)
+			if (elapsed < 1/fps):
+				sleep(1/fps - elapsed)
 				
 		camera.stop_preview()
 		frame.tkraise() 
