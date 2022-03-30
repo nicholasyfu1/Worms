@@ -67,7 +67,6 @@ appwidth=800
 xspacer=appheight/80
 yspacer=appheight/80
 
-experimentType = int()
 
 #(Don't need this anymore; adjust fps line 188) imagecapturerate = 0.0625 
 
@@ -81,6 +80,7 @@ class Experiment():
 		self.exptype = str()
 		self.exptime = int()
 		self.savefile = str()
+		self.isScrunching = bool()
 		#self.capturerate = imagecapturerate
 		self.iscontrol = False
 		self.expy = []
@@ -197,7 +197,7 @@ class BehaviorBox(tk.Tk, Experiment):
 		wait=0.88
 
 		#Check Scrunching
-		if experimentType==4:
+		if self.isScrunching:
 			fps=4
 			wait=0.15
 
@@ -446,7 +446,10 @@ class ExpSelPg(tk.Frame, Experiment):
 	def qfb(self, ExpOptionChosen): 
 		"""Store the selection"""
 		self.userexpchoice = str(ExpOptionChosen)
-		experimentType = ExpOptionChosen
+		if ExpOptionChosen==4:
+			self.isScrunching = True
+		else:
+			self.isScrunching = False
 
 	def checkchosenexp(self, parent, controller): 
 		"""Check if chose an experiment. If yes, store values"""
