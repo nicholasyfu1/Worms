@@ -194,12 +194,12 @@ class BehaviorBox(tk.Tk, Experiment):
 		#Image capturing
 		imgnum=0
 		fps=1
-		wait=0.15
+		wait=0.88
 
 		#Check Scrunching
 		if experimentType==4:
 			fps=4
-			wait=0.88
+			wait=0.15
 
 		numFrames=Appa.exptime*fps
 		seconds=0
