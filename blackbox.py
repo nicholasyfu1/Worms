@@ -197,7 +197,7 @@ class BehaviorBox(tk.Tk, Experiment):
 		wait=0.88
 
 		#Check Scrunching
-		if self.isScrunching:
+		if Appa.isScrunching:
 			fps=4
 			wait=0.15
 
