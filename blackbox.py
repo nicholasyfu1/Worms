@@ -67,6 +67,8 @@ appwidth=800
 xspacer=appheight/80
 yspacer=appheight/80
 
+experimentType = int()
+
 #(Don't need this anymore; adjust fps line 188) imagecapturerate = 0.0625 
 
 if not os.path.exists( "/home/pi/Desktop/ExperimentFolder/"): #Makes folder for data if doesn't exist
@@ -191,7 +193,14 @@ class BehaviorBox(tk.Tk, Experiment):
 
 		#Image capturing
 		imgnum=0
-		fps=5
+		fps=1
+		wait=0.15
+
+		#Check Scrunching
+		if experimentType==4:
+			fps=4
+			wait=0.88
+
 		numFrames=Appa.exptime*fps
 		seconds=0
 		for i in range(numFrames):
@@ -207,8 +216,8 @@ class BehaviorBox(tk.Tk, Experiment):
 			imgnum+=1
 
 			elapsed = clock() - startTime
-			if elapsed < 0.15:
-				sleep(0.15 - (elapsed))
+			if elapsed < wait:
+				sleep(wait - (elapsed))
 			
 			#clock() 1 fps (1.00 frameTime) is actually: ~1.13
 			#clock() 2 fps (0.50 frameTime) is actually: ~0.6
@@ -216,7 +225,7 @@ class BehaviorBox(tk.Tk, Experiment):
 			#clock() 4 fps (0.25 frameTime) is actually: ~0.33
 			#clock() 4 fps (0.20 frameTime) is actually: ~0.33
 			#clock() 4 fps (0.20 frameTime) is actually: ~0.27 (removed resize(640,480) from camera.capture())
-			#clock() 5 fps (0.15 frameTime) is actually:       (removed resize)
+			#clock() 5 fps (0.15 frameTime) is actually: ~0.26 (removed resize)
 			
 			#time() 1.0 is actually: 0.9 to 1.1
 				
@@ -437,6 +446,7 @@ class ExpSelPg(tk.Frame, Experiment):
 	def qfb(self, ExpOptionChosen): 
 		"""Store the selection"""
 		self.userexpchoice = str(ExpOptionChosen)
+		experimentType = ExpOptionChosen
 
 	def checkchosenexp(self, parent, controller): 
 		"""Check if chose an experiment. If yes, store values"""
