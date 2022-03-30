@@ -447,9 +447,9 @@ class ExpSelPg(tk.Frame, Experiment):
 		"""Store the selection"""
 		self.userexpchoice = str(ExpOptionChosen)
 		if ExpOptionChosen==4:
-			self.isScrunching = True
+			Appa.isScrunching = True
 		else:
-			self.isScrunching = False
+			Appa.isScrunching = False
 
 	def checkchosenexp(self, parent, controller): 
 		"""Check if chose an experiment. If yes, store values"""
