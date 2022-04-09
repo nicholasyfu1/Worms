@@ -128,22 +128,19 @@ class BehaviorBox(tk.Tk, Experiment):
 		s.configure("my.TButton", font=(SMALL_FONT))
 		s.configure("checkbuttonstyle.TCheckbutton", font=(TINY_FONT), background="white")
 		s.configure("radio.TRadiobutton", font=(SMALL_FONT))
-
-
-	def startfresh(self):
-		"""Reinitalize pages that have updating values"""
+	
+	def startfresh(self): #Reinitialize page & update values
+		
 		for F in (StartPage, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, DataDelPg):
 			frame = F(self.container, self)
 			self.frames[F] = frame 
 			frame.grid(row=0, column=0, sticky="nsew") #other choice than pack. Sticky alignment + stretch
-
-	def show_frame(self, cont):
-		"""Basic function to raise frame to front"""
+	
+	def show_frame(self, cont): #Raise frame to front
 		frame = self.frames[cont]
 		frame.tkraise() #raise to front
-
-	def show_frameAlpha(self, cont):
-		"""Main menu -> new experiment. Resets all of Appa's values"""
+	
+	def show_frameAlpha(self, cont): #Main -> NewExp & reset Appa values
 		#Reset all of experiment-class variables
 		Appa.expnumber = str()
 		Appa.exptype = str()
@@ -154,19 +151,19 @@ class BehaviorBox(tk.Tk, Experiment):
 		frame = self.frames[cont]
 		frame.tkraise() #raise to front
 	
-	def show_frameZebra(self, cont):
+	def show_frameZebra(self, cont): #InsertPg -> ConfirmPg & stop camera preview
 		"""Confirm Page <- Insert Page; ends camera preview"""
 		frame = self.frames[cont]
 		camera.stop_preview()#Stops the preview window
 		frame.tkraise() #raise to front
-
-	def show_frameFish(self, cont):
+	
+	def show_frameFish(self, cont): #ConfirmPg -> InsertPg & start camera preview
 		"""Confirm Page -> Insert Page; starts camera preview"""
 		frame = self.frames[cont]
 		camera.start_preview(fullscreen=False, window=(0,appheight/4,appwidth,appheight/2)) #this line starts the preview. 
 		frame.tkraise()
-
-	def show_frameCharlie(self, cont):
+	
+	def show_frameCharlie(self, cont): #TimeSelPg -> ConfirmPg
 		"""TimeSelPg -> Confirm Pg; 
 			save time choice -> confirmation and updates label values in confirmation based on previous user   
 			input
@@ -174,14 +171,14 @@ class BehaviorBox(tk.Tk, Experiment):
 		frame = self.frames[cont]
 		frame.confirmlabels()
 		frame.tkraise()
-
-	def show_frameDelta(self, cont):
+	
+	def show_frameDelta(self, cont): #Insert -> StimPrepPg & display exp type
 		"""InsertPg -> StimPrepPg and displays either "Ready" or "Insert stimuli" based on experiment type"""
 		frame = self.frames[cont]
 		frame.gettext() #Displays either "Ready" or "Insert stimuli" based on experiment type
 		frame.tkraise()
-
-	def show_frameEcho(self, cont):
+	
+	def show_frameEcho(self, cont): #StimPrepPg -> Imaging & countdown
 		"""StimPrepPg -> start imaging and count down"""
 		self.frames[StimPrepPg].button1.grid_remove()
 		self.frames[StimPrepPg].button2.grid_remove()
@@ -231,15 +228,15 @@ class BehaviorBox(tk.Tk, Experiment):
 				
 		camera.stop_preview()
 		frame.tkraise() 
-
-	def show_frameFoxtrot(self, cont):
+	
+	def show_frameFoxtrot(self, cont): #Reinitialize without confirmation prompt
 		"""Reinitalize a page without prompting for confirmation""" 
 		frame = cont(self.container, self)
 		self.frames[cont] = frame 
 		frame.grid(row=0, column=0, sticky="nsew")
 		frame.tkraise()
 	
-	def show_frameFoxtrot2(self, cont):
+	def show_frameFoxtrot2(self, cont): #Reinitialize with confirmation prompt
 		"""Confirm if want to reinitalize page and the reinitalize"""
 		result = tkMessageBox.askquestion("Warning", "All progess will be lost.\nProceed anyways?")
 		if result == "yes":
@@ -247,8 +244,8 @@ class BehaviorBox(tk.Tk, Experiment):
 			self.frames[cont] = frame 
 			frame.grid(row=0, column=0, sticky="nsew") 
 			frame.tkraise() 
-
-	def show_frameLima(self, cont, chosenexp):
+	
+	def show_frameLima(self, cont, chosenexp): #DataAnalPg -> DataAnalImaPg & load Appa obj
 		"""DataAnalysisPg -> DataAnalysisImagePg; load Appa object for exp and pull up first image from chosen experiment"""
 		result = True       
 		result2 = True
@@ -287,17 +284,16 @@ class BehaviorBox(tk.Tk, Experiment):
 					frame.grid(row=0, column=0, sticky="nsew")
 					frame.tkraise() 
 					"""
-
-	def show_frameBean(self, cont):
+	
+	def show_frameBean(self, cont): #AnalTypeForNone -> DataAnalImgPg
 		"""AnalysisTypeForNone -> DataAnalysisImagePg"""
 		frame = cont(self.container, self)
 		self.frames[cont] = frame 
 		frame.grid(row=0, column=0, sticky="nsew")
 		frame.ChangePic(1) # Go to first picture
 		frame.tkraise() 
-
-
-	def show_frameMarlin(self, cont): 
+	
+	def show_frameMarlin(self, cont): #ExpFinishPg -> ReviewData & configure/display imgs
 		"""ExpFinishPg -> ReviewData. Configures ReviewData to display all images taken during experiment"""
 		frame = cont(self.container, self)
 		self.frames[cont] = frame 
@@ -323,24 +319,23 @@ class BehaviorBox(tk.Tk, Experiment):
 		frame.canvas.config(yscrollcommand=scrollbar.set)
 
 		frame.tkraise()
-
-
-	def show_frameStingray(self, cont, obj):
+	
+	def show_frameStingray(self, cont, obj): #ReviewData -> StartPage & save data
 		"""ReviewData(keep) -> StartPage; stores data"""
 		saveobject(obj)
 		tkMessageBox.showwarning("Done", "Data has been saved for:" + obj.expnumber) #show warning
 		frame = self.frames[cont]
 		frame.tkraise() #raise to front
-
-	def show_frameRhino(self, cont):
+	
+	def show_frameRhino(self, cont): #ReviewData -> StartPage & discard data
 		"""ReviewData(discard) -> StartPage; deletes data"""
 		frame = self.frames[cont]
 		result = tkMessageBox.askquestion("Discard", "Are you sure you want \nto discard these data?")
 		if result == "yes":
 			shutil.rmtree(Appa.savefile)
 			frame.tkraise() 
-
-	def show_frameShark(self, cont, listofbuttons):
+	
+	def show_frameShark(self, cont, listofbuttons): #DataGraphChoice -> GraphPage
 		"""DataGraphChoice -> GraphPage; checks to see if experiments were chosen to graph and will graph"""
 		frame = cont(self.container, self)
 		self.frames[cont] = frame 
@@ -377,8 +372,8 @@ class BehaviorBox(tk.Tk, Experiment):
 				frame.a.legend(loc='upper right', fontsize=8)
 				frame.canvas.draw() 
 				frame.tkraise() 
-
-	def show_frameSquid(self, cont):
+	
+	def show_frameSquid(self, cont): #Main -> CamPreviewPg & start preview
 			"""Main menu -> CameraPreviewPg; starts preview and raises frame"""
 			frame = self.frames[cont]
 			frame.tkraise() 
