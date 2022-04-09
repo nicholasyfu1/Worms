@@ -81,6 +81,7 @@ class Experiment():
 		self.exptime = int()
 		self.savefile = str()
 		self.isScrunching = bool()
+		self.isChemo = bool()
 		#self.capturerate = imagecapturerate
 		self.iscontrol = False
 		self.expy = []
@@ -197,6 +198,11 @@ class BehaviorBox(tk.Tk, Experiment):
 		if Appa.isScrunching:
 			fps=4
 			wait=0.15
+
+		#Check Chemotaxis
+		if Appa.isChemo:
+			fps=1/3
+			wait=2.88
 
 		numFrames=Appa.exptime*fps
 		seconds=0
