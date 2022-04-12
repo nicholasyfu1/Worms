@@ -201,12 +201,12 @@ class BehaviorBox(tk.Tk, Experiment):
 
 		#Check Chemotaxis
 		if Appa.isChemo:
-			fps=1/3
+			fps=0.33
 			wait=2.88
 
 		numFrames=Appa.exptime*fps
 		seconds=0
-		for i in range(numFrames):
+		for i in range(int(numFrames)):
 			startTime = clock()
 			if i%fps==0: #updates countdown clock every second
 				remaining = Appa.exptime-seconds # Calculate countdown
