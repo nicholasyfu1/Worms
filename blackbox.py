@@ -863,9 +863,9 @@ class DataAnalysisImagePg(tk.Frame):
 			img = mpimg.imread(Momo.savefile + "/ExpDataPictures/image" + str(self.currentimagenum) + ".jpg") # Read in image based on current image index
 			self.a.imshow(img) # Renders image
 			if Momo.exptype == "1": # Thermotaxis
-				shape = Circle((320,240),200, fill=False, edgecolor="R")
+				shape = Circle((320,240),150, fill=False, edgecolor="R")
 			elif Momo.exptype == "2": # Chemotaxis
-				shape = Circle((320,240),200, fill=False, edgecolor="R")
+				shape = Circle((320,240),150, fill=False, edgecolor="R")
 			elif Momo.exptype == "3": # Phototaxis
 				shape = Rectangle((80,200), width=200, height=200, fill=False, edgecolor="R")
 			elif Momo.exptype == "4": # Scrunching
