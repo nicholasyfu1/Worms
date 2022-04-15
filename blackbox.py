@@ -115,7 +115,7 @@ class BehaviorBox(tk.Tk, Experiment):
 
 		# Initalize/render all pages
 		self.frames = {}
-		for F in (StartPage, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, ReviewData, DataDelPg, DataAnalysisImagePg, DataAnalysisPg, GraphPage, DataMenu, DataGraphChoice, AnalysisTypeForNone, CameraPreviewPg):
+		for F in (StartPage, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, ReviewData, DataDelPg, DataAnalysisImagePg, ScrunchingPg, DataAnalysisPg, GraphPage, DataMenu, DataGraphChoice, AnalysisTypeForNone, CameraPreviewPg):
 			frame = F(self.container, self)
 			self.frames[F] = frame 
 			frame.grid(row=0, column=0, sticky="nsew")         
@@ -284,12 +284,12 @@ class BehaviorBox(tk.Tk, Experiment):
 					frame.tkraise() 
 				else:
 					tkMessageBox.showwarning("Scrunching analysis not implimented yet") #show warning
-					"""
-					frame = SrunchingAnalysis(self.container, self) # Create fresh page in case of old data
-					self.frames[cont] = frame 
+					
+					frame = ScrunchingPg(self.container, self) # Create fresh page in case of old data
+					self.frames[ScrunchingPg] = frame 
 					frame.grid(row=0, column=0, sticky="nsew")
 					frame.tkraise() 
-					"""
+					
 	
 	def show_frameBean(self, cont): #AnalTypeForNone -> DataAnalImgPg
 		"""AnalysisTypeForNone -> DataAnalysisImagePg"""
@@ -894,7 +894,20 @@ class DataAnalysisImagePg(tk.Frame):
 			self.wormscounted = Momo.expy[self.currentimagenum] # Store value of just entered number
 			controller.show_frameStingray(DataMenu, Momo) 
 
-		
+class ScrunchingPg(tk.Frame):
+	def __init__(self, parent, controller):
+		tk.Frame.__init__(self, parent)
+		self.grid_columnconfigure(0, weight=1)
+
+		label = tk.Label(self, text="Scrunching Page", font=MEDIUM_FONT)
+		label.grid(row=0, column=0, sticky="nsew")
+
+		label = tk.Label(self, text="Under construction", font=SMALL_FONT)
+		label.grid(row=1, column=0, sticky="NSEW", ipadx=xspacer, pady=yspacer)
+
+		button1 = ttk.Button(self, text="Back to Home", style='my.TButton', command=lambda: controller.show_frame(StartPage)) 
+		button1.grid(row=2, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
+
 class DataGraphChoice(tk.Frame):
 	"""Allows user to choose experiments to graph"""
 	def __init__(self, parent, controller):
