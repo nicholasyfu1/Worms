@@ -6,12 +6,14 @@ Welcome to Behavior Box's documentation!
    :caption: Contents:
 
    README
-   EXP
-   BB
+   start
+   running
+   analysis
+   troubleshooting
+   exp
+   bb
 
-Indices and tables
+Index
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

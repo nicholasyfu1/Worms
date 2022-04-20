@@ -18,7 +18,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="blackbox.experiment" href="EXP.html" /> 
+    <link rel="prev" title="blackbox.experiment" href="exp.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,7 +40,9 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="README.html">Behavior Box</a></li>
-<li class="toctree-l1"><a class="reference internal" href="EXP.html">blackbox.experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exp.html">blackbox.experiment</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">blackbox.BehaviorBox</a></li>
 </ul>
 
@@ -60,7 +62,7 @@
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
       <li>blackbox.BehaviorBox</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/BB.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/bb.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -114,6 +116,7 @@ Works on the following pages: <em>StartPage</em>, <em>ExpSelPg</em>, <em>TimeSel
 <dt class="sig sig-object py" id="BehaviorBox.show_frameAlpha">
 <span class="sig-name descname"><span class="pre">show_frameAlpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cont</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BehaviorBox.show_frameAlpha" title="Permalink to this definition"></a></dt>
 <dd><p>Resets all variables in the <em>Experiment</em> class and reinitalizes all necessary pages to starting state.
+This ensures that when a new experiment is started, all data from the previous experiment is erased.
 Raises frame <code class="docutils literal notranslate"><span class="pre">cont</span></code> to front.</p>
 <p>Used when navigating from <em>StartPage</em> to <em>ExpSelPg</em>.</p>
 </dd></dl>
@@ -121,38 +124,68 @@ Raises frame <code class="docutils literal notranslate"><span class="pre">cont</
 <dl class="py method">
 <dt class="sig sig-object py" id="BehaviorBox.show_frameZebra">
 <span class="sig-name descname"><span class="pre">show_frameZebra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cont</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BehaviorBox.show_frameZebra" title="Permalink to this definition"></a></dt>
-<dd><p>Stops camera preview. Raises frame <code class="docutils literal notranslate"><span class="pre">cont</span></code> to front.</p>
-<p>Used when navigating from <em>InsertPg</em> to <em>ConfirmPg</em>.</p>
+<dd><p>Stops camera preview and raises frame <code class="docutils literal notranslate"><span class="pre">cont</span></code> to front.
+Used when navigating from <em>InsertPg</em> to <em>ConfirmPg</em>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="BehaviorBox.show_frameFish">
 <span class="sig-name descname"><span class="pre">show_frameFish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cont</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BehaviorBox.show_frameFish" title="Permalink to this definition"></a></dt>
-<dd><p>Starts camera preview. Raises frame <code class="docutils literal notranslate"><span class="pre">cont</span></code> to front.</p>
-<p>Used when navigating from <em>ConfirmPg</em> to <em>InsertPg</em>.</p>
+<dd><p>Starts camera preview and raises frame <code class="docutils literal notranslate"><span class="pre">cont</span></code> to front.
+Used when navigating from <em>ConfirmPg</em> to <em>InsertPg</em>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="BehaviorBox.show_frameCharlie">
 <span class="sig-name descname"><span class="pre">show_frameCharlie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cont</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BehaviorBox.show_frameCharlie" title="Permalink to this definition"></a></dt>
-<dd><p>Confirms labels. Raises frame <code class="docutils literal notranslate"><span class="pre">cont</span></code> to front.</p>
-<p>Used when navigating from <em>TimeSelPg</em> to <em>ConfirmPg</em>.</p>
+<dd><p>Confirms labels and raises frame <code class="docutils literal notranslate"><span class="pre">cont</span></code> to front.
+Used when navigating from <em>TimeSelPg</em> to <em>ConfirmPg</em>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="BehaviorBox.show_frameDelta">
 <span class="sig-name descname"><span class="pre">show_frameDelta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cont</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BehaviorBox.show_frameDelta" title="Permalink to this definition"></a></dt>
-<dd><p>Depending on the type of experiment selected, displays ready or prompts the user to insert stimuli.
-Raises frame <code class="docutils literal notranslate"><span class="pre">cont</span></code> to front.</p>
+<dd><p>Depending on the type of experiment selected, configures <em>StimPrepPg.label1</em> with appropriate instructions for the user.
+See <code class="docutils literal notranslate"><span class="pre">StimPrepPg.gettext()</span></code> for details.</p>
+<ul class="simple">
+<li><p>No stimulus: Displays ready</p></li>
+<li><p>Thermotaxis: Prompts the user to insert stimuli</p></li>
+<li><p>Chemotaxis: Displays ready</p></li>
+<li><p>Phototaxis: Prompts the user to insert stimuli</p></li>
+<li><p>Scrunching: Prompts the user to prepare to cut worm</p></li>
+</ul>
+<p>Raises frame <code class="docutils literal notranslate"><span class="pre">cont</span></code> to front.</p>
 <p>Used when navigating from <em>InsertPg</em> to <em>StimPrepPg</em>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="BehaviorBox.show_frameEcho">
 <span class="sig-name descname"><span class="pre">show_frameEcho</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cont</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BehaviorBox.show_frameEcho" title="Permalink to this definition"></a></dt>
-<dd><p>Creates a folder for experiment data and images.
-Captures images for duration of experiment and saves images to /ExpDataPictures/image.
-Raises frame <code class="docutils literal notranslate"><span class="pre">cont</span></code> to front.</p>
+<dd><p>Configures the current page (StimPrepPg) to display a countdown.</p>
+<ul class="simple">
+<li><p>Sets <em>StimPrepPg.label1</em> to display Experiment in Progress.</p></li>
+<li><p>Deletes <em>StimPrepPg.button1</em> and <em>StimPrepPg.button2</em>.</p></li>
+</ul>
+<p>Creates a folder for experiment data.
+Images captured during the experiment are saved in /ExpDataPictures.</p>
+<p>Captures images for duration of experiment.
+The image capture frame rate depends on  <code class="docutils literal notranslate"><span class="pre">fps</span></code> and  <code class="docutils literal notranslate"><span class="pre">wait</span></code>.
+When adjusting frame rate, both variables must be adjusted accordingly.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="BehaviorBox.fps">
+<span class="sig-name descname"><span class="pre">fps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#BehaviorBox.fps" title="Permalink to this definition"></a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">fps</span></code> sets the ideal capture rate, measured in frames per second.
+The default value is used for thermotaxis and phototaxis.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="BehaviorBox.wait">
+<span class="sig-name descname"><span class="pre">wait</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.88</span></em><a class="headerlink" href="#BehaviorBox.wait" title="Permalink to this definition"></a></dt>
+<dd><p>In our testing, the Raspberry Pi takes about 0.1 seconds to capture and save an image.
+In order to capture 1 frame per second, the sleep function is used to wait for 0.88 seconds before the next image is captured.</p>
+</dd></dl>
+
+<p>Raises frame <code class="docutils literal notranslate"><span class="pre">cont</span></code> to front.</p>
 <p>Sets frame rate for image capturing based on type of experiment selected.</p>
 <ul class="simple">
 <li><p>Chemotaxis: <code class="docutils literal notranslate"><span class="pre">fps=0.33</span></code></p></li>
@@ -238,7 +271,7 @@ Raises frame <code class="docutils literal notranslate"><span class="pre">cont</
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="EXP.html" class="btn btn-neutral float-left" title="blackbox.experiment" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="exp.html" class="btn btn-neutral float-left" title="blackbox.experiment" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

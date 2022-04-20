@@ -28,40 +28,70 @@ blackbox.BehaviorBox
 
     .. py:method:: show_frameAlpha(cont)
 
-        Resets all variables in the *Experiment* class and reinitalizes all necessary pages to starting state. 
+        Resets all variables in the *Experiment* class and reinitalizes all necessary pages to starting state.
+        This ensures that when a new experiment is started, all data from the previous experiment is erased.  
         Raises frame ``cont`` to front.
 
         Used when navigating from *StartPage* to *ExpSelPg*.
 
     .. py:method:: show_frameZebra(cont)
 
-        Stops camera preview. Raises frame ``cont`` to front.
-
+        Stops camera preview and raises frame ``cont`` to front.
         Used when navigating from *InsertPg* to *ConfirmPg*.
 
     .. py:method:: show_frameFish(cont)
 
-        Starts camera preview. Raises frame ``cont`` to front.
-
+        Starts camera preview and raises frame ``cont`` to front.
         Used when navigating from *ConfirmPg* to *InsertPg*.
 
     .. py:method:: show_frameCharlie(cont)
 
-        Confirms labels. Raises frame ``cont`` to front.
-
+        Confirms labels and raises frame ``cont`` to front.
         Used when navigating from *TimeSelPg* to *ConfirmPg*.
 
     .. py:method:: show_frameDelta(cont)
 
-        Depending on the type of experiment selected, displays ready or prompts the user to insert stimuli. 
+        Depending on the type of experiment selected, configures *StimPrepPg.label1* with appropriate instructions for the user. 
+        See ``StimPrepPg.gettext()`` for details. 
+
+        * No stimulus: Displays ready
+        * Thermotaxis: Prompts the user to insert stimuli
+        * Chemotaxis: Displays ready
+        * Phototaxis: Prompts the user to insert stimuli
+        * Scrunching: Prompts the user to prepare to cut worm
+        
         Raises frame ``cont`` to front.
 
         Used when navigating from *InsertPg* to *StimPrepPg*.
 
     .. py:method:: show_frameEcho(cont)
 
-        Creates a folder for experiment data and images. 
-        Captures images for duration of experiment and saves images to /ExpDataPictures/image. 
+        Configures the current page (StimPrepPg) to display a countdown.
+        
+        * Sets *StimPrepPg.label1* to display Experiment in Progress.
+        * Deletes *StimPrepPg.button1* and *StimPrepPg.button2*. 
+        
+        Creates a folder for experiment data. 
+        Images captured during the experiment are saved in /ExpDataPictures. 
+
+        Captures images for duration of experiment. 
+        The image capture frame rate depends on  ``fps`` and  ``wait``. 
+        When adjusting frame rate, both variables must be adjusted accordingly.
+
+        .. py:data:: fps 
+            :type: float
+            :value: 1.0
+
+            ``fps`` sets the ideal capture rate, measured in frames per second. 
+            The default value is used for thermotaxis and phototaxis.
+
+        .. py:data:: wait
+            :type: float
+            :value: 0.88
+
+            In our testing, the Raspberry Pi takes about 0.1 seconds to capture and save an image.
+            In order to capture 1 frame per second, the sleep function is used to wait for 0.88 seconds before the next image is captured.  
+
         Raises frame ``cont`` to front.
         
         Sets frame rate for image capturing based on type of experiment selected.
