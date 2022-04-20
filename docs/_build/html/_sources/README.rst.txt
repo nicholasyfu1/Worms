@@ -25,4 +25,4 @@ Installation
 Behavior Box is designed to run on Raspberry Pi.
 
 * If you are having issues, please let us know: nfu1@swarthmore.edu
-* Source Code: github.com/Behavior Box/Behavior Box
+* Source Code: https://github.com/nicholasyfu1/Worms

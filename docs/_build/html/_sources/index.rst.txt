@@ -1,14 +1,13 @@
 Welcome to Behavior Box's documentation!
 ========================================
 
-.. automodule:: blackbox.experiment
-   :members:
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    README
+   EXP
+   BB
 
 Indices and tables
 ==================
