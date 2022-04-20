@@ -3,13 +3,6 @@ Behavior Box Overview
 
 This program is used to run experiments on the behavioral box. It is designed to be run on a 640x480 screen. The UI is designed using TKinter.
 
-Basic overview
---------------
-
-* Create experiment object that stores experiment parameters
-* Create class pages
-* Buttons on page use specific "show_frame<name.()" commands to raise the next page as well as start fuctions such as imaging
-
 Features
 --------
 

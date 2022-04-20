@@ -10,8 +10,7 @@ Welcome to Behavior Box's documentation!
    running
    analysis
    troubleshooting
-   exp
-   bb
+   documentation
 
 Index
 ==================

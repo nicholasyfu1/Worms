@@ -18,10 +18,8 @@ Starting a new experiment
 -------------------------
 
     #. To start a new experiment, select ``New Experiment`` from the main menu.
-    #. Select the experiment type and click ``Next``. 
-        Or, to return to the main menu, click ``Back to Main Menu``.
-    #. Enter the duration of your experiment (in seconds) and click ``Next``.
-        To return to experiment type selection, click ``Back to Experiment Selection``.
+    #. Select the experiment type and click ``Next``. Or, to return to the main menu, click ``Back to Main Menu``.
+    #. Enter the duration of your experiment (in seconds) and click ``Next``. To return to experiment type selection, click ``Back to Experiment Selection``.
     #. The program will display a confirmation page with the experiment number.
         You are advised to record this number in your lab notebook, because you will need it to analyze data later.
         If all the information is correct, click ``Next``. Or, use ``Back`` to return to the previous screen.
