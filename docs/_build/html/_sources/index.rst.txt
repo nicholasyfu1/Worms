@@ -1,7 +1,7 @@
 Welcome to Behavior Box's documentation!
 ========================================
 
-.. automodule:: blackbox
+.. automodule:: blackbox.experiment
    :members:
 
 .. toctree::
