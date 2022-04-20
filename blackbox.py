@@ -74,6 +74,7 @@ if not os.path.exists( "/home/pi/Desktop/ExperimentFolder/"): #Makes folder for 
 	os.makedirs( "/home/pi/Desktop/ExperimentFolder/")
 
 class Experiment():
+	"""Saves parameters for each experiment. """
 
 	def __init__(self):
 		self.expnumber = str()
@@ -98,9 +99,12 @@ class Experiment():
 Appa = Experiment()
 
 class BehaviorBox(tk.Tk, Experiment):
-
-	""" Base line code to initialize everything """
-	#coi = [] not sure if this is needed
+	"""Base line code to initialize everything.
+	
+	Attributes:
+        tk.Tk: Tkinter window.
+        Experiment: Class containing experiment parameters.
+	"""
 
 	def __init__(self, *args, **kwargs):
 
