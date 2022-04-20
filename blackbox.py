@@ -902,7 +902,7 @@ class ScrunchingPg(tk.Frame):
 		label = tk.Label(self, text="Scrunching Page", font=MEDIUM_FONT)
 		label.grid(row=0, column=0, sticky="nsew")
 
-		label = tk.Label(self, text="Under construction", font=SMALL_FONT)
+		label = tk.Label(self, text="Tap on the image to zoom in", font=SMALL_FONT)
 		label.grid(row=1, column=0, sticky="NSEW", ipadx=xspacer, pady=yspacer)
 
 		button1 = ttk.Button(self, text="Back to Home", style='my.TButton', command=lambda: controller.show_frame(StartPage)) 
