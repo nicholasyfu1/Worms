@@ -255,7 +255,7 @@ class BehaviorBox(tk.Tk, Experiment):
 			frame.grid(row=0, column=0, sticky="nsew") 
 			frame.tkraise() 
 	
-	def show_frameLima(self, cont, chosenexp): #DataAnalPg -> DataAnalImaPg & load Appa obj
+	def show_frameLima(self, cont, chosenexp): #DataAnalPg -> DataAnalImaPg or ScrunchingPg & load Appa obj
 		"""DataAnalysisPg -> DataAnalysisImagePg; load Appa object for exp and pull up first image from chosen experiment"""
 		result = True       
 		result2 = True
@@ -286,12 +286,12 @@ class BehaviorBox(tk.Tk, Experiment):
 					frame.grid(row=0, column=0, sticky="nsew")
 					frame.ChangePic(1) # Go to first picture
 					frame.tkraise() 
-				else:
-					tkMessageBox.showwarning("Scrunching analysis not implimented yet") #show warning
-					
+				else: #If scrunching, pull up ScrunchingpPg
+					tkMessageBox.askquestion("Scrunching analysis under construction, continue?") #show warning
 					frame = ScrunchingPg(self.container, self) # Create fresh page in case of old data
 					self.frames[ScrunchingPg] = frame 
 					frame.grid(row=0, column=0, sticky="nsew")
+					#frame.ChangePic(1)?
 					frame.tkraise() 
 					
 	
@@ -900,17 +900,71 @@ class DataAnalysisImagePg(tk.Frame):
 
 class ScrunchingPg(tk.Frame):
 	def __init__(self, parent, controller):
-		tk.Frame.__init__(self, parent)
-		self.grid_columnconfigure(0, weight=1)
+		tk.Frame.__init__(self, parent)    
+		for column in range(3,9):
+			self.grid_columnconfigure(column, weight=1)
+		self.grid_columnconfigure(2, minsize=xspacer) # Spacer
+		self.grid_columnconfigure(9, minsize=xspacer) # Spacer
+		
+		self.button1 = ttk.Button(self, text="Next\nPicture", style="TINYFONT.TButton", command=lambda: self.ChangePic(1)) 
+		self.button1.grid(row=10, column=6, sticky="NESW", padx=xspacer, rowspan=4, columnspan=3)
 
-		label = tk.Label(self, text="Scrunching Page", font=MEDIUM_FONT)
-		label.grid(row=0, column=0, sticky="nsew")
+		self.button2 = ttk.Button(self, text="Previous\nPicture", style="TINYFONT.TButton", command=lambda: self.ChangePic(-1))
+		self.button2.grid(row=10, column=3, sticky="NESW", padx=xspacer, rowspan=4, columnspan=3)
 
-		label = tk.Label(self, text="Tap on the image to zoom in", font=SMALL_FONT)
-		label.grid(row=1, column=0, sticky="NSEW", ipadx=xspacer, pady=yspacer)
+		self.button3 = ttk.Button(self, text="Save\nand\nFinish", style="TINYFONT.TButton", command=lambda: self.finalpic(controller)) # Save data and provide options
+		self.button3.grid(row=10, column=6, sticky="NESW", padx=xspacer, rowspan=4, columnspan=3)
 
-		button1 = ttk.Button(self, text="Back to Home", style='my.TButton', command=lambda: controller.show_frame(StartPage)) 
-		button1.grid(row=2, column=0, sticky="nsew", padx=xspacer, pady=yspacer)
+		self.button4 = ttk.Button(self, text="Back to\nExperiment\nSelection", style="VERYTINYFONT.TButton", command=lambda: controller.show_frameFoxtrot2(DataAnalysisPg))
+		self.button4.grid(row=10, column=3, sticky="NESW", padx=xspacer, rowspan=4, columnspan=3)
+		
+		# Label for length of worm
+		self.wormscounted = ""
+		self.wormscountedtext = tk.Label(self, text = "Enter length of worm:", font=VERYTINY_FONT) 
+		self.wormscountedtext.grid(row=2, column=3, rowspan=2, columnspan=7, sticky="EW")
+		#self.wormscountedtext.configure(text = "Enter length of worm:\n%.5s" % self.wormscounted) #edit text
+
+		# Label for current image number
+		self.currentimagenum = -1
+		self.imagenumtext = tk.Label(self, text = "", font=VERYTINY_FONT) 
+		self.imagenumtext.grid(row=0, column=3, rowspan=2, columnspan=7, sticky="EW")
+		self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, 5))
+
+		# Display images on canvas
+		self.f = Figure(figsize = (1,1))
+		self.placesubplot() # Add subplot to figure
+		self.canvas = FigureCanvasTkAgg(self.f, self) # Render canvas and fill it with figure
+		self.canvas.draw() #bring canvas to front
+		self.canvas.get_tk_widget().grid(row=0, column=0, rowspan = 15) #Fill options: BOTH, X, Y Expand options:  
+		self.canvas.get_tk_widget().config(width=450, height=480) # TODO
+
+		# Number Pad
+		btn_numbers = [ '7', '8', '9', '4', '5', '6', '1', '2', '3', ' ', '0', 'x'] #create list of numbers to be displayed
+		r = 5 
+		c = 3
+		for num in btn_numbers:
+			if num == ' ':
+				self.num = ttk.Button(self, text=num, width=5)
+				self.num.grid(row=r, column=c, sticky= "nsew", columnspan=2)
+				c += 2
+			else: 
+				self.num = ttk.Button(self, text=num, width=5, command=lambda b = num: self.click(b))
+				self.num.grid(row=r, column=c, sticky= "nsew", columnspan=2)
+				c += 2
+			if c > 7:
+				c = 3
+				r += 1
+
+	def ChangePic(self, direction):
+		flag=True
+		self.button3.lower() # Save and finish
+		self.button2.lift() # Previous picture
+		if self.currentimagenum != -1 and self.wormscounted == "" and direction == 1: # Prohibit going forward without enter a number first
+			tkMessageBox.showwarning("Error", "Must enter a number")
+
+	def finalpic(self, controller):
+		if self.wormscounted == "": # Prohibit going forward without enter a number first
+			tkMessageBox.showwarning("Error", "Must enter a number")
 
 class DataGraphChoice(tk.Frame):
 	"""Allows user to choose experiments to graph"""
