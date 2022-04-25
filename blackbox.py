@@ -929,9 +929,9 @@ class ScrunchingPg(tk.Frame):
 
 		# Label for current image number
 		self.currentimagenum = -1
-		self.imagenumtext = tk.Label(self, text = "", font=VERYTINY_FONT) 
-		self.imagenumtext.grid(row=0, column=3, rowspan=2, columnspan=7, sticky="EW")
-		self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, 5))
+		#self.imagenumtext = tk.Label(self, text = "", font=VERYTINY_FONT) 
+		#self.imagenumtext.grid(row=0, column=3, rowspan=2, columnspan=7, sticky="EW")
+		#self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, 5))
 
 		# Display images on canvas
 		self.f = Figure(figsize = (1,1))
@@ -994,6 +994,14 @@ class ScrunchingPg(tk.Frame):
 				shape = Rectangle((80,200), width=200, height=200, fill=False, edgecolor="R")
 			elif Momo.exptype == "4": # Scrunching
 				shape = Circle((320,240),150, fill=False, edgecolor="R")
+
+			self.a.add_patch(shape)
+			self.canvas.draw()
+			# self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, len(Momo.expy))) # Update text so user knows what image number they are on. +1 accounts for index starting at 0
+			if self.currentimagenum == len(Momo.expy)-1: # If last image, show "generate graph" button
+				self.button3.lift()
+			if self.currentimagenum == 0: # If first image, show "back to experiment selection" button
+				self.button4.lift()    
 
 	def placesubplot(self):
 		"""Add subplot to figure"""
