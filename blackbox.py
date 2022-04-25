@@ -287,7 +287,7 @@ class BehaviorBox(tk.Tk, Experiment):
 					frame.ChangePic(1) # Go to first picture
 					frame.tkraise() 
 				else: #If scrunching, pull up ScrunchingpPg
-					tkMessageBox.askquestion("Scrunching analysis under construction, continue?") #show warning
+					tkMessageBox.askquestion("Warning", "Scrunching analysis under construction, continue?") #show warning
 					frame = ScrunchingPg(self.container, self) # Create fresh page in case of old data
 					self.frames[ScrunchingPg] = frame 
 					frame.grid(row=0, column=0, sticky="nsew")
@@ -969,7 +969,7 @@ class ScrunchingPg(tk.Frame):
 		self.a.yaxis.set_visible(False)
 		self.a.set_position([0,0,1,1])
 		self.a.set_aspect(1)
-		
+
 	def finalpic(self, controller):
 		if self.wormscounted == "": # Prohibit going forward without enter a number first
 			tkMessageBox.showwarning("Error", "Must enter a number")
