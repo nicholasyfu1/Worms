@@ -961,6 +961,35 @@ class ScrunchingPg(tk.Frame):
 		self.button2.lift() # Previous picture
 		if self.currentimagenum != -1 and self.wormscounted == "" and direction == 1: # Prohibit going forward without enter a number first
 			tkMessageBox.showwarning("Error", "Must enter a number")
+		else: # If user did enter a number
+			# The next 3 if statements make sure the user can not break the program by hitting next/back too quickly
+			if self.currentimagenum + direction < 0:
+				self.currentimagenum=0
+				flag=False
+			if self.currentimagenum + direction > len(Momo.expy)-1:
+				self.currentimagenum=len(Momo.expy)-1
+				flag=False
+			if flag:
+				self.currentimagenum = self.currentimagenum + direction # Set current image index to next/previous depending on button clicked
+			
+			# Configure text so user can see any previously entered values
+			# self.wormscountedtext.configure(text = "Number of worms:\n%.5s" % str(Momo.expy[self.currentimagenum]))  
+			# self.wormscounted = Momo.expy[self.currentimagenum] # Get any previously entered value for current image index or "" if first time entering
+			
+			self.f.clf() # Clear plot
+			self.placesubplot() # Place plot again
+			img = mpimg.imread(Momo.savefile + "/ExpDataPictures/image" + str(self.currentimagenum) + ".jpg") # Read in image based on current image index
+			self.a.imshow(img) # Renders image
+			
+			# Draw shape onto image
+			if Momo.exptype == "1": # Thermotaxis
+				shape = Circle((320,240),150, fill=False, edgecolor="R")
+			elif Momo.exptype == "2": # Chemotaxis
+				shape = Circle((320,240),150, fill=False, edgecolor="R")
+			elif Momo.exptype == "3": # Phototaxis
+				shape = Rectangle((80,200), width=200, height=200, fill=False, edgecolor="R")
+			elif Momo.exptype == "4": # Scrunching
+				shape = Circle((320,240),150, fill=False, edgecolor="R")
 
 	def placesubplot(self):
 		"""Add subplot to figure"""
@@ -971,7 +1000,7 @@ class ScrunchingPg(tk.Frame):
 		self.a.set_aspect(1)
 
 	def finalpic(self, controller):
-		if self.wormscounted == "": # Prohibit going forward without enter a number first
+		if self.wormscounted == "": # Prohibit going forward without entering a number first
 			tkMessageBox.showwarning("Error", "Must enter a number")
 
 class DataGraphChoice(tk.Frame):
