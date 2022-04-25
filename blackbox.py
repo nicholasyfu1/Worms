@@ -962,6 +962,14 @@ class ScrunchingPg(tk.Frame):
 		if self.currentimagenum != -1 and self.wormscounted == "" and direction == 1: # Prohibit going forward without enter a number first
 			tkMessageBox.showwarning("Error", "Must enter a number")
 
+	def placesubplot(self):
+		"""Add subplot to figure"""
+		self.a = self.f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
+		self.a.xaxis.set_visible(False)
+		self.a.yaxis.set_visible(False)
+		self.a.set_position([0,0,1,1])
+		self.a.set_aspect(1)
+		
 	def finalpic(self, controller):
 		if self.wormscounted == "": # Prohibit going forward without enter a number first
 			tkMessageBox.showwarning("Error", "Must enter a number")
