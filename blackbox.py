@@ -280,7 +280,7 @@ class BehaviorBox(tk.Tk, Experiment):
 			if Momo.expy[0] != "": # Already analyzed
 				result = tkMessageBox.askquestion("Warning", "The selected experiment has already been analyzed.\nChanges may overwrite exisiting data.\nProceed anyways?")
 			if result != "no": # First time analyzing or want to override
-				if Momo.exptype != "4": # Not strunching
+				if Momo.exptype != "4": # Not scrunching
 					frame = cont(self.container, self)
 					self.frames[cont] = frame 
 					frame.grid(row=0, column=0, sticky="nsew")
@@ -918,6 +918,9 @@ class ScrunchingPg(tk.Frame):
 		self.button4 = ttk.Button(self, text="Back to\nExperiment\nSelection", style="VERYTINYFONT.TButton", command=lambda: controller.show_frameFoxtrot2(DataAnalysisPg))
 		self.button4.grid(row=10, column=3, sticky="NESW", padx=xspacer, rowspan=4, columnspan=3)
 		
+		self.button1.lift() # Next picture
+		self.button2.lift() # Previous picture
+
 		# Label for length of worm
 		self.wormscounted = ""
 		self.wormscountedtext = tk.Label(self, text = "Enter length of worm:", font=VERYTINY_FONT) 
@@ -959,6 +962,7 @@ class ScrunchingPg(tk.Frame):
 		flag=True
 		self.button3.lower() # Save and finish
 		self.button2.lift() # Previous picture
+
 		if self.currentimagenum != -1 and self.wormscounted == "" and direction == 1: # Prohibit going forward without enter a number first
 			tkMessageBox.showwarning("Error", "Must enter a number")
 		else: # If user did enter a number
