@@ -973,7 +973,7 @@ class ScrunchingPg(tk.Frame):
 				self.wormscounted = currentnum + z
 		'''               
 		self.wormlength = z
-		Momo.expy[self.currentimagenum] = self.wormlength # Store length of worm
+		Momo.expy[self.currentimagenum] = int(self.wormlength) # Store length of worm
 		self.wormlengthtext.configure(text = "Enter length of worm:\n%.5s" % str(Momo.expy[self.currentimagenum])) # Configure text so user can see what they entered
 
 
