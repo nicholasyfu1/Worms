@@ -922,10 +922,10 @@ class ScrunchingPg(tk.Frame):
 		self.button2.lift() # Previous picture
 
 		# Label for length of worm
-		self.wormscounted = ""
-		self.wormscountedtext = tk.Label(self, text = "Enter length of worm:", font=VERYTINY_FONT) 
-		self.wormscountedtext.grid(row=2, column=3, rowspan=2, columnspan=7, sticky="EW")
-		#self.wormscountedtext.configure(text = "Enter length of worm:\n%.5s" % self.wormscounted) #edit text
+		self.wormlength = ""
+		self.wormlengthtext = tk.Label(self, text = "", font=VERYTINY_FONT) 
+		self.wormlengthtext.grid(row=2, column=3, rowspan=2, columnspan=7, sticky="EW")
+		self.wormlengthtext.configure(text = "Enter length of worm:\n%.5s" % self.wormlength) #edit text
 
 		# Label for current image number
 		self.currentimagenum = -1
@@ -958,12 +958,31 @@ class ScrunchingPg(tk.Frame):
 				c = 3
 				r += 1
 
+	def click(self, z):
+		"""Save user inputs and display them""" 
+		'''
+		currentnum = self.wormscounted
+		if currentnum == '0':
+			self.wormscounted = z
+		if z == 'x':
+			self.wormscounted = currentnum[:-1]
+		else:
+			if len(self.wormscounted) > 2:
+				tkMessageBox.showwarning("Error", "There's no way that there are that many worms")
+			else:
+				self.wormscounted = currentnum + z
+		'''               
+
+		Momo.expy[self.currentimagenum]=self.wormlength # Store length of worm
+		self.wormlengthtext.configure(text = "Enter length of worm:\n%.5s" % str(Momo.expy[self.currentimagenum])) # Configure text so user can see what they entered
+
+
 	def ChangePic(self, direction):
 		flag=True
 		self.button3.lower() # Save and finish
 		self.button2.lift() # Previous picture
 
-		if self.currentimagenum != -1 and self.wormscounted == "" and direction == 1: # Prohibit going forward without enter a number first
+		if self.currentimagenum != -1 and self.wormlength == "" and direction == 1: # Prohibit going forward without enter a number first
 			tkMessageBox.showwarning("Error", "Must enter a number")
 		else: # If user did enter a number
 			# The next 3 if statements make sure the user can not break the program by hitting next/back too quickly
@@ -1001,9 +1020,19 @@ class ScrunchingPg(tk.Frame):
 			if self.currentimagenum == len(Momo.expy)-1: # If last image, show "generate graph" button
 				self.button3.lift()
 			if self.currentimagenum == 0: # If first image, show "back to experiment selection" button
-				self.button4.lift()    
+				self.button4.lift()   
 
-	def placesubplot(self):
+			'''
+			self.a.add_patch(shape)
+			self.canvas.draw()
+			self.imagenumtext.configure(text = "Image Number:\n%.3i of %.3i" % (self.currentimagenum+1, len(Momo.expy))) # Update text so user knows what image number they are on. +1 accounts for index starting at 0
+			if self.currentimagenum == len(Momo.expy)-1: # If last image, show "generate graph" button
+				self.button3.lift()
+			if self.currentimagenum == 0: # If first image, show "back to experiment selection" button
+				self.button4.lift()    
+			''' 
+
+	def placesubplot(self): #done
 		"""Add subplot to figure"""
 		self.a = self.f.add_subplot(1,1,1) #add subplot RCP. Pth pos on grid with R rows and C columns
 		self.a.xaxis.set_visible(False)
@@ -1012,8 +1041,11 @@ class ScrunchingPg(tk.Frame):
 		self.a.set_aspect(1)
 
 	def finalpic(self, controller):
-		if self.wormscounted == "": # Prohibit going forward without entering a number first
+		if self.wormlength == "": # Prohibit going forward without entering a number first
 			tkMessageBox.showwarning("Error", "Must enter a number")
+		else:
+			self.wormlength = Momo.expy[self.currentimagenum] # Store value of just entered number
+			controller.show_frameStingray(DataMenu, Momo) 
 
 class DataGraphChoice(tk.Frame):
 	"""Allows user to choose experiments to graph"""
