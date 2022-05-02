@@ -871,7 +871,7 @@ class DataAnalysisImagePg(tk.Frame):
 			elif Momo.exptype == "2": # Chemotaxis
 				shape = Circle((320,240),150, fill=False, edgecolor="R")
 			elif Momo.exptype == "3": # Phototaxis
-				shape = Rectangle((80,200), width=200, height=200, fill=False, edgecolor="R")
+				shape = Rectangle((160,200), width=200, height=200, fill=False, edgecolor="R")
 			elif Momo.exptype == "4": # Scrunching
 				shape = Circle((200,400),150, fill=False, edgecolor="R")
 			
@@ -973,7 +973,7 @@ class ScrunchingPg(tk.Frame):
 				self.wormscounted = currentnum + z
 		'''               
 		self.wormlength = z
-		Momo.expy[self.currentimagenum] = int(self.wormlength) # Store length of worm
+		Momo.expy[self.currentimagenum] = self.wormlength # Store length of worm
 		self.wormlengthtext.configure(text = "Enter length of worm:\n%.5s" % str(Momo.expy[self.currentimagenum])) # Configure text so user can see what they entered
 
 
@@ -1044,7 +1044,7 @@ class ScrunchingPg(tk.Frame):
 		if self.wormlength == "": # Prohibit going forward without entering a number first
 			tkMessageBox.showwarning("Error", "Must enter a number")
 		else:
-			self.wormlength = Momo.expy[self.currentimagenum] # Store value of just entered number
+			#self.wormlength = Momo.expy[self.currentimagenum] # Store value of just entered number
 			controller.show_frameStingray(DataMenu, Momo) 
 
 class DataGraphChoice(tk.Frame):
