@@ -973,7 +973,7 @@ class ScrunchingPg(tk.Frame):
 				self.wormscounted = currentnum + z
 		'''               
 
-		Momo.expy[self.currentimagenum]=self.wormlength # Store length of worm
+		Momo.expy[self.currentimagenum]=z # Store length of worm
 		self.wormlengthtext.configure(text = "Enter length of worm:\n%.5s" % str(Momo.expy[self.currentimagenum])) # Configure text so user can see what they entered
 
 
@@ -1102,7 +1102,7 @@ class GraphPage(tk.Frame):
 		self.grid_rowconfigure(2, weight=1) # Graph row
 		self.grid_rowconfigure(3, minsize=yspacer*1) # Spacer            
 
-		self.label = tk.Label(self, text = "Graph of worms vs time" , font=LARGE_FONT)
+		self.label = tk.Label(self, text = "Graph of worm length vs time" , font=LARGE_FONT)
 		self.label.grid(row = 0, column=0, columnspan = 3, sticky="NSEW")
 		
 		button1 = ttk.Button(self,text="Back to\nExperiment\nSelection", style='TINYFONT.TButton', command=lambda: controller.show_frameFoxtrot(DataGraphChoice))
@@ -1118,7 +1118,7 @@ class GraphPage(tk.Frame):
 		self.a = self.f.add_subplot(1,1,1) # Add subplot to figure
 		self.a.spines["top"].set_color("none")
 		self.a.spines["right"].set_color("none")
-		self.a.set_ylabel("Number of Worms")
+		self.a.set_ylabel("Length of Worms")
 		self.a.set_xlabel("Time")
 		self.a.set_position([0,0,1,1])
 		self.canvas = FigureCanvasTkAgg(self.f, self) # Create canvas and fill with figure
