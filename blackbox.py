@@ -205,8 +205,8 @@ class BehaviorBox(tk.Tk, Experiment):
 
 		#Check Chemotaxis
 		if Appa.isChemo:
-			fps=0.33
-			wait=2.88
+			fps=0.17
+			wait=5.88
 
 		numFrames=Appa.exptime*fps
 		seconds=0
@@ -869,7 +869,7 @@ class DataAnalysisImagePg(tk.Frame):
 			if Momo.exptype == "1": # Thermotaxis
 				shape = Rectangle((240,160), width=160, height=160, fill=False, edgecolor="R")
 			elif Momo.exptype == "2": # Chemotaxis
-				shape = Circle((320,240),180, fill=False, edgecolor="R")
+				shape = Circle((320,240),120, fill=False, edgecolor="R")
 			elif Momo.exptype == "3": # Phototaxis
 				shape = Rectangle((220,260), width=200, height=140, fill=False, edgecolor="R")
 			elif Momo.exptype == "4": # Scrunching
