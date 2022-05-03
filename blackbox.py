@@ -205,8 +205,12 @@ class BehaviorBox(tk.Tk, Experiment):
 
 		#Check Chemotaxis
 		if Appa.isChemo:
-			fps=0.17
-			wait=5.88
+			fps=0.1
+			wait=9.88
+
+		if Appa.exptype == "3":
+			fps=0.25
+			wait=3.88
 
 		numFrames=Appa.exptime*fps
 		seconds=0
