@@ -399,10 +399,13 @@ class BehaviorBox(tk.Tk, Experiment):
 			camera.start_preview(fullscreen=False, window=(appwidth/800, appheight/4, appwidth-(2*appwidth/800), appheight*9/10)) # This line starts the preview. 
 			
 class SplashScreen(tk.Frame):
-	def __init__(seld, parent, controller):
+	def __init__(self, parent, controller):
 		tk.Frame.__init__(self,parent)
+		self.grid_rowconfigure(3, weight=1)
+		self.grid_columnconfigure(3, weight=1)
+		
 		label = tk.Label(self, text="Loading...", font=LARGE_FONT) 
-		label.grid(row=0, column=0, sticky="nsew")
+		label.grid(row=1, column=1, sticky="nsew")
 			
 class StartPage(tk.Frame):
 	"""Main menu"""   
