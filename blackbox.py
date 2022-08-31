@@ -118,7 +118,6 @@ class BehaviorBox(tk.Tk, Experiment):
 		self.container.grid_columnconfigure(0, weight=1) 
 
 		frame = SplashScreen(self.container, self)
-		SplashScreen = frame
 		frame.grid(row=0, column=0, sticky="nsew")
 		self.showFrame(SplashScreen)
 
