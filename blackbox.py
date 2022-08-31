@@ -125,6 +125,7 @@ class BehaviorBox(tk.Tk, Experiment):
 			frame.grid(row=0, column=0, sticky="nsew")
 			if(F == "SplashScreen"):
 				self.show_frame(SplashScreen)         
+		sleep(2)
 		self.show_frame(StartPage) # Raise Start Page
 	
 
