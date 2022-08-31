@@ -117,6 +117,8 @@ class BehaviorBox(tk.Tk, Experiment):
 		self.container.grid_rowconfigure(0, weight=1) # Configure rows/grids. 0 sets minimum size weight sets priority
 		self.container.grid_columnconfigure(0, weight=1) 
 
+		self.showFrame(SplashScreen)
+
 		# Initalize/render all pages
 		self.frames = {}
 		for F in (StartPage, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, ReviewData, DataDelPg, DataAnalysisImagePg, ScrunchingPg, DataAnalysisPg, GraphPage, DataMenu, DataGraphChoice, AnalysisTypeForNone, CameraPreviewPg):
@@ -393,6 +395,11 @@ class BehaviorBox(tk.Tk, Experiment):
 			frame.tkraise() 
 			camera.start_preview(fullscreen=False, window=(appwidth/800, appheight/4, appwidth-(2*appwidth/800), appheight*9/10)) # This line starts the preview. 
 			
+class SplashScreen(tk.Frame):
+	def __init__(seld, parent, controller):
+		tk.Frame.__init__(self,parent)
+		label = tk.Label(self, text="Loading...", font=LARGE_FONT) 
+		label.grid(row=0, column=0, sticky="nsew")
 			
 class StartPage(tk.Frame):
 	"""Main menu"""   
