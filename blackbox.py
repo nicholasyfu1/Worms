@@ -117,16 +117,14 @@ class BehaviorBox(tk.Tk, Experiment):
 		self.container.grid_rowconfigure(0, weight=1) # Configure rows/grids. 0 sets minimum size weight sets priority
 		self.container.grid_columnconfigure(0, weight=1) 
 
-		frame = SplashScreen(self.container, self)
-		frame.grid(row=0, column=0, sticky="nsew")
-		self.showFrame(SplashScreen)
-
 		# Initalize/render all pages
 		self.frames = {}
-		for F in (StartPage, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, ReviewData, DataDelPg, DataAnalysisImagePg, ScrunchingPg, DataAnalysisPg, GraphPage, DataMenu, DataGraphChoice, AnalysisTypeForNone, CameraPreviewPg):
+		for F in (SplashScreen, StartPage, ExpSelPg, TimeSelPg, ConfirmPg, InsertPg, StimPrepPg, ExpFinishPg, ReviewData, DataDelPg, DataAnalysisImagePg, ScrunchingPg, DataAnalysisPg, GraphPage, DataMenu, DataGraphChoice, AnalysisTypeForNone, CameraPreviewPg):
 			frame = F(self.container, self)
 			self.frames[F] = frame 
-			frame.grid(row=0, column=0, sticky="nsew")         
+			frame.grid(row=0, column=0, sticky="nsew")
+			if(F == "SplashScreen"):
+				self.show_frame(SplashScreen)         
 		self.show_frame(StartPage) # Raise Start Page
 	
 
