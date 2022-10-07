@@ -884,7 +884,7 @@ class DataAnalysisImagePg(tk.Frame):
 			if Momo.exptype == "1": # Thermotaxis
 				shape = Rectangle((240,160), width=160, height=160, fill=False, edgecolor="R")
 			elif Momo.exptype == "2": # Chemotaxis
-				shape = Circle((320,240),120, fill=False, edgecolor="R")
+				shape = Circle((320,240),200, fill=False, edgecolor="R")
 			elif Momo.exptype == "3": # Phototaxis
 				shape = Rectangle((220,260), width=200, height=140, fill=False, edgecolor="R")
 			elif Momo.exptype == "4": # Scrunching
@@ -1117,7 +1117,7 @@ class GraphPage(tk.Frame):
 		self.grid_rowconfigure(2, weight=1) # Graph row
 		self.grid_rowconfigure(3, minsize=yspacer*1) # Spacer            
 
-		self.label = tk.Label(self, text = "Graph of worm length vs time" , font=LARGE_FONT)
+		self.label = tk.Label(self, text = "Preview Graph" , font=LARGE_FONT)
 		self.label.grid(row = 0, column=0, columnspan = 3, sticky="NSEW")
 		
 		button1 = ttk.Button(self,text="Back to\nExperiment\nSelection", style='TINYFONT.TButton', command=lambda: controller.show_frameFoxtrot(DataGraphChoice))
@@ -1133,8 +1133,8 @@ class GraphPage(tk.Frame):
 		self.a = self.f.add_subplot(1,1,1) # Add subplot to figure
 		self.a.spines["top"].set_color("none")
 		self.a.spines["right"].set_color("none")
-		self.a.set_ylabel("Length of Worms")
-		self.a.set_xlabel("Time")
+		self.a.set_ylabel("Number of worms")
+		self.a.set_xlabel("Frame number")
 		self.a.set_position([0,0,1,1])
 		self.canvas = FigureCanvasTkAgg(self.f, self) # Create canvas and fill with figure
 		self.canvas.get_tk_widget().grid(row=1, column=1, rowspan = 2, sticky="NSEW", pady=yspacer) 
