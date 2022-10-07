@@ -201,22 +201,24 @@ class BehaviorBox(tk.Tk, Experiment):
 		fps=1
 		wait=0.88
 		seconds=0
+		frametime=1
 
 		#Check Scrunching
 		if Appa.isScrunching:
 			fps=4
 			wait=0.15
+			frametime=0.25
 
 		#Check Chemotaxis
 		if Appa.isChemo:
 			fps=0.1
 			wait=9.88
-			seconds=10
+			frametime=10
 
 		if Appa.exptype == "3":
 			fps=0.25
 			wait=3.88
-			seconds=4
+			frametime=4
 
 		numFrames=Appa.exptime*fps
 		for i in range(int(numFrames)):
@@ -225,7 +227,7 @@ class BehaviorBox(tk.Tk, Experiment):
 				remaining = Appa.exptime-seconds # Calculate countdown
 				self.frames[StimPrepPg].label2.configure(text="Time remaining: %d" % remaining) # Set countdown
 				self.frames[StimPrepPg].update_idletasks() # Refresh page 
-				seconds+=1 
+				seconds+=frametime 
 			
 			camera.capture(Appa.savefile + "/ExpDataPictures/image" + str(imgnum) + ".jpg", use_video_port=True)
 			Appa.expy.append("") # Append empty place holder for future analysis
