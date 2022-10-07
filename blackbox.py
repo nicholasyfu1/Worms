@@ -200,6 +200,7 @@ class BehaviorBox(tk.Tk, Experiment):
 		imgnum=0
 		fps=1
 		wait=0.88
+		seconds=0
 
 		#Check Scrunching
 		if Appa.isScrunching:
@@ -210,13 +211,14 @@ class BehaviorBox(tk.Tk, Experiment):
 		if Appa.isChemo:
 			fps=0.1
 			wait=9.88
+			seconds=10
 
 		if Appa.exptype == "3":
 			fps=0.25
 			wait=3.88
+			seconds=4
 
 		numFrames=Appa.exptime*fps
-		seconds=0
 		for i in range(int(numFrames)):
 			startTime = clock()
 			if i%fps==0: #updates countdown clock every second
@@ -886,7 +888,7 @@ class DataAnalysisImagePg(tk.Frame):
 			elif Momo.exptype == "2": # Chemotaxis
 				shape = Circle((320,240),200, fill=False, edgecolor="R")
 			elif Momo.exptype == "3": # Phototaxis
-				shape = Rectangle((220,260), width=200, height=140, fill=False, edgecolor="R")
+				shape = Rectangle((220,260), width=200, height=200, fill=False, edgecolor="R")
 			elif Momo.exptype == "4": # Scrunching
 				shape = Circle((200,400),180, fill=False, edgecolor="R")
 			
