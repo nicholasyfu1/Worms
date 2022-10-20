@@ -396,7 +396,7 @@ class BehaviorBox(tk.Tk, Experiment):
 						exptypenum = 4
 					if exptype == "C":
 						exptypenum = 10
-					frame.a.plot(range(0, len(experiment.expy), exptypenum), experiment.expy, label=experiment.expnumber)
+					frame.a.plot([exptypenum * n for n in range(len(experiment.expy))], experiment.expy, label=experiment.expnumber)
 					expnames.append(experiment.expnumber)
 
 
