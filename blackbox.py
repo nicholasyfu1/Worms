@@ -376,6 +376,7 @@ class BehaviorBox(tk.Tk, Experiment):
 		else:
 			# Check to see if all selected experiments are the same type
 			exptype = ""
+			exptypenum = 1
 			itr = 0
 			error = False
 			for experiment in ExpsToGraph:
@@ -391,7 +392,11 @@ class BehaviorBox(tk.Tk, Experiment):
 					unanalyzedlist.append(experiment.expnumber)
 				elif error == False:
 					experiment.expy = list(map(int, experiment.expy))
-					frame.a.plot(range(len(experiment.expy)*4),experiment.expy, label=experiment.expnumber)
+					if exptype == "P":
+						exptypenum = 4
+					if exptype == "C":
+						exptypenum = 10
+					frame.a.plot(range(0, len(experiment.expy), exptypenum), experiment.expy, label=experiment.expnumber)
 					expnames.append(experiment.expnumber)
 
 
