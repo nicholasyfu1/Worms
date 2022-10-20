@@ -391,7 +391,7 @@ class BehaviorBox(tk.Tk, Experiment):
 					unanalyzedlist.append(experiment.expnumber)
 				elif error == False:
 					experiment.expy = list(map(int, experiment.expy))
-					frame.a.plot(range(len(experiment.expy)),experiment.expy, label=experiment.expnumber)
+					frame.a.plot(range(len(experiment.expy)*4),experiment.expy, label=experiment.expnumber)
 					expnames.append(experiment.expnumber)
 
 
@@ -405,7 +405,7 @@ class BehaviorBox(tk.Tk, Experiment):
 
 				if exptype == "P": #phototaxis
 					frame.a.set_ylabel("Number of worms")
-					frame.a.set_xlabel("Frame number")
+					frame.a.set_xlabel("Time (seconds)")
 					frame.label.config(text = "Graph of Phototaxis")
 				else:
 					frame.a.set_ylabel("Number of worms")
