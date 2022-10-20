@@ -215,7 +215,7 @@ class BehaviorBox(tk.Tk, Experiment):
 			wait=9.88
 			frametime=10
 
-		if Appa.exptype == "3":
+		if Appa.exptype == "3": #Phototaxis
 			fps=0.25
 			wait=3.88
 			frametime=4
@@ -297,7 +297,7 @@ class BehaviorBox(tk.Tk, Experiment):
 					frame.grid(row=0, column=0, sticky="nsew")
 					frame.ChangePic(1) # Go to first picture
 					frame.tkraise() 
-				else: #If scrunching, pull up ScrunchingpPg
+				else: #If scrunching, pull up ScrunchingPg
 					tkMessageBox.askquestion("Warning", "Scrunching analysis under construction, continue?") #show warning
 					frame = ScrunchingPg(self.container, self) # Create fresh page in case of old data
 					self.frames[ScrunchingPg] = frame 
@@ -374,11 +374,22 @@ class BehaviorBox(tk.Tk, Experiment):
 		if len(ExpsToGraph) == 0: # Did not choose an experiment to graph
 				tkMessageBox.showwarning("Error", "No experiments selected")
 		else:
+			# Check to see if all selected experiments are the same type
+			exptype = ""
+			itr = 0
+			error = False
+			for experiment in ExpsToGraph:
+				if itr == 0:
+					exptype = experiment.expnumber[0] #Type of experiment
+				elif experiment.expnumber[0] != exptype:
+					tkMessageBox.showwarning("Error", "Selected experiments are not the same type")
+					error = True
+
 			# Check to see if all experiments selected have been analyzed
 			for experiment in ExpsToGraph:
 				if experiment.expy[0] == "":
 					unanalyzedlist.append(experiment.expnumber)
-				else:
+				elif error == False:
 					experiment.expy = list(map(int, experiment.expy))
 					frame.a.plot(range(len(experiment.expy)),experiment.expy, label=experiment.expnumber)
 					expnames.append(experiment.expnumber)
@@ -388,9 +399,17 @@ class BehaviorBox(tk.Tk, Experiment):
 				unanalyzedlist = ", ".join(unanalyzedlist)
 				result = tkMessageBox.askquestion("Warning", "The following experiments have\nnot been analyzed yet\nand will not be graphed\n\n" +unanalyzedlist+ "\n\nProceed anyways?")
 
-			if result !=  "no": # Override or all experiments have been analyzed                
+			if result !=  "no" and error == False: # Override or all experiments have been analyzed                
 				frame.grid(row=0, column=0, sticky="nsew") 
 				frame.a.legend(loc='upper right', fontsize=8)
+
+				if exptype == "P": #phototaxis
+					frame.a.set_ylabel("Number of worms")
+					frame.a.set_xlabel("Frame number")
+					frame.label.config(text = "Graph of Phototaxis")
+				else:
+					frame.a.set_ylabel("Number of worms")
+					frame.a.set_xlabel("Frame number")
 				frame.canvas.draw() 
 				frame.tkraise() 
 	
@@ -1137,8 +1156,6 @@ class GraphPage(tk.Frame):
 		self.a = self.f.add_subplot(1,1,1) # Add subplot to figure
 		self.a.spines["top"].set_color("none")
 		self.a.spines["right"].set_color("none")
-		self.a.set_ylabel("Number of worms")
-		self.a.set_xlabel("Frame number")
 		self.a.set_position([0,0,1,1])
 		self.canvas = FigureCanvasTkAgg(self.f, self) # Create canvas and fill with figure
 		self.canvas.get_tk_widget().grid(row=1, column=1, rowspan = 2, sticky="NSEW", pady=yspacer) 
