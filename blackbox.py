@@ -399,8 +399,10 @@ class BehaviorBox(tk.Tk, Experiment):
 					experiment.expy = list(map(int, experiment.expy))
 					if exptype == "P":
 						exptypenum = 4
-					if exptype == "C":
+					elif exptype == "C":
 						exptypenum = 10
+					elif exptype == "T":
+						exptypenum = 5
 					frame.a.plot([exptypenum * n for n in range(len(experiment.expy))], experiment.expy, label=experiment.expnumber)
 					expnames.append(experiment.expnumber)
 
@@ -417,6 +419,14 @@ class BehaviorBox(tk.Tk, Experiment):
 					frame.a.set_ylabel("Number of worms")
 					frame.a.set_xlabel("Time (seconds)")
 					frame.label.config(text = "Graph of Phototaxis")
+				elif exptype == "C":
+					frame.a.set_ylabel("Number of worms")
+					frame.a.set_xlabel("Time (seconds)")
+					frame.label.config(text = "Graph of Chemotaxis")
+				elif exptype == "T":
+					frame.a.set_ylabel("Number of worms")
+					frame.a.set_xlabel("Time (seconds)")
+					frame.label.config(text = "Graph of Thermotaxis")
 				else:
 					frame.a.set_ylabel("Number of worms")
 					frame.a.set_xlabel("Frame number")
