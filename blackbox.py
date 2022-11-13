@@ -220,6 +220,11 @@ class BehaviorBox(tk.Tk, Experiment):
 			wait=3.88
 			frametime=4
 
+		if Appa.exptype == "1":
+			fps=0.2
+			wait=4.88
+			frametime=5
+
 		numFrames=Appa.exptime*fps
 		for i in range(int(numFrames)):
 			startTime = clock()
