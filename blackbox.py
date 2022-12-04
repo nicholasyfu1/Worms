@@ -404,7 +404,7 @@ class BehaviorBox(tk.Tk, Experiment):
 					elif exptype == "T":
 						exptypenum = 5
 					frame.a.plot([exptypenum * n for n in range(len(experiment.expy))], experiment.expy, 'ro:', label=experiment.expnumber)
-					frame.a.ylim(0,5)
+					frame.a.set_ylim(0,5)
 					expnames.append(experiment.expnumber)
 
 
